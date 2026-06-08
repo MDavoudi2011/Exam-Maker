@@ -89,6 +89,7 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
   const isSelected = (id: string) => selectedQuestions.some(sq => sq.id === id);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [step]);
 
@@ -201,7 +202,7 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto pb-20">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl w-full mx-auto pb-20">
       
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -401,7 +402,7 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
               )}
 
               {selectionMode === 'random' && (
-                <div className="space-y-8 animate-in fade-in mx-auto">
+                <div className="space-y-8 animate-in fade-in w-full">
                    
                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                      <table className="w-full text-sm text-right">
