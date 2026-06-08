@@ -11,8 +11,14 @@ import { ReportsTab } from '@/components/dashboard/ReportsTab';
 
 export default function ClientDashboard({ user, initialExams }: { user: any, initialExams: any[] }) {
   const [activeTab, setActiveTab] = useState('overview');
+  const [navParam, setNavParam] = useState<string | null>(null);
   const [exams, setExams] = useState(initialExams);
   const supabase = createClient();
+
+  const handleNavigate = (tab: string, param?: string) => {
+    setActiveTab(tab);
+    setNavParam(param || null);
+  };
 
   // Reload exams when coming back to Exams or Overview from Create
   const refreshExams = async () => {
@@ -50,10 +56,10 @@ export default function ClientDashboard({ user, initialExams }: { user: any, ini
         </div>
 
         <nav className="flex-1 space-y-1.5 focus:outline-none">
-          <NavItem active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<LayoutDashboard />} label="داشبورد" />
-          <NavItem active={activeTab === 'exams'} onClick={() => setActiveTab('exams')} icon={<List />} label="لیست آزمون‌ها" />
-          <NavItem active={activeTab === 'create'} onClick={() => setActiveTab('create')} icon={<PlusCircle />} label="ساخت آزمون" />
-          <NavItem active={activeTab === 'reports'} onClick={() => setActiveTab('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
+          <NavItem active={activeTab === 'overview'} onClick={() => handleNavigate('overview')} icon={<LayoutDashboard />} label="داشبورد" />
+          <NavItem active={activeTab === 'exams'} onClick={() => handleNavigate('exams')} icon={<List />} label="لیست آزمون‌ها" />
+          <NavItem active={activeTab === 'create'} onClick={() => handleNavigate('create')} icon={<PlusCircle />} label="ساخت آزمون" />
+          <NavItem active={activeTab === 'reports'} onClick={() => handleNavigate('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
         </nav>
 
         <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2">
@@ -77,15 +83,15 @@ export default function ClientDashboard({ user, initialExams }: { user: any, ini
       {/* Main Content Area */}
       <main className="flex-1 p-6 md:p-10 lg:p-12 h-[calc(100vh-auto)] md:h-screen overflow-y-auto z-10 relative">
         <div className="max-w-6xl mx-auto pb-10">
-          {activeTab === 'overview' && <OverviewTab initialExams={exams} />}
-          {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={setActiveTab} />}
+          {activeTab === 'overview' && <OverviewTab initialExams={exams} onNavigate={handleNavigate} />}
+          {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={handleNavigate} onDataChanged={refreshExams} initialSearchTerm={navParam || ''} />}
           {activeTab === 'create' && (
             <CreateTab 
-               onCreated={() => { refreshExams(); setActiveTab('exams'); }} 
-               onCancel={() => setActiveTab('exams')} 
+               onCreated={() => { refreshExams(); handleNavigate('exams'); }} 
+               onCancel={() => handleNavigate('exams')} 
             />
           )}
-          {activeTab === 'reports' && <ReportsTab />}
+          {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
         </div>
       </main>
     </div>

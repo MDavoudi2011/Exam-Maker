@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, ArrowRight, ArrowLeft, Loader2, Timer, Sun, Moon, LayoutGrid, X } from 'lucide-react';
+import { CheckCircle2, ArrowRight, ArrowLeft, Loader2, Timer, Sun, Moon, LayoutGrid, X, AlertOctagon } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { toFarsiNumber } from '@/lib/utils';
 import Link from 'next/link';
@@ -33,13 +33,13 @@ const renderContent = (content: string) => {
   });
 };
 
-export function ExamViewer({ exam, questions, user }: any) {
-  const [hasParticipated, setHasParticipated] = useState(false);
+export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
+  const [hasParticipated, setHasParticipated] = useState(!!adminViewAttemptId);
   const [currentStep, setCurrentStep] = useState<'intro' | 'question'>('intro');
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(!!adminViewAttemptId);
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -54,43 +54,43 @@ export function ExamViewer({ exam, questions, user }: any) {
 
   const supabase = createClient();
 
-  const loadAttemptData = async (attempt: any) => {
-    try {
-      const { data: dbAnswers } = await supabase.from('test_answers').select('*').eq('attempt_id', attempt.id);
-      if (dbAnswers) {
-        const restoredAnswers: Record<string, number> = {};
-        dbAnswers.forEach((ans: any) => {
-          restoredAnswers[ans.exam_question_id] = ans.selected_option_index;
-        });
-        setAnswers(restoredAnswers);
-      }
-      setScore(attempt.score || 0);
-      setSubmitted(true);
-    } catch(err) {}
-    setLoadingAttempt(false);
-  };
-
   useEffect(() => {
+    const loadAttemptData = async (attemptId: string) => {
+      try {
+        const { data: attempt } = await supabase.from('test_attempts').select('*').eq('id', attemptId).single();
+        if (attempt) {
+          const { data: dbAnswers } = await supabase.from('test_answers').select('*').eq('attempt_id', attempt.id);
+          if (dbAnswers) {
+            const restoredAnswers: Record<string, number> = {};
+            dbAnswers.forEach((ans: any) => {
+              restoredAnswers[ans.exam_question_id] = ans.selected_option_index;
+            });
+            setAnswers(restoredAnswers);
+          }
+          setScore(attempt.score || 0);
+          setHasParticipated(true);
+          setSubmitted(true);
+        }
+      } catch(err) {}
+      setLoadingAttempt(false);
+    };
+
     if (typeof window !== 'undefined') {
-      setIsDarkMode(document.documentElement.classList.contains('dark'));
+      setTimeout(() => setIsDarkMode(document.documentElement.classList.contains('dark')), 0);
       
       const checkPrevious = async () => {
+        if (adminViewAttemptId) {
+          await loadAttemptData(adminViewAttemptId);
+          return;
+        }
+
         const attemptId = localStorage.getItem('completed_exam_attempt_' + exam.id);
         const hasLocallyCompleted = localStorage.getItem('completed_exam_' + exam.id);
 
         try {
           if (attemptId) {
-            const { data, error } = await supabase
-              .from('test_attempts')
-              .select('*')
-              .eq('id', attemptId)
-              .eq('status', 'completed')
-              .single();
-
-            if (data) {
-              await loadAttemptData(data);
-              return;
-            }
+             await loadAttemptData(attemptId);
+             return;
           }
         } catch (e) {
           console.error(e);
@@ -104,7 +104,7 @@ export function ExamViewer({ exam, questions, user }: any) {
 
       checkPrevious();
     }
-  }, [exam.id, user]);
+  }, [exam.id, user, adminViewAttemptId, supabase]);
 
   const toggleDarkMode = () => {
     const isDark = document.documentElement.classList.toggle('dark');
@@ -113,6 +113,8 @@ export function ExamViewer({ exam, questions, user }: any) {
 
   const requiredFields = exam.settings?.studentDetails || {};
   const needsInfo = Object.values(requiredFields).some(Boolean);
+
+  const examStatus = exam.settings?.status || (exam.is_published ? 'active' : 'draft');
 
   const startExam = () => {
     // Validate fields
@@ -138,6 +140,7 @@ export function ExamViewer({ exam, questions, user }: any) {
   };
 
   const handleSubmit = async (e?: any, autoSubmit = false) => {
+    if (adminViewAttemptId) return;
     if (!autoSubmit && Object.keys(answers).length !== questions.length) {
       if (!confirm('شما به همه سوالات پاسخ نداده‌اید، مطمئنید می‌خواهید ثبت کنید؟')) return;
     }
@@ -181,6 +184,7 @@ export function ExamViewer({ exam, questions, user }: any) {
       localStorage.setItem('completed_exam_' + exam.id, 'true');
       localStorage.setItem('completed_exam_attempt_' + exam.id, attempt.id);
       setSubmitted(true);
+      setHasParticipated(true);
     } catch (err: any) {
       if (!autoSubmit) alert(err.message || 'خطایی در ثبت آزمون رخ داد.');
     } finally {
@@ -190,10 +194,10 @@ export function ExamViewer({ exam, questions, user }: any) {
 
   // Handle countdown
   useEffect(() => {
-    if (timeLeft === null || submitted || currentStep !== 'question') return;
+    if (timeLeft === null || submitted || currentStep !== 'question' || adminViewAttemptId) return;
     
     if (timeLeft <= 0) {
-      void handleSubmit(null, true);
+      setTimeout(() => void handleSubmit(null, true), 0);
       return;
     }
 
@@ -202,7 +206,8 @@ export function ExamViewer({ exam, questions, user }: any) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, submitted, currentStep]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft, submitted, currentStep, adminViewAttemptId]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -218,15 +223,46 @@ export function ExamViewer({ exam, questions, user }: any) {
     );
   }
 
+  // Handle statuses
+  if (!adminViewAttemptId) {
+    if (examStatus === 'draft' && !hasParticipated) {
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 font-sans text-slate-800 dark:text-slate-200" dir="rtl">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-10 text-center shadow-xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-500">
+            <div className="bg-slate-100 dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
+              <Timer className="w-10 h-10" />
+            </div>
+            <h1 className="text-2xl font-extrabold mb-4">آزمون هنوز شروع نشده است</h1>
+            <p className="text-slate-500 font-medium">لطفاً در زمان مقرر مراجعه کنید.</p>
+          </div>
+        </div>
+      );
+    }
+    
+    if (examStatus === 'completed' && !hasParticipated) {
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 font-sans text-slate-800 dark:text-slate-200" dir="rtl">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-10 text-center shadow-xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-500">
+            <div className="bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertOctagon className="w-10 h-10" />
+            </div>
+            <h1 className="text-2xl font-extrabold mb-4">آزمون به پایان رسیده است</h1>
+            <p className="text-slate-500 font-medium">زمان شرکت در این آزمون گذشته است.</p>
+          </div>
+        </div>
+      );
+    }
+  }
+
   if (hasParticipated && !submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center py-20 px-4 font-sans text-slate-800 dark:text-slate-200" dir="rtl">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center py-20 px-4 font-sans text-slate-800 dark:text-slate-200" dir="rtl">
         <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-10 text-center shadow-xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-500">
           <div className="bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10" />
           </div>
           <h1 className="text-2xl font-extrabold mb-4">آزمون شما ثبت شده است</h1>
-          <p className="text-slate-500 font-medium mb-8">شما در این آزمون شرکت کرده‌اید. اما به دلیل محدودیت‌های شبکه فعلاً نتیجه قابل نمایش نیست.</p>
+          <p className="text-slate-500 font-medium mb-8">شما در این آزمون شرکت کرده‌اید. اما به دلیل محدودیت‌های شبکه مشخصات دقیق یافت نشد.</p>
         </div>
       </div>
     );
@@ -244,18 +280,20 @@ export function ExamViewer({ exam, questions, user }: any) {
     const correctPct = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
     
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center py-10 px-4 font-sans text-slate-800 dark:text-slate-200" dir="rtl">
-        <div className="w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-10 shadow-sm border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-500">
+      <div className={`${adminViewAttemptId ? 'pb-32 pt-6' : 'min-h-screen pt-10 pb-20'} bg-slate-50 dark:bg-slate-950 flex flex-col items-center px-4 font-sans text-slate-800 dark:text-slate-200`} dir="rtl">
+        <div className={`w-full max-w-3xl ${adminViewAttemptId ? '' : 'bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-10 shadow-sm border border-slate-200 dark:border-slate-800'} animate-in fade-in zoom-in duration-500`}>
           
-          <div className="text-center mb-10">
-            <div className="bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-               <CheckCircle2 className="w-8 h-8" />
+          {!adminViewAttemptId && (
+            <div className="text-center mb-10">
+              <div className="bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <h1 className="text-3xl font-extrabold mb-2">آزمون با موفقیت ثبت شد</h1>
+              <p className="text-slate-500 font-medium">پاسخ‌های شما در سیستم ذخیره گردید.</p>
             </div>
-            <h1 className="text-3xl font-extrabold mb-2">آزمون با موفقیت ثبت شد</h1>
-            <p className="text-slate-500 font-medium">پاسخ‌های شما در سیستم ذخیره گردید.</p>
-          </div>
+          )}
 
-          {exam.show_results !== false && (
+          {(exam.show_results !== false || adminViewAttemptId) && (
              <div className="flex flex-col items-center border-t border-slate-100 dark:border-slate-800 pt-10">
                
                {/* Circle Chart */}

@@ -1,20 +1,41 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Download, Users, AlertCircle, BarChart, Loader2 } from 'lucide-react';
+import { Download, Users, BarChart, Loader2, FileQuestion, ChevronDown, Eye, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { toFarsiNumber } from '@/lib/utils';
+import { ExamViewer } from './ExamViewer';
 
-export function ReportsTab() {
+export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExams?: any[], initialSelectedExamId?: string | null }) {
+  const [selectedExamId, setSelectedExamId] = useState<string>(initialSelectedExamId || '');
   const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [viewingAttempt, setViewingAttempt] = useState<any>(null);
+  const [examData, setExamData] = useState<any>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
   const supabase = createClient();
 
   useEffect(() => {
     async function fetchResults() {
-      // In a real app we'd fetch actual test results
-      // Here we fetch mock-like data that matches schema or just empty for now
+      if (!selectedExamId) {
+        setResults([]);
+        setExamData(null);
+        return;
+      }
+      
+      setLoading(true);
       try {
-        const { data, error } = await supabase.from('test_attempts').select('*, exams(title), users:user_id(email)').limit(10);
+        const { data: examDataObj } = await supabase.from('exams').select('*').eq('id', selectedExamId).single();
+        setExamData(examDataObj);
+
+        // Fetch questions for detailed view later
+        const { data: qData } = await supabase.from('exam_questions').select('id, order_index, questions(*)').eq('exam_id', selectedExamId).order('order_index');
+        if (qData) setQuestions(qData);
+
+        const { data, error } = await supabase.from('test_attempts')
+          .select('id, full_name, class_name, school, district, score, created_at, completed_at, status')
+          .eq('exam_id', selectedExamId)
+          .order('completed_at', { ascending: false });
+          
         if (data) {
           setResults(data);
         }
@@ -25,69 +46,105 @@ export function ReportsTab() {
       }
     }
     fetchResults();
-  }, [supabase]);
+  }, [selectedExamId, supabase]);
+
+  const requiredFields = examData?.settings?.studentDetails || {};
+  const showFullName = requiredFields.fullName;
+  const showClassName = requiredFields.className;
+  const showSchool = requiredFields.school;
+  const showDistrict = requiredFields.district;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">گزارش‌ها و نتایج</h1>
-          <p className="text-slate-500 font-medium">لیست آخرین شرکت‌کنندگان و نمرات ثبت شده در سیستم.</p>
         </div>
-        <button className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 font-bold px-6 py-3.5 rounded-2xl shadow-sm flex items-center justify-center gap-2 transition-all">
-          <Download className="w-5 h-5" />
-          خروجی اکسل (CSV)
-        </button>
+        <div className="w-full md:w-96">
+          <div className="relative">
+            <select 
+              value={selectedExamId}
+              onChange={(e) => setSelectedExamId(e.target.value)}
+              className="w-full appearance-none bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-700 hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/20 rounded-2xl px-5 py-3.5 font-bold text-sm outline-none transition-all cursor-pointer shadow-sm"
+            >
+              <option value="" disabled>یک آزمون را انتخاب کنید...</option>
+              {initialExams?.map(exam => (
+                <option key={exam.id} value={exam.id}>{exam.title}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-start gap-4 bg-slate-50/50 dark:bg-slate-800/20">
-             <div className="bg-indigo-500/10 p-3 rounded-2xl text-indigo-500 mt-1">
-               <BarChart className="w-6 h-6" />
-             </div>
-             <div>
-               <h2 className="text-xl font-bold text-slate-800 dark:text-white">شرکت‌کنندگان اخیر</h2>
-               <p className="text-sm text-slate-500 mt-1">جزئیات و نمرات دانشجویانی که اخیراً آزمون داده‌اند.</p>
-             </div>
-        </div>
-
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden min-h-[400px]">
         <div className="overflow-x-auto">
-          <table className="w-full text-right border-collapse">
+          <table className="w-full text-right border-collapse min-w-[700px]">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm">
-                <th className="p-4 font-semibold">ایمیل شرکت‌کننده</th>
-                <th className="p-4 font-semibold">آزمون</th>
-                <th className="p-4 font-semibold">نمره</th>
-                <th className="p-4 font-semibold">شروع</th>
-                <th className="p-4 font-semibold">پایان (ارسال)</th>
+              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm border-b border-slate-100 dark:border-slate-800">
+                {showFullName && <th className="p-5 font-semibold">نام و نام خانوادگی</th>}
+                {showClassName && <th className="p-5 font-semibold">کلاس</th>}
+                {showSchool && <th className="p-5 font-semibold">مدرسه</th>}
+                {showDistrict && <th className="p-5 font-semibold">ناحیه/منطقه</th>}
+                <th className="p-5 font-semibold text-center w-24">نمره</th>
+                <th className="p-5 font-semibold text-center w-40">شروع</th>
+                <th className="p-5 font-semibold text-center w-40">پایان (ارسال)</th>
+                <th className="p-5 font-semibold text-center w-32">ریز نتایج</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {results.length > 0 ? results.map((res: any, i) => (
-                <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="p-4 font-bold text-indigo-600 dark:text-indigo-400">{res.users?.email || res.user_id}</td>
-                  <td className="p-4 text-slate-700 dark:text-slate-300 font-medium">{res.exams?.title || 'آزمون نامشخص'}</td>
-                  <td className="p-4">
-                    <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300 px-3 py-1 rounded-full text-sm font-bold">
-                      {res.score !== null ? toFarsiNumber(res.score) : '-'}
-                    </span>
-                  </td>
-                  <td className="p-4 text-slate-500 text-sm">{res.started_at ? toFarsiNumber(new Date(res.started_at).toLocaleString('fa-IR')) : '-'}</td>
-                  <td className="p-4 text-slate-500 text-sm">{res.completed_at ? toFarsiNumber(new Date(res.completed_at).toLocaleString('fa-IR')) : 'در حال انجام...'}</td>
-                </tr>
-              )) : (
+              {loading ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-slate-500">
-                    {loading ? (
-                      <div className="flex justify-center items-center py-10">
-                        <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
+                   <td colSpan={10} className="p-16 text-center">
+                     <div className="flex justify-center items-center">
+                       <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
+                     </div>
+                   </td>
+                </tr>
+              ) : selectedExamId ? (
+                results.length > 0 ? results.map((res: any) => {
+                  return (
+                  <tr key={res.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    {showFullName && <td className="p-5 font-bold text-slate-800 dark:text-slate-200">{res.full_name || '-'}</td>}
+                    {showClassName && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.class_name || '-'}</td>}
+                    {showSchool && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.school || '-'}</td>}
+                    {showDistrict && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.district || '-'}</td>}
+                    <td className="p-5 text-center">
+                      {res.status === 'completed' ? (
+                      <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300 px-3 py-1.5 rounded-xl text-sm font-black border border-indigo-200 dark:border-indigo-500/30 w-16 inline-block">
+                        {res.score !== null ? toFarsiNumber(res.score) : '-'}
+                      </span>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-bold">در حال انجام</span>
+                      )}
+                    </td>
+                    <td className="p-5 text-slate-500 text-xs text-center" dir="ltr">{res.created_at ? toFarsiNumber(new Date(res.created_at).toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}</td>
+                    <td className="p-5 text-slate-500 text-xs text-center" dir="ltr">{res.completed_at ? toFarsiNumber(new Date(res.completed_at).toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}</td>
+                    <td className="p-5">
+                      <div className="flex items-center justify-center">
+                        <button onClick={() => setViewingAttempt(res)} className="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white text-slate-600 dark:text-slate-300 rounded-xl transition-all shadow-sm" disabled={res.status !== 'completed'}>
+                          <Eye className={`w-5 h-5 ${res.status !== 'completed' ? 'opacity-30' : ''}`} />
+                        </button>
                       </div>
-                    ) : (
-                       <div className="flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 m-4">
-                          <Users className="w-12 h-12 text-slate-300 mb-4" />
-                          <p className="font-medium">هنوز هیچ آزمونی توسط کاربران انجام نشده است.</p>
-                        </div>
-                    )}
+                    </td>
+                  </tr>
+                )}) : (
+                  <tr>
+                    <td colSpan={10} className="p-16 text-center text-slate-500">
+                      <div className="flex flex-col items-center justify-center p-8 m-4">
+                        <Users className="w-16 h-16 text-slate-200 dark:text-slate-700 mb-4" />
+                        <p className="font-bold text-lg text-slate-400 dark:text-slate-500">هنوز شرکت‌کننده‌ای یافت نشد.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              ) : (
+                <tr>
+                  <td colSpan={10} className="p-16 text-center text-slate-500">
+                     <div className="flex flex-col items-center justify-center p-8 m-4">
+                        <FileQuestion className="w-16 h-16 text-slate-200 dark:text-slate-700 mb-4" />
+                        <p className="font-bold text-lg text-slate-400 dark:text-slate-500">لطفاً برای مشاهده نتایج یک آزمون را انتخاب کنید.</p>
+                      </div>
                   </td>
                 </tr>
               )}
@@ -95,6 +152,23 @@ export function ReportsTab() {
           </table>
         </div>
       </div>
+
+      {viewingAttempt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setViewingAttempt(null)}></div>
+          <div className="relative w-full max-w-5xl h-full max-h-screen bg-slate-50 dark:bg-slate-950 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md z-10">
+              <h3 className="font-bold">ریز نتایج: {viewingAttempt.full_name || 'کاربر بدون نام'}</h3>
+              <button onClick={() => setViewingAttempt(null)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto w-full relative">
+               <ExamViewer exam={examData} questions={questions} user={null} adminViewAttemptId={viewingAttempt.id} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

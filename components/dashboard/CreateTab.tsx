@@ -20,11 +20,11 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
   // Step 1 State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [isTimeLimited, setIsTimeLimited] = useState(false);
-  const [timeLimit, setTimeLimit] = useState(45);
+  const [isTimeLimited, setIsTimeLimited] = useState(true);
+  const [timeLimit, setTimeLimit] = useState(20);
   const [showResults, setShowResults] = useState(true);
   const [studentDetails, setStudentDetails] = useState({
-    fullName: false,
+    fullName: true,
     className: false,
     school: false,
     district: false
@@ -87,6 +87,10 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
   };
 
   const isSelected = (id: string) => selectedQuestions.some(sq => sq.id === id);
+
+  useEffect(() => {
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   const handleNextStep = () => {
     if (!title.trim()) {
@@ -205,9 +209,6 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
           <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">
             {step === 1 ? 'اطلاعات اولیه آزمون' : 'انتخاب سوالات'}
           </h1>
-          <p className="text-slate-500 font-medium mt-1">
-            {step === 1 ? 'جزئیات پایه را تکمیل کنید.' : 'سوالات آزمون خود را از بانک سوال مشخص کنید.'}
-          </p>
         </div>
         {step === 2 && (
           <button onClick={() => setStep(1)} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
@@ -221,9 +222,9 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
         
         {step === 1 && (
           <div className="p-6 md:p-8 space-y-8">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">عنوان آزمون <span className="text-rose-500">*</span></label>
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <label className="text-lg font-black text-slate-800 dark:text-slate-200 block">عنوان آزمون <span className="text-rose-500">*</span></label>
                 <input 
                   value={title} onChange={e => setTitle(e.target.value)}
                   type="text" placeholder="مثال: کوییز پایانی برنامه‌نویسی ری‌اکت"
@@ -231,8 +232,8 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
                 />
               </div>
               
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">توضیحات (اختیاری)</label>
+              <div className="space-y-3">
+                <label className="text-lg font-black text-slate-800 dark:text-slate-200 block">توضیحات (اختیاری)</label>
                 <textarea 
                   value={description} onChange={e => setDescription(e.target.value)}
                   placeholder="توضیحاتی کوتاه درباره محتوای آزمون، قوانین یا مباحث..."
