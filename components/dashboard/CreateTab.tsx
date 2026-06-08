@@ -27,7 +27,10 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
     fullName: true,
     className: false,
     school: false,
-    district: false
+    district: false,
+    nationalCode: false,
+    personnelCode: false,
+    orgTitle: false
   });
 
   // Step 2 State
@@ -285,6 +288,9 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
                         { id: 'fullName', label: 'نام و نام خانوادگی' },
+                        { id: 'nationalCode', label: 'کد ملی' },
+                        { id: 'personnelCode', label: 'کد پرسنلی' },
+                        { id: 'orgTitle', label: 'عنوان سازمانی' },
                         { id: 'className', label: 'کلاس' },
                         { id: 'school', label: 'مدرسه' },
                         { id: 'district', label: 'ناحیه / منطقه' }

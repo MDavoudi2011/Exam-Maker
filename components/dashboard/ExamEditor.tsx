@@ -27,7 +27,10 @@ export function ExamEditor({ exam, initialQuestions, user }: any) {
     fullName: exam?.settings?.studentDetails?.fullName ?? true,
     className: exam?.settings?.studentDetails?.className ?? false,
     school: exam?.settings?.studentDetails?.school ?? false,
-    district: exam?.settings?.studentDetails?.district ?? false
+    district: exam?.settings?.studentDetails?.district ?? false,
+    nationalCode: exam?.settings?.studentDetails?.nationalCode ?? false,
+    personnelCode: exam?.settings?.studentDetails?.personnelCode ?? false,
+    orgTitle: exam?.settings?.studentDetails?.orgTitle ?? false
   });
 
   // Step 2 State
@@ -311,6 +314,9 @@ export function ExamEditor({ exam, initialQuestions, user }: any) {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
                         { id: 'fullName', label: 'نام و نام خانوادگی' },
+                        { id: 'nationalCode', label: 'کد ملی' },
+                        { id: 'personnelCode', label: 'کد پرسنلی' },
+                        { id: 'orgTitle', label: 'عنوان سازمانی' },
                         { id: 'className', label: 'کلاس' },
                         { id: 'school', label: 'مدرسه' },
                         { id: 'district', label: 'ناحیه / منطقه' }

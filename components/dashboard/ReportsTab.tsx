@@ -32,7 +32,7 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
         if (qData) setQuestions(qData);
 
         const { data, error } = await supabase.from('test_attempts')
-          .select('id, full_name, class_name, school, district, score, created_at, completed_at, status')
+          .select('id, full_name, national_code, personnel_code, org_title, class_name, school, district, score, created_at, completed_at, status')
           .eq('exam_id', selectedExamId)
           .order('completed_at', { ascending: false });
           
@@ -50,6 +50,9 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
 
   const requiredFields = examData?.settings?.studentDetails || {};
   const showFullName = requiredFields.fullName;
+  const showNationalCode = requiredFields.nationalCode;
+  const showPersonnelCode = requiredFields.personnelCode;
+  const showOrgTitle = requiredFields.orgTitle;
   const showClassName = requiredFields.className;
   const showSchool = requiredFields.school;
   const showDistrict = requiredFields.district;
@@ -83,6 +86,9 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm border-b border-slate-100 dark:border-slate-800">
                 {showFullName && <th className="p-5 font-semibold">نام و نام خانوادگی</th>}
+                {showNationalCode && <th className="p-5 font-semibold">کد ملی</th>}
+                {showPersonnelCode && <th className="p-5 font-semibold">کد پرسنلی</th>}
+                {showOrgTitle && <th className="p-5 font-semibold">عنوان سازمانی</th>}
                 {showClassName && <th className="p-5 font-semibold">کلاس</th>}
                 {showSchool && <th className="p-5 font-semibold">مدرسه</th>}
                 {showDistrict && <th className="p-5 font-semibold">ناحیه/منطقه</th>}
@@ -106,6 +112,9 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
                   return (
                   <tr key={res.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     {showFullName && <td className="p-5 font-bold text-slate-800 dark:text-slate-200">{res.full_name || '-'}</td>}
+                    {showNationalCode && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.national_code || '-'}</td>}
+                    {showPersonnelCode && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.personnel_code || '-'}</td>}
+                    {showOrgTitle && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.org_title || '-'}</td>}
                     {showClassName && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.class_name || '-'}</td>}
                     {showSchool && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.school || '-'}</td>}
                     {showDistrict && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.district || '-'}</td>}
