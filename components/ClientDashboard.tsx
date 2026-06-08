@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrainCircuit, LayoutDashboard, List, PlusCircle, LogOut, BarChart3, ChevronRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -9,15 +9,53 @@ import { ExamsTab } from '@/components/dashboard/ExamsTab';
 import { CreateTab } from '@/components/dashboard/CreateTab';
 import { ReportsTab } from '@/components/dashboard/ReportsTab';
 
-export default function ClientDashboard({ user, initialExams }: { user: any, initialExams: any[] }) {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [navParam, setNavParam] = useState<string | null>(null);
+export default function ClientDashboard({ user, initialExams, initialTab = 'overview', initialParam = null }: { user: any, initialExams: any[], initialTab?: string, initialParam?: string | null }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [navParam, setNavParam] = useState<string | null>(initialParam);
   const [exams, setExams] = useState(initialExams);
   const supabase = createClient();
+
+  // Sync state if url changes externally (though we handle it mostly internally)
+  useEffect(() => {
+    setActiveTab(initialTab);
+    setNavParam(initialParam);
+  }, [initialTab, initialParam]);
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path.startsWith('/exams')) {
+        setActiveTab('exams');
+        setNavParam(null);
+      } else if (path.startsWith('/create')) {
+        setActiveTab('create');
+        setNavParam(null);
+      } else if (path.startsWith('/result')) {
+        setActiveTab('reports');
+        const parts = path.split('/');
+        setNavParam(parts.length > 2 ? parts[2] : null);
+      } else {
+        setActiveTab('overview');
+        setNavParam(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const handleNavigate = (tab: string, param?: string) => {
     setActiveTab(tab);
     setNavParam(param || null);
+    
+    // Update URL instantly without full reload
+    let newUrl = '/dashboard';
+    if (tab === 'exams') newUrl = '/exams';
+    if (tab === 'create') newUrl = '/create';
+    if (tab === 'reports') {
+      newUrl = param ? `/result/${param}` : '/result';
+    }
+    window.history.pushState(null, '', newUrl);
   };
 
   // Reload exams when coming back to Exams or Overview from Create
