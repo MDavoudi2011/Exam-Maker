@@ -8,6 +8,7 @@ import { OverviewTab } from '@/components/dashboard/OverviewTab';
 import { ExamsTab } from '@/components/dashboard/ExamsTab';
 import { CreateTab } from '@/components/dashboard/CreateTab';
 import { ReportsTab } from '@/components/dashboard/ReportsTab';
+import { UsersPerformanceTab } from '@/components/dashboard/UsersPerformanceTab';
 
 export default function ClientDashboard({ user, initialExams, initialTab = 'overview', initialParam = null }: { user: any, initialExams: any[], initialTab?: string, initialParam?: string | null }) {
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -98,6 +99,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
           <NavItem active={activeTab === 'exams'} onClick={() => handleNavigate('exams')} icon={<List />} label="لیست آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleNavigate('create')} icon={<PlusCircle />} label="ساخت آزمون" />
           <NavItem active={activeTab === 'reports'} onClick={() => handleNavigate('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
+          <NavItem active={activeTab === 'users'} onClick={() => handleNavigate('users')} icon={<BarChart3 />} label="تحلیل عملکرد کاربران" />
         </nav>
 
         <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2">
@@ -130,6 +132,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
             />
           )}
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
+          {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
         </div>
       </main>
     </div>
