@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Search, Loader2, Eye, X, BookOpen } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { ExamViewer } from './ExamViewer';
 
 export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,9 +17,7 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
       setLoading(true);
       try {
         const { data, error } = await supabase.from('test_attempts')
-          .select('id, full_name, personnel_code, score, exam_id')
-          .not('personnel_code', 'is', null)
-          .not('personnel_code', 'eq', '')
+          .select('id, full_name, national_code, personnel_code, score, exam_id')
           .order('created_at', { ascending: false });
         
         if (data) {
@@ -33,41 +32,45 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
     fetchData();
   }, []);
 
-  // Group attempts by user (personnel_code)
+  // Group attempts by user (national_code or personnel_code)
   const usersMap = new Map<string, {
     fullName: string,
-    personnelCode: string,
+    uniqueId: string,
     attempts: Record<string, { score: number, attemptId: string }>,
     totalScore: number,
     examsCount: number,
   }>();
 
   attempts.forEach(attempt => {
-    if (!usersMap.has(attempt.personnel_code)) {
-      usersMap.set(attempt.personnel_code, {
+    const identifier = attempt.national_code || attempt.personnel_code;
+    if (!identifier) return;
+
+    if (!usersMap.has(identifier)) {
+      usersMap.set(identifier, {
         fullName: attempt.full_name || 'نامشخص',
-        personnelCode: attempt.personnel_code,
+        uniqueId: identifier,
         attempts: {},
         totalScore: 0,
         examsCount: 0,
       });
     }
-    const userStats = usersMap.get(attempt.personnel_code)!;
-    // Keep the latest or highest? Usually if there are multiple attempts for same exam, we'll keep the first one or we should just keep highest
-    if (!userStats.attempts[attempt.exam_id] || userStats.attempts[attempt.exam_id].score < attempt.score) {
+    const userStats = usersMap.get(identifier)!;
+    const currentScore = parseFloat(attempt.score) || 0;
+    
+    if (!userStats.attempts[attempt.exam_id] || userStats.attempts[attempt.exam_id].score < currentScore) {
       if (userStats.attempts[attempt.exam_id]) {
         userStats.totalScore -= userStats.attempts[attempt.exam_id].score;
       } else {
         userStats.examsCount += 1;
       }
-      userStats.attempts[attempt.exam_id] = { score: attempt.score, attemptId: attempt.id };
-      userStats.totalScore += attempt.score;
+      userStats.attempts[attempt.exam_id] = { score: currentScore, attemptId: attempt.id };
+      userStats.totalScore += currentScore;
     }
   });
 
   const usersArray = Array.from(usersMap.values());
   const filteredUsers = usersArray.filter(u => 
-    u.fullName.includes(searchTerm) || u.personnelCode.includes(searchTerm)
+    u.fullName.includes(searchTerm) || u.uniqueId.includes(searchTerm)
   );
 
   // We should only show columns for exams that have at least one attempt among these users.
@@ -123,7 +126,7 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm border-b border-slate-100 dark:border-slate-800">
                   <th className="p-5 font-semibold">تکمیل کننده</th>
-                  <th className="p-5 font-semibold">کد پرسنلی</th>
+                  <th className="p-5 font-semibold">کد ملی/پرسنلی</th>
                   {filteredExams.map(exam => (
                     <th key={exam.id} className="p-5 font-semibold">{exam.title}</th>
                   ))}
@@ -136,7 +139,7 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
                   return (
                     <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0 pl-4">
                       <td className="p-5 font-bold text-slate-800 dark:text-slate-200">{user.fullName}</td>
-                      <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{user.personnelCode}</td>
+                      <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{user.uniqueId}</td>
                       {filteredExams.map(exam => {
                         const att = user.attempts[exam.id];
                         return (
@@ -175,6 +178,8 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
 
 function AttemptDetailsModal({ attemptId, onClose }: { attemptId: string, onClose: () => void }) {
   const [details, setDetails] = useState<any>(null);
+  const [examData, setExamData] = useState<any>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -182,9 +187,16 @@ function AttemptDetailsModal({ attemptId, onClose }: { attemptId: string, onClos
     const fetchDetails = async () => {
       setLoading(true);
       try {
-        const { data } = await supabase.from('test_attempts').select('*, exams(title)').eq('id', attemptId).single();
+        const { data } = await supabase.from('test_attempts').select('*, exams(*)').eq('id', attemptId).single();
         if (data) {
           setDetails(data);
+          setExamData(data.exams);
+          // Fetch questions
+          const { data: qData } = await supabase.from('exam_questions')
+            .select('id, order_index, questions(*)')
+            .eq('exam_id', data.exam_id)
+            .order('order_index');
+          if (qData) setQuestions(qData);
         }
       } catch (err) {
         console.error(err);
@@ -196,57 +208,22 @@ function AttemptDetailsModal({ attemptId, onClose }: { attemptId: string, onClos
   }, [attemptId]);
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-2xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Eye className="w-5 h-5 text-primary" />
-            جزییات آزمون
-          </h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-            <X className="w-5 h-5 text-slate-500" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="relative w-full max-w-5xl h-full max-h-screen bg-slate-50 dark:bg-slate-950 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md z-10">
+          <h3 className="font-bold">ریز نتایج: {details?.full_name || 'در حال بارگذاری...'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
+            <X className="w-6 h-6" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto w-full relative">
           {loading ? (
             <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
-          ) : details ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                  <span className="text-xs font-bold text-slate-400 block mb-1">نام آزمون</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{details.exams?.title}</span>
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                  <span className="text-xs font-bold text-slate-400 block mb-1">نمره نهایی</span>
-                  <span className={`font-black text-lg ${details.score >= 50 ? 'text-emerald-500' : 'text-rose-500'}`}>{details.score.toFixed(1)}%</span>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <h4 className="font-bold text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 pb-2">پاسخ‌های کاربر</h4>
-                <div className="space-y-3">
-                  {details.answers && Array.isArray(details.answers) && details.answers.map((ans: any, i: number) => {
-                    return (
-                      <div key={i} className="bg-slate-50 dark:bg-slate-800/30 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                        <p className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-2">{i+1}. {ans.question_text || 'سوال'}</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                           <div className={`p-3 rounded-xl border ${ans.is_correct ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-300' : 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-300'}`}>
-                             <span className="block text-[10px] uppercase font-bold opacity-70 mb-1">پاسخ کاربر</span>
-                             <span className="font-medium">{ans.selected_option_text || 'بدون پاسخ'}</span>
-                           </div>
-                           <div className="p-3 rounded-xl border bg-slate-100 border-slate-200 text-slate-800 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300">
-                             <span className="block text-[10px] uppercase font-bold opacity-70 mb-1">پاسخ صحیح</span>
-                             <span className="font-medium">{ans.correct_option_text}</span>
-                           </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
+          ) : details && examData ? (
+             <ExamViewer exam={examData} questions={questions} user={null} adminViewAttemptId={attemptId} />
           ) : (
-            <p>اطلاعاتی یافت نشد</p>
+            <p className="text-center text-slate-500">اطلاعاتی یافت نشد</p>
           )}
         </div>
       </div>

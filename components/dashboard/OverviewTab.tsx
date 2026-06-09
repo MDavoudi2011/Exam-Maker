@@ -27,12 +27,17 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
       try {
         const { data: attempts, error } = await supabase
           .from('test_attempts')
-          .select('exam_id, score, completed_at, created_at')
+          .select('exam_id, score, completed_at, created_at, national_code, personnel_code')
           .in('exam_id', examIds)
           .eq('status', 'completed');
 
         if (attempts && attempts.length > 0) {
-          const totalParticipants = attempts.length;
+          const uniqueUsers = new Set();
+          attempts.forEach(att => {
+             const identifier = att.national_code || att.personnel_code;
+             if (identifier) uniqueUsers.add(identifier);
+          });
+          const totalParticipants = uniqueUsers.size;
           
           let totalPercentage = 0;
           let totalSeconds = 0;
@@ -71,7 +76,7 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
 
           setStats({
             totalParticipants,
-            avgScore: totalParticipants > 0 ? Math.round(totalPercentage / totalParticipants) : 0,
+            avgScore: attempts.length > 0 ? Math.round(totalPercentage / attempts.length) : 0,
             avgTime: timeCount > 0 ? Math.round((totalSeconds / timeCount) / 60) : 0
           });
 
