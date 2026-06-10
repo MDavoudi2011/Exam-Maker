@@ -50,10 +50,8 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
           });
 
           attempts.forEach(attempt => {
-            const examInfo = initialExams.find(e => e.id === attempt.exam_id);
-            const maxScore = examInfo?.exam_questions?.[0]?.count || 1;
-            const percentage = ((attempt.score || 0) / maxScore) * 100;
-            totalPercentage += percentage;
+            const score = attempt.score || 0;
+            totalPercentage += score;
             
             if (attempt.created_at && attempt.completed_at) {
                const start = new Date(attempt.created_at).getTime();

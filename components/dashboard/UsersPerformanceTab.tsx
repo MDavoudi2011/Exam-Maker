@@ -30,6 +30,7 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Group attempts by user (national_code or personnel_code)
@@ -205,6 +206,7 @@ function AttemptDetailsModal({ attemptId, onClose }: { attemptId: string, onClos
       }
     };
     fetchDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attemptId]);
 
   return (

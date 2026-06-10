@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BrainCircuit, LayoutDashboard, List, PlusCircle, LogOut, BarChart3, ChevronRight } from 'lucide-react';
+import { BrainCircuit, LayoutDashboard, List, PlusCircle, LogOut, BarChart3, ChevronRight, Users, Database } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 import { OverviewTab } from '@/components/dashboard/OverviewTab';
@@ -9,6 +9,7 @@ import { ExamsTab } from '@/components/dashboard/ExamsTab';
 import { CreateTab } from '@/components/dashboard/CreateTab';
 import { ReportsTab } from '@/components/dashboard/ReportsTab';
 import { UsersPerformanceTab } from '@/components/dashboard/UsersPerformanceTab';
+import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
 
 export default function ClientDashboard({ user, initialExams, initialTab = 'overview', initialParam = null }: { user: any, initialExams: any[], initialTab?: string, initialParam?: string | null }) {
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -18,6 +19,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
 
   // Sync state if url changes externally (though we handle it mostly internally)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveTab(initialTab);
     setNavParam(initialParam);
   }, [initialTab, initialParam]);
@@ -99,7 +101,8 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
           <NavItem active={activeTab === 'exams'} onClick={() => handleNavigate('exams')} icon={<List />} label="لیست آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleNavigate('create')} icon={<PlusCircle />} label="ساخت آزمون" />
           <NavItem active={activeTab === 'reports'} onClick={() => handleNavigate('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
-          <NavItem active={activeTab === 'users'} onClick={() => handleNavigate('users')} icon={<BarChart3 />} label="تحلیل عملکرد کاربران" />
+          <NavItem active={activeTab === 'users'} onClick={() => handleNavigate('users')} icon={<Users />} label="تحلیل عملکرد کاربران" />
+          <NavItem active={activeTab === 'question-bank'} onClick={() => handleNavigate('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
 
         <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2">
@@ -133,6 +136,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
           )}
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
           {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
+          {activeTab === 'question-bank' && <QuestionBankTab />}
         </div>
       </main>
     </div>
