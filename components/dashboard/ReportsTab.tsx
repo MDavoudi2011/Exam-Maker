@@ -59,9 +59,13 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">گزارش‌ها و نتایج</h1>
+          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-3">
+            <BarChart className="w-7 h-7 text-primary" />
+            گزارش‌ها و نتایج
+          </h2>
+          <p className="text-slate-500 font-medium mt-2">مشاهده و تحلیل کارنامه و نتایج شرکت‌کنندگان</p>
         </div>
         <div className="w-full md:w-96">
           <div className="relative">

@@ -38,6 +38,12 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
         setActiveTab('reports');
         const parts = path.split('/');
         setNavParam(parts.length > 2 ? parts[2] : null);
+      } else if (path.startsWith('/users')) {
+        setActiveTab('users');
+        setNavParam(null);
+      } else if (path.startsWith('/questions')) {
+        setActiveTab('question-bank');
+        setNavParam(null);
       } else {
         setActiveTab('overview');
         setNavParam(null);
@@ -55,6 +61,8 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
     let newUrl = '/dashboard';
     if (tab === 'exams') newUrl = '/exams';
     if (tab === 'create') newUrl = '/create';
+    if (tab === 'users') newUrl = '/users';
+    if (tab === 'question-bank') newUrl = '/questions';
     if (tab === 'reports') {
       newUrl = param ? `/result/${param}` : '/result';
     }

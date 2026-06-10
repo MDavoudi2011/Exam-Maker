@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { FileQuestion, Users, GraduationCap, Clock, Play, Edit, Trash, Plus, CheckCircle2, ChevronLeft, Loader2, Search } from 'lucide-react';
+import { FileQuestion, Users, GraduationCap, Clock, Play, Edit, Trash, Plus, CheckCircle2, ChevronLeft, Loader2, Search, LayoutDashboard } from 'lucide-react';
 import { toFarsiNumber } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -100,7 +100,11 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">نمای کلی سیستم</h1>
+        <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-3">
+          <LayoutDashboard className="w-7 h-7 text-primary" />
+          نمای کلی سیستم
+        </h2>
+        <p className="text-slate-500 font-medium mt-1">خلاصه وضعیت و مشارکت کاربران در آزمون‌ها</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

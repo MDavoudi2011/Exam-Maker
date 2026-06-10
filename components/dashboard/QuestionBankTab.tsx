@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Search, Loader2, Edit, Trash, Eye, Plus, ChevronDown, Check, X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, Loader2, Edit, Trash, Eye, Plus, ChevronDown, Check, X, ChevronRight, ChevronLeft, Database } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { toFarsiNumber } from '@/lib/utils';
 
@@ -34,7 +34,7 @@ const renderContent = (text: any) => {
   let inCode = false;
   
   const isFarsi = (char: string) => /[\u0600-\u06FF\u200C]/.test(char);
-  const isWhitespace = (char: string) => /\s/.test(char);
+  const isCodeStart = (char: string) => /[a-zA-Z0-9]/.test(char);
 
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
@@ -55,7 +55,7 @@ const renderContent = (text: any) => {
         currentStr += char;
       }
     } else {
-      if (!isFarsi(char) && !isWhitespace(char)) {
+      if (isCodeStart(char)) {
         if (currentStr) {
           parts.push({ text: currentStr, isCode: false });
         }
@@ -86,7 +86,7 @@ const renderContent = (text: any) => {
   return parts.map((part, i) => {
     if (part.isCode) {
       return (
-        <span key={i} dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1 py-0.5 rounded text-[0.9em] mx-1 align-middle">
+        <span key={i} dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
           {part.text}
         </span>
       );
@@ -181,8 +181,11 @@ export function QuestionBankTab() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-black text-slate-800 dark:text-white">بانک سوالات</h2>
-          <p className="text-slate-500 text-sm mt-1">مدیریت و دسته‌بندی تمامی سوالات سیستم</p>
+          <h2 className="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+            <Database className="w-7 h-7 text-primary" />
+            بانک سوالات
+          </h2>
+          <p className="text-slate-500 font-medium mt-2">مدیریت و دسته‌بندی تمامی سوالات سیستم</p>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
-import { Save, Plus, Database, Copy, CheckCircle2, Search, Shuffle, ListChecks, ArrowRight, X, Loader2, ArrowLeft } from 'lucide-react';
+import { Save, Plus, PlusCircle, Database, Copy, CheckCircle2, Search, Shuffle, ListChecks, ArrowRight, X, Loader2, ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { toFarsiNumber } from '@/lib/utils';
 import Link from 'next/link';
@@ -208,16 +208,23 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl w-full mx-auto pb-20">
       
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">
-            {step === 1 ? 'اطلاعات اولیه آزمون' : 'انتخاب سوالات'}
-          </h1>
+          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-3">
+            <PlusCircle className="w-7 h-7 text-primary" />
+            ساخت آزمون جدید
+          </h2>
+          <p className="text-slate-500 font-medium mt-2">
+            {step === 1 ? 'مشخصات اولیه آزمون را وارد کنید' : 'سوالات مورد نظر را انتخاب کنید'}
+          </p>
         </div>
         {step === 2 && (
-          <button onClick={() => setStep(1)} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
-            <ArrowRight className="w-4 h-4" />
-            بازگشت
+          <button 
+            onClick={handlePublish} disabled={saving || selectedQuestions.length === 0}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98]"
+          >
+            {saving ? <Loader2 className="w-5 h-5 animate-spin"/> : <CheckCircle2 className="w-5 h-5" />}
+            انتشار نهایی آزمون
           </button>
         )}
       </div>
@@ -226,87 +233,90 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
         
         {step === 1 && (
           <div className="p-6 md:p-8 space-y-8">
-            <div className="space-y-8">
-              <div className="space-y-3">
-                <label className="text-lg font-black text-slate-800 dark:text-slate-200 block">عنوان آزمون <span className="text-rose-500">*</span></label>
-                <input 
-                  value={title} onChange={e => setTitle(e.target.value)}
-                  type="text" placeholder="مثال: کوییز پایانی برنامه‌نویسی ری‌اکت"
-                  className="w-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary rounded-2xl px-5 py-4 transition-all text-sm font-medium"
-                />
-              </div>
-              
-              <div className="space-y-3">
-                <label className="text-lg font-black text-slate-800 dark:text-slate-200 block">توضیحات (اختیاری)</label>
-                <textarea 
-                  value={description} onChange={e => setDescription(e.target.value)}
-                  placeholder="توضیحاتی کوتاه درباره محتوای آزمون، قوانین یا مباحث..."
-                  className="w-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary rounded-2xl px-5 py-4 transition-all text-sm font-medium min-h-[120px] resize-y"
-                ></textarea>
-              </div>
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="w-full md:w-[65%] space-y-8">
+                <div className="space-y-3">
+                  <label className="text-lg font-black text-slate-800 dark:text-slate-200 block">عنوان آزمون <span className="text-rose-500">*</span></label>
+                  <input 
+                    value={title} onChange={e => setTitle(e.target.value)}
+                    type="text" placeholder="مثال: کوییز پایانی برنامه‌نویسی ری‌اکت"
+                    className="w-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary rounded-2xl px-5 py-4 transition-all text-sm font-medium"
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <label className="text-lg font-black text-slate-800 dark:text-slate-200 block">توضیحات (اختیاری)</label>
+                  <textarea 
+                    value={description} onChange={e => setDescription(e.target.value)}
+                    placeholder="توضیحاتی کوتاه درباره محتوای آزمون، قوانین یا مباحث..."
+                    className="w-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary rounded-2xl px-5 py-4 transition-all text-sm font-medium min-h-[168px] resize-y"
+                  ></textarea>
+                </div>
 
-              <div className="space-y-4">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/30 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl">
-                     <div>
-                       <div className="text-sm font-bold text-slate-800 dark:text-slate-200">الزام زمان‌بندی</div>
-                       <div className="text-xs text-slate-500 mt-0.5">آزمون محدودیت زمانی داشته باشد</div>
+                <div className="space-y-4">
+                   <div className="grid grid-cols-1 gap-4">
+                     <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/30 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl">
+                       <div>
+                         <div className="text-sm font-bold text-slate-800 dark:text-slate-200">الزام زمان‌بندی</div>
+                         <div className="text-xs text-slate-500 mt-0.5">آزمون محدودیت زمانی داشته باشد</div>
+                       </div>
+                       <div className="flex items-center gap-3">
+                         {isTimeLimited && (
+                           <div className="flex items-center gap-2 animate-in zoom-in duration-200">
+                             <input 
+                               value={timeLimit} onChange={e => setTimeLimit(Number(e.target.value))}
+                               type="number" min="1"
+                               className="w-16 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary/50 rounded-lg px-2 py-1.5 transition-all font-bold text-center dir-ltr text-sm"
+                             />
+                             <span className="text-xs font-bold text-slate-500">دقیقه</span>
+                           </div>
+                         )}
+                         <label className="relative inline-flex items-center cursor-pointer shrink-0" dir="ltr">
+                           <input type="checkbox" className="sr-only peer" checked={isTimeLimited} onChange={e => setIsTimeLimited(e.target.checked)} />
+                           <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                         </label>
+                       </div>
                      </div>
-                     <div className="flex items-center gap-3">
-                       {isTimeLimited && (
-                         <div className="flex items-center gap-2 animate-in zoom-in duration-200">
-                           <input 
-                             value={timeLimit} onChange={e => setTimeLimit(Number(e.target.value))}
-                             type="number" min="1"
-                             className="w-16 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary/50 rounded-lg px-2 py-1.5 transition-all font-bold text-center dir-ltr text-sm"
-                           />
-                           <span className="text-xs font-bold text-slate-500">دقیقه</span>
-                         </div>
-                       )}
+
+                     <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/30 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl">
+                       <div>
+                         <div className="text-sm font-bold text-slate-800 dark:text-slate-200">نمایش نتایج</div>
+                         <div className="text-xs text-slate-500 mt-0.5">کارنامه پس از پایان نمایش داده شود</div>
+                       </div>
                        <label className="relative inline-flex items-center cursor-pointer shrink-0" dir="ltr">
-                         <input type="checkbox" className="sr-only peer" checked={isTimeLimited} onChange={e => setIsTimeLimited(e.target.checked)} />
+                         <input type="checkbox" className="sr-only peer" checked={showResults} onChange={e => setShowResults(e.target.checked)} />
                          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                        </label>
                      </div>
                    </div>
+                </div>
+              </div>
 
-                   <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/30 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl">
-                     <div>
-                       <div className="text-sm font-bold text-slate-800 dark:text-slate-200">نمایش نتایج</div>
-                       <div className="text-xs text-slate-500 mt-0.5">کارنامه پس از پایان نمایش داده شود</div>
-                     </div>
-                     <label className="relative inline-flex items-center cursor-pointer shrink-0" dir="ltr">
-                       <input type="checkbox" className="sr-only peer" checked={showResults} onChange={e => setShowResults(e.target.checked)} />
-                       <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                     </label>
+              <div className="w-full md:w-[35%]">
+                 <div className="bg-slate-50/50 dark:bg-slate-800/30 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 h-full flex flex-col">
+                   <label className="text-lg font-black text-slate-800 dark:text-slate-200 block mb-6">دریافت مشخصات فردی</label>
+                   <div className="flex flex-col gap-3 flex-1">
+                     {[
+                       { id: 'fullName', label: 'نام و نام خانوادگی' },
+                       { id: 'nationalCode', label: 'کد ملی' },
+                       { id: 'personnelCode', label: 'کد پرسنلی' },
+                       { id: 'orgTitle', label: 'عنوان سازمانی' },
+                       { id: 'className', label: 'کلاس' },
+                       { id: 'school', label: 'مدرسه' },
+                       { id: 'district', label: 'ناحیه / منطقه' }
+                     ].map(field => (
+                       <div 
+                         key={field.id}
+                         onClick={() => setStudentDetails({...studentDetails, [field.id]: !studentDetails[field.id as keyof typeof studentDetails]})}
+                         className={`cursor-pointer px-4 py-3.5 rounded-xl border flex items-center gap-3 transition-all text-sm font-bold ${studentDetails[field.id as keyof typeof studentDetails] ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
+                       >
+                         <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${studentDetails[field.id as keyof typeof studentDetails] ? 'bg-primary border-primary text-white' : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600'}`}>
+                           {studentDetails[field.id as keyof typeof studentDetails] && <CheckCircle2 className="w-3 h-3" />}
+                         </div>
+                         {field.label}
+                       </div>
+                     ))}
                    </div>
-                 </div>
-
-                 <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <div className="text-sm font-bold text-slate-800 dark:text-slate-200">دریافت مشخصات فردی</div>
-                    <div className="text-xs text-slate-500 -mt-2">مشخص کنید شرکت‌کننده چه اطلاعاتی را باید وارد کند:</div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {[
-                        { id: 'fullName', label: 'نام و نام خانوادگی' },
-                        { id: 'nationalCode', label: 'کد ملی' },
-                        { id: 'personnelCode', label: 'کد پرسنلی' },
-                        { id: 'orgTitle', label: 'عنوان سازمانی' },
-                        { id: 'className', label: 'کلاس' },
-                        { id: 'school', label: 'مدرسه' },
-                        { id: 'district', label: 'ناحیه / منطقه' }
-                      ].map(field => (
-                        <div 
-                          key={field.id}
-                          onClick={() => setStudentDetails({...studentDetails, [field.id]: !studentDetails[field.id as keyof typeof studentDetails]})}
-                          className={`cursor-pointer p-3 rounded-xl border flex items-center justify-center gap-2 transition-all text-sm font-bold ${studentDetails[field.id as keyof typeof studentDetails] ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
-                        >
-                          <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${studentDetails[field.id as keyof typeof studentDetails] ? 'bg-primary border-primary text-white' : 'border-slate-300 dark:border-slate-600'}`}>
-                            {studentDetails[field.id as keyof typeof studentDetails] && <CheckCircle2 className="w-3 h-3" />}
-                          </div>
-                          {field.label}
-                        </div>
-                      ))}
-                    </div>
                  </div>
               </div>
             </div>
@@ -485,11 +495,11 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
                  سوال انتخاب شده
               </div>
               <button 
-                onClick={handlePublish} disabled={saving || selectedQuestions.length === 0}
-                className="bg-primary hover:bg-primary/90 text-white font-bold h-14 px-8 rounded-2xl shadow-xl shadow-primary/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98]"
+                onClick={() => setStep(1)}
+                className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-6 h-12 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors"
               >
-                {saving ? <Loader2 className="w-5 h-5 animate-spin"/> : <CheckCircle2 className="w-6 h-6" />}
-                انتشار نهایی آزمون
+                <ArrowRight className="w-4 h-4" />
+                مرحله قبلی
               </button>
             </div>
 
