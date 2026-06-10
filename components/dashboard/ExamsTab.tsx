@@ -193,19 +193,21 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
                    <td className="p-4 text-sm text-slate-500 text-center whitespace-nowrap">
                      {toFarsiNumber(new Date(exam.created_at).toLocaleDateString('fa-IR'))}
                    </td>
-                   <td className="p-4 px-6 flex flex-nowrap items-center justify-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
-                     <button onClick={() => window.open(`/view/${exam.id}`, '_blank')} className="p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
-                       <Play className="w-4 h-4" />
-                     </button>
-                     <button onClick={() => window.location.href = (`/edit/${exam.id}`)} className="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 rounded-xl transition-colors tooltip-trigger" title="ویرایش">
-                       <Edit className="w-4 h-4" />
-                     </button>
-                     <button onClick={() => onNavigate('reports', exam.id)} className="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 rounded-xl transition-colors tooltip-trigger" title="مشاهده نتایج">
-                       <BarChart2 className="w-4 h-4" />
-                     </button>
-                     <button onClick={() => handleDelete(exam.id)} disabled={loading} className="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-xl transition-colors tooltip-trigger" title="حذف">
-                       <Trash className="w-4 h-4" />
-                     </button>
+                   <td className="p-4 px-6 text-center whitespace-nowrap">
+                     <div className="inline-flex items-center justify-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                       <button onClick={() => window.open(`/view/${exam.id}`, '_blank')} className="p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
+                         <Play className="w-4 h-4" />
+                       </button>
+                       <button onClick={() => onNavigate('edit', exam.id)} className="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 rounded-xl transition-colors tooltip-trigger" title="ویرایش">
+                         <Edit className="w-4 h-4" />
+                       </button>
+                       <button onClick={() => onNavigate('reports', exam.id)} className="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 rounded-xl transition-colors tooltip-trigger" title="مشاهده نتایج">
+                         <BarChart2 className="w-4 h-4" />
+                       </button>
+                       <button onClick={() => handleDelete(exam.id)} disabled={loading} className="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-xl transition-colors tooltip-trigger" title="حذف">
+                         <Trash className="w-4 h-4" />
+                       </button>
+                     </div>
                    </td>
                  </tr>
                 );

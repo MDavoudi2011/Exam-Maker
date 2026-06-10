@@ -215,7 +215,7 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
             ساخت آزمون جدید
           </h2>
           <p className="text-slate-500 font-medium mt-2">
-            {step === 1 ? 'مشخصات اولیه آزمون را وارد کنید' : 'سوالات مورد نظر را انتخاب کنید'}
+            {step === 1 ? 'مشخصات اولیه آزمون را وارد کنید' : 'سوالات مورد نظر خود را انتخاب کنید'}
           </p>
         </div>
         {step === 2 && (

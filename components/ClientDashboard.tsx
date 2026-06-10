@@ -10,8 +10,9 @@ import { CreateTab } from '@/components/dashboard/CreateTab';
 import { ReportsTab } from '@/components/dashboard/ReportsTab';
 import { UsersPerformanceTab } from '@/components/dashboard/UsersPerformanceTab';
 import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
+import { ExamEditor } from '@/components/dashboard/ExamEditor';
 
-export default function ClientDashboard({ user, initialExams, initialTab = 'overview', initialParam = null }: { user: any, initialExams: any[], initialTab?: string, initialParam?: string | null }) {
+export default function ClientDashboard({ user, initialExams, initialTab = 'overview', initialParam = null, initialExam = null, initialQuestions = [] }: { user: any, initialExams: any[], initialTab?: string, initialParam?: string | null, initialExam?: any, initialQuestions?: any[] }) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [navParam, setNavParam] = useState<string | null>(initialParam);
   const [exams, setExams] = useState(initialExams);
@@ -28,7 +29,11 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
-      if (path.startsWith('/exams')) {
+      if (path.startsWith('/edit')) {
+        setActiveTab('edit');
+        const parts = path.split('/');
+        setNavParam(parts.length > 2 ? parts[2] : null);
+      } else if (path.startsWith('/exams')) {
         setActiveTab('exams');
         setNavParam(null);
       } else if (path.startsWith('/create')) {
@@ -60,6 +65,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
     // Update URL instantly without full reload
     let newUrl = '/dashboard';
     if (tab === 'exams') newUrl = '/exams';
+    if (tab === 'edit') newUrl = param ? `/edit/${param}` : '/exams';
     if (tab === 'create') newUrl = '/create';
     if (tab === 'users') newUrl = '/users';
     if (tab === 'question-bank') newUrl = '/questions';
@@ -106,7 +112,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
 
         <nav className="flex-1 space-y-1.5 focus:outline-none">
           <NavItem active={activeTab === 'overview'} onClick={() => handleNavigate('overview')} icon={<LayoutDashboard />} label="داشبورد" />
-          <NavItem active={activeTab === 'exams'} onClick={() => handleNavigate('exams')} icon={<List />} label="لیست آزمون‌ها" />
+          <NavItem active={activeTab === 'exams' || activeTab === 'edit'} onClick={() => handleNavigate('exams')} icon={<List />} label="لیست آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleNavigate('create')} icon={<PlusCircle />} label="ساخت آزمون" />
           <NavItem active={activeTab === 'reports'} onClick={() => handleNavigate('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
           <NavItem active={activeTab === 'users'} onClick={() => handleNavigate('users')} icon={<Users />} label="تحلیل عملکرد کاربران" />
@@ -141,6 +147,15 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
                onCreated={() => { refreshExams(); handleNavigate('exams'); }} 
                onCancel={() => handleNavigate('exams')} 
             />
+          )}
+          {activeTab === 'edit' && navParam && (
+             <ExamEditor 
+                examId={navParam} 
+                initialExam={initialExam} 
+                initialQuestions={initialQuestions} 
+                onNavigate={handleNavigate} 
+                onDataChanged={refreshExams} 
+             />
           )}
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
           {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
