@@ -26,7 +26,71 @@ const renderContent = (content: string) => {
           if (j % 2 === 1) {
             return <code key={j} className="inline-block px-1.5 py-0.5 mx-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-sm rounded-md dir-ltr text-left" dir="ltr">{part}</code>;
           }
-          return <span key={j}>{part}</span>;
+          
+          const textParts: { text: string; isCode: boolean }[] = [];
+          let currentStr = '';
+          let inCode = false;
+          
+          const isFarsiChar = (char: string) => /[\u0600-\u06FF\u200C]/.test(char);
+          const isCodeStart = (char: string) => /[a-zA-Z0-9]/.test(char);
+
+          for (let k = 0; k < part.length; k++) {
+            const char = part[k];
+            if (inCode) {
+              if (isFarsiChar(char)) {
+                const match = currentStr.match(/(\s+)$/);
+                if (match) {
+                  const spaces = match[1];
+                  const code = currentStr.slice(0, currentStr.length - spaces.length);
+                  if (code) textParts.push({ text: code, isCode: true });
+                  currentStr = spaces + char;
+                } else {
+                  textParts.push({ text: currentStr, isCode: true });
+                  currentStr = char;
+                }
+                inCode = false;
+              } else {
+                currentStr += char;
+              }
+            } else {
+              if (isCodeStart(char)) {
+                if (currentStr) {
+                  textParts.push({ text: currentStr, isCode: false });
+                }
+                currentStr = char;
+                inCode = true;
+              } else {
+                currentStr += char;
+              }
+            }
+          }
+          
+          if (currentStr) {
+            if (inCode) {
+              const match = currentStr.match(/(\s+)$/);
+              if (match) {
+                const spaces = match[1];
+                const code = currentStr.slice(0, currentStr.length - spaces.length);
+                if (code) textParts.push({ text: code, isCode: true });
+                if (spaces) textParts.push({ text: spaces, isCode: false });
+              } else {
+                textParts.push({ text: currentStr, isCode: true });
+              }
+            } else {
+              textParts.push({ text: currentStr, isCode: false });
+            }
+          }
+
+          return textParts.map((t, idx) => {
+            if (t.isCode) {
+              return (
+                <span key={`${j}-${idx}`} dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
+                  {t.text}
+                </span>
+              );
+            }
+            return <span key={`${j}-${idx}`}>{t.text}</span>;
+          });
         })}
       </span>
     );
@@ -622,7 +686,7 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
                            </div>
                            <input type="radio" className="sr-only" checked={isSelected} onChange={() => setAnswers({...answers, [qId]: idx})} />
                            <div className={`flex-1 flex font-bold text-sm md:text-base transition-colors ${isSelected ? 'text-primary' : 'text-slate-700 dark:text-slate-300'} ${optIsFarsi ? 'text-right' : 'text-left font-mono dir-ltr'}`} dir={optIsFarsi ? 'rtl' : 'ltr'}>
-                             {optIsFarsi ? toFarsiNumber(opt) : opt}
+                             {renderContent(opt)}
                            </div>
                          </label>
                        );

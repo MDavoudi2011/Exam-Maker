@@ -75,7 +75,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
     window.history.pushState(null, '', newUrl);
   };
 
-  // Reload exams when coming back to Exams or Overview from Create
+  // Reload exams
   const refreshExams = async () => {
     try {
       const { data } = await supabase.from('exams').select('*, exam_questions(count)').order('created_at', { ascending: false });
@@ -84,6 +84,12 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    if (activeTab === 'exams' || activeTab === 'overview' || activeTab === 'edit' || activeTab === 'reports') {
+      refreshExams();
+    }
+  }, [activeTab]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

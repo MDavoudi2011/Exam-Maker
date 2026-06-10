@@ -153,8 +153,13 @@ export function QuestionBankTab() {
 
   const handleDelete = async (id: string) => {
     if (confirm('آیا از حذف این سوال اطمینان دارید؟')) {
-      await supabase.from('questions').delete().eq('id', id);
-      fetchQuestions();
+      try {
+        const { error } = await supabase.from('questions').delete().eq('id', id);
+        if (error) throw error;
+        fetchQuestions();
+      } catch (err: any) {
+        alert(`خطا در حذف سوال:\n${err.message || 'مشکلی رخ داد.'}`);
+      }
     }
   };
 
@@ -447,26 +452,29 @@ function EditModal({ question, topics, onClose, onSave }: { question: any, topic
     setLoading(true);
     try {
       if (question.id) {
-        await supabase.from('questions').update({
+        const { error } = await supabase.from('questions').update({
           content,
           options,
           correct_option_index: correctIndex,
           topic,
           point_value: score
         }).eq('id', question.id);
+        if (error) throw error;
       } else {
-        await supabase.from('questions').insert({
+        const { error } = await supabase.from('questions').insert({
           content,
           options,
           correct_option_index: correctIndex,
           topic,
           point_value: score
         });
+        if (error) throw error;
       }
       onSave();
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert(`عملیات با خطا مواجه شد:\n${err.message || 'مشکل در برقراری ارتباط با سرور'}`);
     } finally {
       setLoading(false);
     }

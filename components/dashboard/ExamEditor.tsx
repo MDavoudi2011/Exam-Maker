@@ -219,7 +219,8 @@ export function ExamEditorInner({ exam, initialQuestions, user, onNavigate, onDa
             </button>
           </div>
 
-          <button onClick={() => onNavigate && onNavigate('exams')} className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-bold transition-colors">
+          <button onClick={() => onNavigate && onNavigate('exams')} className="bg-white hover:bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 h-12 px-6 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all mx-auto">
+            <ArrowRight className="w-4 h-4" />
             بازگشت به پیشخوان
           </button>
         </div>
@@ -520,15 +521,17 @@ export function ExamEditorInner({ exam, initialQuestions, user, onNavigate, onDa
 
             {/* Footer without Publish Button (moved to header) */}
             <div className="bg-slate-50 dark:bg-slate-800/50 p-6 md:p-8 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
-              <button onClick={() => setStep(1)} className="bg-white hover:bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 h-12 px-6 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
-                <ArrowRight className="w-4 h-4" />
-                مرحله قبل
-              </button>
-              
-              <div className="hidden text-sm font-medium text-slate-500 flex items-center gap-2 md:flex">
-                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                {toFarsiNumber(selectedQuestions.length)} سوال انتخاب شده
+              <div className="font-bold text-slate-700 dark:text-slate-300">
+                 <span className="text-primary text-xl ml-2">{toFarsiNumber(selectedQuestions.length)}</span>
+                 سوال انتخاب شده
               </div>
+              <button 
+                onClick={() => setStep(1)}
+                className="bg-white hover:bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 h-12 px-6 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all"
+              >
+                <ArrowRight className="w-4 h-4" />
+                مرحله قبلی
+              </button>
             </div>
 
           </div>

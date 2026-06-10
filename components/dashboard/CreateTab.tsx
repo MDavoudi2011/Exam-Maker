@@ -196,7 +196,8 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
             </button>
           </div>
 
-          <button onClick={onCreated} className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-bold transition-colors">
+          <button onClick={onCreated} className="bg-white hover:bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 h-12 px-6 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all mx-auto">
+            <ArrowRight className="w-4 h-4" />
             بازگشت به پیشخوان
           </button>
         </div>
@@ -496,7 +497,7 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
               </div>
               <button 
                 onClick={() => setStep(1)}
-                className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-6 h-12 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors"
+                className="bg-white hover:bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 h-12 px-6 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all"
               >
                 <ArrowRight className="w-4 h-4" />
                 مرحله قبلی
