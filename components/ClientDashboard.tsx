@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { BrainCircuit, LayoutDashboard, List, PlusCircle, LogOut, BarChart3, ChevronRight, Users, Database } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BrainCircuit, LayoutDashboard, List, PlusCircle, LogOut, BarChart3, ChevronRight, Users, Database, Menu, X, Moon, Sun } from 'lucide-react';
 import { OverviewTab } from '@/components/dashboard/OverviewTab';
 import { ExamsTab } from '@/components/dashboard/ExamsTab';
 import { CreateTab } from '@/components/dashboard/CreateTab';
@@ -22,36 +22,108 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
     handleLogout
   } = useClientDashboard(initialTab, initialParam, initialExams);
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
+    setIsDarkMode(isDark);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDarkMode(true);
+    }
+  };
+
+  const handleTabClick = (tab: string) => {
+    handleNavigate(tab);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="h-screen w-full bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col md:flex-row relative flex-1 overflow-hidden" dir="rtl">
+    <div className="h-screen w-full bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col md:flex-row relative overflow-hidden" dir="rtl">
       
       {/* Background Decor */}
       <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-primary/10 blur-[100px] rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
       <div className="absolute top-64 -right-64 w-[500px] h-[500px] bg-sky-400/10 blur-[100px] rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
 
-      
-      {/* Sidebar */}
-      <aside className="w-full md:w-72 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-l border-slate-200 dark:border-slate-800 p-6 flex flex-col z-10 shadow-[0_0_40px_rgba(0,0,0,0.03)] dark:shadow-none min-h-[auto] md:min-h-screen relative">
-        <div className="flex items-center gap-3 mb-12">
-          <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-2.5 rounded-2xl shadow-inner border border-primary/10">
-            <BrainCircuit className="w-7 h-7 text-primary" />
+      {/* Mobile Top Bar */}
+      <div className="md:hidden flex shrink-0 items-center justify-between p-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-30">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setIsMobileMenuOpen(true)} className="p-1 -mr-1 text-slate-700 dark:text-slate-200" aria-label="Open Menu">
+            <Menu className="w-6 h-6" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-1.5 rounded-xl border border-primary/10">
+              <BrainCircuit className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-lg font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-sky-600">هوشیار</h2>
           </div>
-          <div>
-            <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-sky-600">هوشیار</h2>
-            <p className="text-xs text-slate-500 font-medium tracking-tight">آزمون‌ساز هوشمند</p>
+        </div>
+        
+        <button
+           onClick={toggleDarkMode}
+           className="relative flex items-center w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors p-1"
+        >
+           <div className={`absolute top-1 max-w-full w-4 h-4 rounded-full bg-white dark:bg-slate-800 shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
+              {isDarkMode ? <Moon className="w-2.5 h-2.5 text-indigo-500" /> : <Sun className="w-2.5 h-2.5 text-yellow-500" />}
+           </div>
+        </button>
+      </div>
+
+      {/* Overlay for mobile menu */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)}></div>
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed md:static inset-y-0 right-0 w-72 bg-white/95 md:bg-white/70 dark:bg-slate-900/95 dark:md:bg-slate-900/70 backdrop-blur-2xl border-l border-slate-200 dark:border-slate-800 p-6 flex flex-col z-50 md:z-10 shadow-2xl md:shadow-none h-full transition-transform duration-300 shrink-0 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0`}>
+        <div className="flex items-center justify-between mb-8 md:mb-12">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-2.5 rounded-2xl shadow-inner border border-primary/10">
+              <BrainCircuit className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-sky-600">هوشیار</h2>
+              <p className="text-xs text-slate-500 font-medium tracking-tight">آزمون‌ساز هوشمند</p>
+            </div>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+          
+          <div className="hidden md:block">
+            <button
+               onClick={toggleDarkMode}
+               className="relative flex items-center w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors p-1"
+            >
+               <div className={`absolute top-1 w-4 h-4 rounded-full bg-white dark:bg-slate-800 shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
+                  {isDarkMode ? <Moon className="w-2.5 h-2.5 text-indigo-500" /> : <Sun className="w-2.5 h-2.5 text-yellow-500" />}
+               </div>
+            </button>
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1.5 focus:outline-none">
-          <NavItem active={activeTab === 'overview'} onClick={() => handleNavigate('overview')} icon={<LayoutDashboard />} label="داشبورد" />
-          <NavItem active={activeTab === 'exams' || activeTab === 'edit'} onClick={() => handleNavigate('exams')} icon={<List />} label="لیست آزمون‌ها" />
-          <NavItem active={activeTab === 'create'} onClick={() => handleNavigate('create')} icon={<PlusCircle />} label="ساخت آزمون" />
-          <NavItem active={activeTab === 'reports'} onClick={() => handleNavigate('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
-          <NavItem active={activeTab === 'users'} onClick={() => handleNavigate('users')} icon={<Users />} label="تحلیل عملکرد کاربران" />
-          <NavItem active={activeTab === 'question-bank'} onClick={() => handleNavigate('question-bank')} icon={<Database />} label="بانک سوالات" />
+        <nav className="flex-1 space-y-1.5 focus:outline-none overflow-y-auto pr-2 custom-scrollbar">
+          <NavItem active={activeTab === 'overview'} onClick={() => handleTabClick('overview')} icon={<LayoutDashboard />} label="داشبورد" />
+          <NavItem active={activeTab === 'exams' || activeTab === 'edit'} onClick={() => handleTabClick('exams')} icon={<List />} label="لیست آزمون‌ها" />
+          <NavItem active={activeTab === 'create'} onClick={() => handleTabClick('create')} icon={<PlusCircle />} label="ساخت آزمون" />
+          <NavItem active={activeTab === 'reports'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
+          <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="تحلیل عملکرد کاربران" />
+          <NavItem active={activeTab === 'question-bank'} onClick={() => handleTabClick('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
 
-        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2 shrink-0">
            <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 mb-4 border border-slate-200/50 dark:border-slate-800">
              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-md ring-2 ring-white dark:ring-slate-900">
                {user?.email?.charAt(0).toUpperCase() || 'A'}
@@ -62,7 +134,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
              </div>
            </div>
 
-           <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all">
+           <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all border border-transparent">
             <LogOut className="w-4 h-4" />
             <span>خروج از سیستم</span>
           </button>
@@ -70,8 +142,8 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 md:p-10 lg:p-12 h-[calc(100vh-auto)] md:h-screen overflow-y-auto z-10 relative">
-        <div className="max-w-6xl mx-auto pb-10">
+      <main className="flex-1 min-w-0 p-4 md:p-8 lg:p-10 lg:pr-8 overflow-y-auto z-10 relative">
+        <div className="max-w-7xl mx-auto pb-10">
           {activeTab === 'overview' && <OverviewTab initialExams={exams} onNavigate={handleNavigate} />}
           {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={handleNavigate} onDataChanged={refreshExams} initialSearchTerm={navParam || ''} />}
           {activeTab === 'create' && (

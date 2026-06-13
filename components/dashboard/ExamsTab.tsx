@@ -33,7 +33,7 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
         <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20 w-full">
           <div className="relative w-full md:flex-[6]">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -46,21 +46,21 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
             />
           </div>
           
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:flex-[4]">
+          <div className="flex flex-row items-center gap-2 md:gap-3 w-full md:flex-[4]">
             <div className="relative flex-1" ref={dropdownRef}>
               <button 
                 onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
+                className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
               >
                 <div className="flex items-center gap-2">
-                  <span>
+                  <span className="truncate max-w-[100px] md:max-w-none">
                     {selectedStatus === 'all' ? 'همه وضعیت‌ها' : selectedStatus === 'active' ? 'در حال اجرا' : 'غیر فعال'}
                   </span>
-                  <span className="w-5 h-5 flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">
+                  <span className="w-5 h-5 flex shrink-0 items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">
                     {toFarsiNumber(selectedStatus === 'all' ? exams.length : exams.filter(e => getStatus(e) === selectedStatus).length)}
                   </span>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-slate-400 mr-3 transition-transform ${showStatusDropdown ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 md:mr-3 transition-transform ${showStatusDropdown ? 'rotate-180' : ''}`} />
               </button>
               {showStatusDropdown && (
                 <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top">
@@ -93,36 +93,38 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
             
             <button 
               onClick={() => onNavigate('create')}
-              className="flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all font-bold text-sm shrink-0 shadow-lg shadow-primary/25"
+              className="flex whitespace-nowrap items-center justify-center gap-1.5 md:gap-2 px-3 md:px-5 py-3 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all font-bold text-xs md:text-sm shrink-0 shadow-lg shadow-primary/25"
             >
-              <Plus className="w-5 h-5" /> ساخت آزمون جدید
+              <Plus className="w-4 h-4 md:w-5 md:h-5" /> 
+              <span className="hidden sm:inline">ساخت آزمون جدید</span>
+              <span className="sm:hidden inline">آزمون جدید</span>
             </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto -mx-6 -mb-6">
-          <table className="w-full text-right border-collapse min-w-[800px] z-10 relative">
+        <div className="overflow-x-auto -mx-4 md:-mx-6 -mb-6">
+          <table className="w-full text-right border-collapse min-w-max md:min-w-[800px] z-10 relative">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm border-y border-slate-100 dark:border-slate-800">
-                <th className="p-4 px-6 font-semibold w-1/3">عنوان آزمون</th>
-                <th className="p-4 font-semibold text-center w-32">وضعیت</th>
-                <th className="p-4 font-semibold text-center w-28">تعداد سوالات</th>
-                <th className="p-4 font-semibold text-center w-28">زمان (دقیقه)</th>
-                <th className="p-4 font-semibold w-32 text-center whitespace-nowrap">تاریخ ایجاد</th>
-                <th className="p-4 px-6 font-semibold text-center">عملیات</th>
+              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">
+                <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-1/3">عنوان آزمون</th>
+                <th className="p-3 md:p-4 font-semibold text-center w-24 md:w-32">وضعیت</th>
+                <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">سوالات</th>
+                <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">زمان</th>
+                <th className="p-3 md:p-4 font-semibold w-24 md:w-32 text-center whitespace-nowrap">تاریخ ایجاد</th>
+                <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center">عملیات</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs md:text-sm">
               {filteredExams.map((exam) => {
                 const status = getStatus(exam);
                 return (
                  <tr key={exam.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                   <td className="p-4 px-6 font-bold text-slate-800 dark:text-slate-200">{exam.title}</td>
-                   <td className="p-4 text-center">
+                   <td className="p-3 md:p-4 px-4 md:px-6 font-bold text-slate-800 dark:text-slate-200">{exam.title}</td>
+                   <td className="p-2 md:p-4 text-center">
                      <button 
                        onClick={() => toggleStatus(exam)}
                        disabled={loading}
-                       className={`px-3 py-1.5 text-xs font-bold rounded-lg border-2 outline-none transition-colors w-full cursor-pointer text-center
+                       className={`px-2 md:px-3 py-1 md:py-1.5 text-[10px] md:text-xs font-bold rounded-lg border-2 outline-none transition-colors w-full cursor-pointer text-center
                           ${status === 'active' ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400 hover:bg-emerald-100' :
                              'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-100'}
                        `}
@@ -130,30 +132,30 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
                        {status === 'active' ? 'در حال اجرا' : 'غیر فعال'}
                      </button>
                    </td>
-                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400 text-center">
+                   <td className="p-3 md:p-4 font-medium text-slate-600 dark:text-slate-400 text-center">
                      {toFarsiNumber(exam.exam_questions?.[0]?.count || 0)}
                    </td>
-                   <td className="p-4 text-center">
-                     <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300">
+                   <td className="p-3 md:p-4 text-center">
+                     <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-[10px] md:text-xs font-bold text-slate-600 dark:text-slate-300">
                        {toFarsiNumber(exam.time_limit_minutes || 0)}
                      </span>
                    </td>
-                   <td className="p-4 text-sm text-slate-500 text-center whitespace-nowrap">
+                   <td className="p-3 md:p-4 text-[10px] md:text-sm text-slate-500 text-center whitespace-nowrap">
                      {toFarsiNumber(new Date(exam.created_at).toLocaleDateString('fa-IR'))}
                    </td>
-                   <td className="p-4 px-6 text-center whitespace-nowrap">
-                     <div className="inline-flex items-center justify-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
-                       <button onClick={() => window.open(`/view/${exam.id}`, '_blank')} className="p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
-                         <Play className="w-4 h-4" />
+                   <td className="p-2 md:p-4 px-3 md:px-6 text-center whitespace-nowrap">
+                     <div className="inline-flex items-center justify-center gap-1.5 md:gap-2 opacity-100 md:opacity-70 group-hover:opacity-100 transition-opacity">
+                       <button onClick={() => window.open(`/view/${exam.id}`, '_blank')} className="p-1.5 md:p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
+                         <Play className="w-3.5 h-3.5 md:w-4 md:h-4" />
                        </button>
-                       <button onClick={() => onNavigate('edit', exam.id)} className="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 rounded-xl transition-colors tooltip-trigger" title="ویرایش">
-                         <Edit className="w-4 h-4" />
+                       <button onClick={() => onNavigate('edit', exam.id)} className="p-1.5 md:p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="ویرایش">
+                         <Edit className="w-3.5 h-3.5 md:w-4 md:h-4" />
                        </button>
-                       <button onClick={() => onNavigate('reports', exam.id)} className="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 rounded-xl transition-colors tooltip-trigger" title="مشاهده نتایج">
-                         <BarChart2 className="w-4 h-4" />
+                       <button onClick={() => onNavigate('reports', exam.id)} className="p-1.5 md:p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="مشاهده نتایج">
+                         <BarChart2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                        </button>
-                       <button onClick={() => handleDelete(exam.id)} disabled={loading} className="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-xl transition-colors tooltip-trigger" title="حذف">
-                         <Trash className="w-4 h-4" />
+                       <button onClick={() => handleDelete(exam.id)} disabled={loading} className="p-1.5 md:p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="حذف">
+                         <Trash className="w-3.5 h-3.5 md:w-4 md:h-4" />
                        </button>
                      </div>
                    </td>

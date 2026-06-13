@@ -18,7 +18,7 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
         <p className="text-slate-500 font-medium mt-1">خلاصه وضعیت و مشارکت کاربران در آزمون‌ها</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
         <StatCard title="کل آزمون‌ها" value={toFarsiNumber(initialExams?.length || 0)} subtitle="آزمون‌های ساخته شده" icon={<FileQuestion />} />
         <StatCard title="شرکت‌کنندگان" value={loading ? <Loader2 className="w-5 h-5 animate-spin" /> : toFarsiNumber(stats.totalParticipants)} subtitle="تا این لحظه" icon={<Users />} />
         <StatCard title="میانگین نمرات" value={loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `${toFarsiNumber(stats.avgScore)}٪`} subtitle="از ۱۰۰" icon={<GraduationCap />} />
@@ -26,10 +26,10 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+        <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
            <h3 className="text-xl font-bold mb-1">مشارکت اخیر</h3>
            <p className="text-slate-500 text-sm mb-6">نمودار شرکت‌کنندگان در طول هفته گذشته.</p>
-           <div className="h-64 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 p-4" dir="ltr">
+           <div className="h-64 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 p-2 md:p-4" dir="ltr">
              {loading ? (
                 <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
              ) : chartData.length > 0 ? (
@@ -56,7 +56,7 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
              )}
            </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
            <h3 className="text-xl font-bold mb-1">آخرین آزمون‌ها</h3>
            <p className="text-slate-500 text-sm mb-6">آزمون‌های تازه ساخته شده</p>
            <div className="space-y-4">
@@ -81,7 +81,7 @@ export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[],
 
 function StatCard({ title, value, subtitle, icon }: any) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform duration-300">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 hover:-translate-y-1 transition-transform duration-300">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-slate-500 font-medium">{title}</h3>
         <div className="p-2.5 bg-primary/10 text-primary rounded-xl">

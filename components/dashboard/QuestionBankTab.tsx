@@ -56,7 +56,7 @@ export function QuestionBankTab() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
         <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20 w-full">
           <div className="relative w-full md:flex-[6]">
             <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -69,17 +69,17 @@ export function QuestionBankTab() {
             />
           </div>
           
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:flex-[4]">
+          <div className="flex flex-row items-center gap-2 md:gap-3 w-full md:flex-[4]">
             <div className="relative flex-1" ref={dropdownRef}>
               <button 
                 onClick={() => setShowTopicDropdown(!showTopicDropdown)}
-                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
+                className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
               >
                 <div className="flex items-center gap-2">
-                  <span>{selectedTopic === 'all' ? 'همه موضوعات' : selectedTopic}</span>
-                  <span className="w-5 h-5 flex items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">{toFarsiNumber(selectedTopic === 'all' ? questions.length : questions.filter(q => q.topic === selectedTopic).length)}</span>
+                  <span className="truncate max-w-[100px] md:max-w-none">{selectedTopic === 'all' ? 'همه موضوعات' : selectedTopic}</span>
+                  <span className="w-5 h-5 flex shrink-0 items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">{toFarsiNumber(selectedTopic === 'all' ? questions.length : questions.filter(q => q.topic === selectedTopic).length)}</span>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-slate-400 mr-3 transition-transform ${showTopicDropdown ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 md:mr-3 transition-transform ${showTopicDropdown ? 'rotate-180' : ''}`} />
               </button>
               {showTopicDropdown && (
                 <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top">
@@ -139,45 +139,47 @@ export function QuestionBankTab() {
             
             <button 
               onClick={() => setEditingQuestion({ content: '', options: ['', '', '', ''], correct_option_index: 0, topic: '', point_value: 10 })}
-              className="flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all font-bold text-sm shrink-0 shadow-lg shadow-primary/25"
+              className="flex whitespace-nowrap items-center justify-center gap-1.5 md:gap-2 px-3 md:px-5 py-3 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all font-bold text-xs md:text-sm shrink-0 shadow-lg shadow-primary/25"
             >
-              <Plus className="w-5 h-5" /> افزودن سوال
+              <Plus className="w-4 h-4 md:w-5 md:h-5" /> 
+              <span className="hidden sm:inline">افزودن سوال</span>
+              <span className="sm:hidden inline">سوال جدید</span>
             </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 md:-mx-6 -mb-6 pb-6">
           {loading ? (
              <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
           ) : (
             <>
-            <table className="w-full text-right z-10 relative table-auto">
+            <table className="w-full text-right z-10 relative table-auto min-w-[500px] md:min-w-0">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm border-b border-slate-100 dark:border-slate-800">
-                  <th className="p-4 font-semibold w-px whitespace-nowrap text-center">موضوع</th>
-                  <th className="p-4 font-semibold text-right">عنوان سوال</th>
-                  <th className="p-4 font-semibold w-px whitespace-nowrap text-center">عملیات</th>
+                <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">
+                  <th className="p-3 md:p-4 font-semibold w-px whitespace-nowrap text-center">موضوع</th>
+                  <th className="p-3 md:p-4 font-semibold text-right min-w-[200px]">عنوان سوال</th>
+                  <th className="p-3 md:p-4 font-semibold w-px whitespace-nowrap text-center">عملیات</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-xs md:text-sm">
                 {paginatedQuestions.length > 0 ? paginatedQuestions.map((q, idx) => (
-                  <tr key={q.id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0">
-                    <td className="p-4 text-sm font-bold text-center w-px whitespace-nowrap">
-                      <span className={`px-3 py-1.5 rounded-lg inline-block align-middle ${getTopicColor(q.topic)}`}>{q.topic || 'بدون دسته‌بندی'}</span>
+                  <tr key={q.id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0 group">
+                    <td className="p-3 md:p-4 text-center w-px whitespace-nowrap font-bold">
+                      <span className={`px-2 md:px-3 py-1 md:py-1.5 rounded-lg inline-block align-middle text-[10px] md:text-xs ${getTopicColor(q.topic)}`}>{q.topic || 'بدون دسته‌بندی'}</span>
                     </td>
-                    <td className="p-4 font-medium text-slate-800 dark:text-slate-200 text-right">
+                    <td className="p-3 md:p-4 font-medium text-slate-800 dark:text-slate-200 text-right">
                        <p className="line-clamp-2 md:line-clamp-1">{q.content}</p>
                     </td>
-                    <td className="p-4 text-center w-px whitespace-nowrap">
-                      <div className="inline-flex items-center justify-center gap-2">
-                        <button onClick={() => setPreviewQuestion(q)} className="p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
-                          <Eye className="w-4 h-4" />
+                    <td className="p-2 md:p-4 text-center w-px whitespace-nowrap">
+                      <div className="inline-flex items-center justify-center gap-1.5 md:gap-2 opacity-100 md:opacity-70 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => setPreviewQuestion(q)} className="p-1.5 md:p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
+                          <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
-                        <button onClick={() => setEditingQuestion(q)} className="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-xl transition-colors tooltip-trigger" title="ویرایش">
-                          <Edit className="w-4 h-4" />
+                        <button onClick={() => setEditingQuestion(q)} className="p-1.5 md:p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="ویرایش">
+                          <Edit className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
-                        <button onClick={() => handleDelete(q.id)} className="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-xl transition-colors tooltip-trigger" title="حذف">
-                          <Trash className="w-4 h-4" />
+                        <button onClick={() => handleDelete(q.id)} className="p-1.5 md:p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="حذف">
+                          <Trash className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
                       </div>
                     </td>
