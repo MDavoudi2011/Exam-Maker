@@ -1,61 +1,28 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Download, Users, BarChart, Loader2, FileQuestion, ChevronDown, Eye, X } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { toFarsiNumber } from '@/lib/utils';
-import { ExamViewer } from './ExamViewer';
+import { toFarsiNumber } from '@/utils/text.util';
+import { ExamViewer } from '@/components/viewer/ExamViewer';
+import { useReportsTab } from '@/hooks/useReportsTab';
 
 export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExams?: any[], initialSelectedExamId?: string | null }) {
-  const [selectedExamId, setSelectedExamId] = useState<string>(initialSelectedExamId || '');
-  const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [viewingAttempt, setViewingAttempt] = useState<any>(null);
-  const [examData, setExamData] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const supabase = createClient();
-
-  useEffect(() => {
-    async function fetchResults() {
-      if (!selectedExamId) {
-        setResults([]);
-        setExamData(null);
-        return;
-      }
-      
-      setLoading(true);
-      try {
-        const { data: examDataObj } = await supabase.from('exams').select('*').eq('id', selectedExamId).single();
-        setExamData(examDataObj);
-
-        // Fetch questions for detailed view later
-        const { data: qData } = await supabase.from('exam_questions').select('id, order_index, questions(*)').eq('exam_id', selectedExamId).order('order_index');
-        if (qData) setQuestions(qData);
-
-        const { data, error } = await supabase.from('test_attempts')
-          .select('id, full_name, national_code, personnel_code, org_title, class_name, school, district, score, created_at, completed_at, status')
-          .eq('exam_id', selectedExamId)
-          .order('completed_at', { ascending: false });
-          
-        if (data) {
-          setResults(data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchResults();
-  }, [selectedExamId, supabase]);
-
-  const requiredFields = examData?.settings?.studentDetails || {};
-  const showFullName = requiredFields.fullName;
-  const showNationalCode = requiredFields.nationalCode;
-  const showPersonnelCode = requiredFields.personnelCode;
-  const showOrgTitle = requiredFields.orgTitle;
-  const showClassName = requiredFields.className;
-  const showSchool = requiredFields.school;
-  const showDistrict = requiredFields.district;
+  const {
+    selectedExamId,
+    setSelectedExamId,
+    results,
+    loading,
+    viewingAttempt,
+    setViewingAttempt,
+    examData,
+    questions,
+    showFullName,
+    showNationalCode,
+    showPersonnelCode,
+    showOrgTitle,
+    showClassName,
+    showSchool,
+    showDistrict
+  } = useReportsTab(initialSelectedExamId);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">

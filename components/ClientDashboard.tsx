@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrainCircuit, LayoutDashboard, List, PlusCircle, LogOut, BarChart3, ChevronRight, Users, Database } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-
 import { OverviewTab } from '@/components/dashboard/OverviewTab';
 import { ExamsTab } from '@/components/dashboard/ExamsTab';
 import { CreateTab } from '@/components/dashboard/CreateTab';
@@ -11,90 +9,18 @@ import { ReportsTab } from '@/components/dashboard/ReportsTab';
 import { UsersPerformanceTab } from '@/components/dashboard/UsersPerformanceTab';
 import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
 import { ExamEditor } from '@/components/dashboard/ExamEditor';
+import { useClientDashboard } from '@/hooks/useClientDashboard';
+import { Exam } from '@/types/exam.type';
 
 export default function ClientDashboard({ user, initialExams, initialTab = 'overview', initialParam = null, initialExam = null, initialQuestions = [] }: { user: any, initialExams: any[], initialTab?: string, initialParam?: string | null, initialExam?: any, initialQuestions?: any[] }) {
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [navParam, setNavParam] = useState<string | null>(initialParam);
-  const [exams, setExams] = useState(initialExams);
-  const supabase = createClient();
-
-  // Sync state if url changes externally (though we handle it mostly internally)
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setActiveTab(initialTab);
-    setNavParam(initialParam);
-  }, [initialTab, initialParam]);
-
-  // Handle browser back/forward buttons
-  useEffect(() => {
-    const handlePopState = () => {
-      const path = window.location.pathname;
-      if (path.startsWith('/edit')) {
-        setActiveTab('edit');
-        const parts = path.split('/');
-        setNavParam(parts.length > 2 ? parts[2] : null);
-      } else if (path.startsWith('/exams')) {
-        setActiveTab('exams');
-        setNavParam(null);
-      } else if (path.startsWith('/create')) {
-        setActiveTab('create');
-        setNavParam(null);
-      } else if (path.startsWith('/result')) {
-        setActiveTab('reports');
-        const parts = path.split('/');
-        setNavParam(parts.length > 2 ? parts[2] : null);
-      } else if (path.startsWith('/users')) {
-        setActiveTab('users');
-        setNavParam(null);
-      } else if (path.startsWith('/questions')) {
-        setActiveTab('question-bank');
-        setNavParam(null);
-      } else {
-        setActiveTab('overview');
-        setNavParam(null);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  const handleNavigate = (tab: string, param?: string) => {
-    setActiveTab(tab);
-    setNavParam(param || null);
-    
-    // Update URL instantly without full reload
-    let newUrl = '/dashboard';
-    if (tab === 'exams') newUrl = '/exams';
-    if (tab === 'edit') newUrl = param ? `/edit/${param}` : '/exams';
-    if (tab === 'create') newUrl = '/create';
-    if (tab === 'users') newUrl = '/users';
-    if (tab === 'question-bank') newUrl = '/questions';
-    if (tab === 'reports') {
-      newUrl = param ? `/result/${param}` : '/result';
-    }
-    window.history.pushState(null, '', newUrl);
-  };
-
-  // Reload exams
-  const refreshExams = async () => {
-    try {
-      const { data } = await supabase.from('exams').select('*, exam_questions(count)').order('created_at', { ascending: false });
-      if (data) setExams(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === 'exams' || activeTab === 'overview' || activeTab === 'edit' || activeTab === 'reports') {
-      refreshExams();
-    }
-  }, [activeTab]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.reload();
-  };
+  const {
+    activeTab,
+    navParam,
+    exams,
+    handleNavigate,
+    refreshExams,
+    handleLogout
+  } = useClientDashboard(initialTab, initialParam, initialExams);
 
   return (
     <div className="h-screen w-full bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col md:flex-row relative flex-1 overflow-hidden" dir="rtl">

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { ExamViewer } from '@/components/dashboard/ExamViewer';
+import { ExamViewer } from '@/components/viewer/ExamViewer';
 
 export const dynamic = 'force-dynamic';
 

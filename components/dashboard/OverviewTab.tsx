@@ -1,101 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { FileQuestion, Users, GraduationCap, Clock, Play, Edit, Trash, Plus, CheckCircle2, ChevronLeft, Loader2, Search, LayoutDashboard } from 'lucide-react';
-import { toFarsiNumber } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
+import React from 'react';
+import { FileQuestion, Users, GraduationCap, Clock, Loader2, LayoutDashboard } from 'lucide-react';
+import { toFarsiNumber } from '@/utils/text.util';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useOverviewTab } from '@/hooks/useOverviewTab';
 
 export function OverviewTab({ initialExams, onNavigate }: { initialExams: any[], onNavigate: (tab: string, param?: string) => void }) {
-  const [stats, setStats] = useState({
-    totalParticipants: 0,
-    avgScore: 0,
-    avgTime: 0,
-  });
-  const [chartData, setChartData] = useState<{name: string, value: number}[]>([]);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-
-  useEffect(() => {
-    async function fetchStats() {
-      if (!initialExams || initialExams.length === 0) {
-        setLoading(false);
-        return;
-      }
-      
-      const examIds = initialExams.map(e => e.id);
-
-      try {
-        const { data: attempts, error } = await supabase
-          .from('test_attempts')
-          .select('exam_id, score, completed_at, created_at, national_code, personnel_code')
-          .in('exam_id', examIds)
-          .eq('status', 'completed');
-
-        if (attempts && attempts.length > 0) {
-          const uniqueUsers = new Set();
-          attempts.forEach(att => {
-             const identifier = att.national_code || att.personnel_code;
-             if (identifier) uniqueUsers.add(identifier);
-          });
-          const totalParticipants = uniqueUsers.size;
-          
-          let totalPercentage = 0;
-          let totalSeconds = 0;
-          let timeCount = 0;
-
-          const last7Days = Array.from({length: 7}, (_, i) => {
-             const d = new Date();
-             d.setDate(d.getDate() - (6 - i));
-             return { date: d.toISOString().split('T')[0], count: 0, name: new Intl.DateTimeFormat('fa-IR', { weekday: 'short' }).format(d) };
-          });
-
-          attempts.forEach(attempt => {
-            const score = attempt.score || 0;
-            totalPercentage += score;
-            
-            if (attempt.created_at && attempt.completed_at) {
-               const start = new Date(attempt.created_at).getTime();
-               const end = new Date(attempt.completed_at).getTime();
-               const diff = (end - start) / 1000;
-               if (diff > 0 && diff < 3600 * 5) { // Sanity check max 5 hours
-                 totalSeconds += diff;
-                 timeCount++;
-               }
-            }
-
-            if (attempt.completed_at) {
-               const completedDate = new Date(attempt.completed_at).toISOString().split('T')[0];
-               const dayObj = last7Days.find(d => d.date === completedDate);
-               if (dayObj) {
-                 dayObj.count += 1;
-               }
-            }
-          });
-
-          setStats({
-            totalParticipants,
-            avgScore: attempts.length > 0 ? Math.round(totalPercentage / attempts.length) : 0,
-            avgTime: timeCount > 0 ? Math.round((totalSeconds / timeCount) / 60) : 0
-          });
-
-          setChartData(last7Days.map(d => ({ name: d.name, value: d.count })));
-        } else {
-           const last7Days = Array.from({length: 7}, (_, i) => {
-             const d = new Date();
-             d.setDate(d.getDate() - (6 - i));
-             return { name: new Intl.DateTimeFormat('fa-IR', { weekday: 'short' }).format(d), value: 0 };
-           });
-           setChartData(last7Days);
-        }
-      } catch (err) {
-        console.error("Error fetching stats", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchStats();
-  }, [initialExams, supabase]);
+  const { stats, chartData, loading } = useOverviewTab(initialExams);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

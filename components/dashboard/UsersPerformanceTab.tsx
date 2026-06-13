@@ -2,85 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { Users, Search, Loader2, Eye, X, BookOpen } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { ExamViewer } from './ExamViewer';
+// removed import
+import { ExamViewer } from '@/components/viewer/ExamViewer';
+import { useUsersPerformanceTab, useAttemptDetails } from '@/hooks/useUsersPerformanceTab';
+import { UserPerformanceModal } from './UserPerformanceModal';
 
 export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [attempts, setAttempts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedAttemptId, setSelectedAttemptId] = useState<string | null>(null);
-  const supabase = createClient();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await supabase.from('test_attempts')
-          .select('id, full_name, national_code, personnel_code, score, exam_id')
-          .order('created_at', { ascending: false });
-        
-        if (data) {
-          setAttempts(data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Group attempts by user (national_code or personnel_code)
-  const usersMap = new Map<string, {
-    fullName: string,
-    uniqueId: string,
-    attempts: Record<string, { score: number, attemptId: string }>,
-    totalScore: number,
-    examsCount: number,
-  }>();
-
-  attempts.forEach(attempt => {
-    const identifier = attempt.national_code || attempt.personnel_code;
-    if (!identifier) return;
-
-    if (!usersMap.has(identifier)) {
-      usersMap.set(identifier, {
-        fullName: attempt.full_name || 'نامشخص',
-        uniqueId: identifier,
-        attempts: {},
-        totalScore: 0,
-        examsCount: 0,
-      });
-    }
-    const userStats = usersMap.get(identifier)!;
-    const currentScore = parseFloat(attempt.score) || 0;
-    
-    if (!userStats.attempts[attempt.exam_id] || userStats.attempts[attempt.exam_id].score < currentScore) {
-      if (userStats.attempts[attempt.exam_id]) {
-        userStats.totalScore -= userStats.attempts[attempt.exam_id].score;
-      } else {
-        userStats.examsCount += 1;
-      }
-      userStats.attempts[attempt.exam_id] = { score: currentScore, attemptId: attempt.id };
-      userStats.totalScore += currentScore;
-    }
-  });
-
-  const usersArray = Array.from(usersMap.values());
-  const filteredUsers = usersArray.filter(u => 
-    u.fullName.includes(searchTerm) || u.uniqueId.includes(searchTerm)
-  );
-
-  // We should only show columns for exams that have at least one attempt among these users.
-  const activeExamIds = new Set<string>();
-  filteredUsers.forEach(u => {
-    Object.keys(u.attempts).forEach(eid => activeExamIds.add(eid));
-  });
-
-  const filteredExams = initialExams.filter(e => activeExamIds.has(e.id));
+  const {
+    searchTerm,
+    setSearchTerm,
+    loading,
+    filteredUsers,
+    filteredExams,
+    selectedAttemptId,
+    setSelectedAttemptId
+  } = useUsersPerformanceTab(initialExams);
 
   return (
     <div className="space-y-6">
@@ -171,64 +107,8 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
       </div>
 
       {selectedAttemptId && (
-        <AttemptDetailsModal attemptId={selectedAttemptId} onClose={() => setSelectedAttemptId(null)} />
+        <UserPerformanceModal attemptId={selectedAttemptId} onClose={() => setSelectedAttemptId(null)} />
       )}
-    </div>
-  );
-}
-
-function AttemptDetailsModal({ attemptId, onClose }: { attemptId: string, onClose: () => void }) {
-  const [details, setDetails] = useState<any>(null);
-  const [examData, setExamData] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-
-  useEffect(() => {
-    const fetchDetails = async () => {
-      setLoading(true);
-      try {
-        const { data } = await supabase.from('test_attempts').select('*, exams(*)').eq('id', attemptId).single();
-        if (data) {
-          setDetails(data);
-          setExamData(data.exams);
-          // Fetch questions
-          const { data: qData } = await supabase.from('exam_questions')
-            .select('id, order_index, questions(*)')
-            .eq('exam_id', data.exam_id)
-            .order('order_index');
-          if (qData) setQuestions(qData);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attemptId]);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative w-full max-w-5xl h-full max-h-screen bg-slate-50 dark:bg-slate-950 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md z-10">
-          <h3 className="font-bold">ریز نتایج: {details?.full_name || 'در حال بارگذاری...'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto w-full relative">
-          {loading ? (
-            <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
-          ) : details && examData ? (
-             <ExamViewer exam={examData} questions={questions} user={null} adminViewAttemptId={attemptId} />
-          ) : (
-            <p className="text-center text-slate-500">اطلاعاتی یافت نشد</p>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

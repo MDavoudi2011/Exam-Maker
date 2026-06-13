@@ -1,186 +1,48 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Loader2, Edit, Trash, Eye, Plus, ChevronDown, Check, X, ChevronRight, ChevronLeft, Database } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { toFarsiNumber } from '@/lib/utils';
-
-const topicColors = [
-  'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
-  'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-  'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-  'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300',
-  'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300',
-  'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
-  'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-300',
-  'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
-  'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
-];
-
-const getTopicColor = (topic: string) => {
-  if (!topic) return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
-  let hash = 0;
-  for (let i = 0; i < topic.length; i++) {
-    hash = topic.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return topicColors[Math.abs(hash) % topicColors.length];
-};
-
-const renderContent = (text: any) => {
-  if (!text || typeof text !== 'string') return text;
-  
-  const parts: { text: string; isCode: boolean }[] = [];
-  let currentStr = '';
-  let inCode = false;
-  
-  const isFarsi = (char: string) => /[\u0600-\u06FF\u200C]/.test(char);
-  const isCodeStart = (char: string) => /[a-zA-Z0-9]/.test(char);
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    if (inCode) {
-      if (isFarsi(char)) {
-        const match = currentStr.match(/(\s+)$/);
-        if (match) {
-          const spaces = match[1];
-          const code = currentStr.slice(0, currentStr.length - spaces.length);
-          if (code) parts.push({ text: code, isCode: true });
-          currentStr = spaces + char;
-        } else {
-          parts.push({ text: currentStr, isCode: true });
-          currentStr = char;
-        }
-        inCode = false;
-      } else {
-        currentStr += char;
-      }
-    } else {
-      if (isCodeStart(char)) {
-        if (currentStr) {
-          parts.push({ text: currentStr, isCode: false });
-        }
-        currentStr = char;
-        inCode = true;
-      } else {
-        currentStr += char;
-      }
-    }
-  }
-  
-  if (currentStr) {
-    if (inCode) {
-      const match = currentStr.match(/(\s+)$/);
-      if (match) {
-        const spaces = match[1];
-        const code = currentStr.slice(0, currentStr.length - spaces.length);
-        if (code) parts.push({ text: code, isCode: true });
-        if (spaces) parts.push({ text: spaces, isCode: false });
-      } else {
-        parts.push({ text: currentStr, isCode: true });
-      }
-    } else {
-      parts.push({ text: currentStr, isCode: false });
-    }
-  }
-
-  return parts.map((part, i) => {
-    if (part.isCode) {
-      return (
-        <span key={i} dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
-          {part.text}
-        </span>
-      );
-    }
-    return <span key={i}>{part.text}</span>;
-  });
-};
+// removed import
+import { toFarsiNumber } from '@/utils/text.util';
+import { ITEMS_PER_PAGE_OPTIONS } from '@/constants/exam.constant';
+import { getTopicColor } from '@/utils/styles.util';
+import { useQuestionBankTab, useEditModal } from '@/hooks/useQuestionBankTab';
+import { RenderContent } from '@/components/ui/RenderContent';
+import { EditModal } from '@/components/dashboard/QuestionBankEditModal';
 
 export function QuestionBankTab() {
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [topics, setTopics] = useState<string[]>([]);
-  const [selectedTopic, setSelectedTopic] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [editingQuestion, setEditingQuestion] = useState<any>(null);
-  const [previewQuestion, setPreviewQuestion] = useState<any>(null);
-  
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number | 'all'>(10);
-  const [showItemsPerPageDropdown, setShowItemsPerPageDropdown] = useState(false);
-  
-  const [showTopicDropdown, setShowTopicDropdown] = useState(false);
-  const [newTopic, setNewTopic] = useState('');
-  const [showAddTopic, setShowAddTopic] = useState(false);
-  
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
-  const itemsPerPageRef = React.useRef<HTMLDivElement>(null);
-  const supabase = createClient();
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowTopicDropdown(false);
-        setShowAddTopic(false);
-      }
-      if (itemsPerPageRef.current && !itemsPerPageRef.current.contains(event.target as Node)) {
-        setShowItemsPerPageDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const fetchQuestions = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.from('questions').select('*').order('created_at', { ascending: false });
-      if (data) {
-        setQuestions(data);
-        const uniqueTopics = Array.from(new Set(data.map(q => q.topic).filter(Boolean)));
-        setTopics(uniqueTopics as string[]);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchQuestions();
-  }, [fetchQuestions]);
-
-  const handleDelete = async (id: string) => {
-    if (confirm('آیا از حذف این سوال اطمینان دارید؟')) {
-      try {
-        const { error } = await supabase.from('questions').delete().eq('id', id);
-        if (error) throw error;
-        fetchQuestions();
-      } catch (err: any) {
-        alert(`خطا در حذف سوال:\n${err.message || 'مشکلی رخ داد.'}`);
-      }
-    }
-  };
-
-  const handleAddTopic = () => {
-    if (newTopic.trim() && !topics.includes(newTopic.trim())) {
-      setTopics([...topics, newTopic.trim()]);
-      setSelectedTopic(newTopic.trim());
-      setNewTopic('');
-      setShowAddTopic(false);
-      setShowTopicDropdown(false);
-    }
-  };
-
-  let filteredQuestions = questions.filter(q => {
-    const matchesTopic = selectedTopic === 'all' || q.topic === selectedTopic;
-    const matchesSearch = q.content?.includes(searchTerm);
-    return matchesTopic && matchesSearch;
-  });
-
-  const totalPages = itemsPerPage === 'all' ? 1 : Math.ceil(filteredQuestions.length / (itemsPerPage as number));
-  const paginatedQuestions = itemsPerPage === 'all' ? filteredQuestions : filteredQuestions.slice((currentPage - 1) * (itemsPerPage as number), currentPage * (itemsPerPage as number));
+  const {
+    questions,
+    topics,
+    selectedTopic,
+    setSelectedTopic,
+    searchTerm,
+    setSearchTerm,
+    loading,
+    editingQuestion,
+    setEditingQuestion,
+    previewQuestion,
+    setPreviewQuestion,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    showItemsPerPageDropdown,
+    setShowItemsPerPageDropdown,
+    showTopicDropdown,
+    setShowTopicDropdown,
+    newTopic,
+    setNewTopic,
+    showAddTopic,
+    setShowAddTopic,
+    dropdownRef,
+    itemsPerPageRef,
+    fetchQuestions,
+    handleDelete,
+    handleAddTopic,
+    filteredQuestions,
+    totalPages,
+    paginatedQuestions
+  } = useQuestionBankTab();
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -221,7 +83,7 @@ export function QuestionBankTab() {
               </button>
               {showTopicDropdown && (
                 <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top">
-                  <div className="max-h-[200px] overflow-y-auto space-y-1 p-1">
+                  <div className="max-h-[200px] overflow-y-auto space-y-1 p-1 custom-scrollbar">
                     <button 
                       onClick={() => { setSelectedTopic('all'); setShowTopicDropdown(false); setCurrentPage(1); }}
                       className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold transition-colors ${selectedTopic === 'all' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
@@ -342,7 +204,7 @@ export function QuestionBankTab() {
                     </button>
                     {showItemsPerPageDropdown && (
                       <div className="absolute bottom-full mb-2 right-0 w-full min-w-[100px] bg-white dark:bg-slate-800 rounded-xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-1 animate-in fade-in zoom-in-95 origin-bottom z-50">
-                        {[10, 20, 50, 'all'].map(val => (
+                        {ITEMS_PER_PAGE_OPTIONS.map(val => (
                           <button 
                             key={val}
                             onClick={() => { setItemsPerPage(val as number | 'all'); setCurrentPage(1); setShowItemsPerPageDropdown(false); }}
@@ -404,7 +266,7 @@ export function QuestionBankTab() {
             </div>
             <div className="mb-6">
               <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl mb-6 text-slate-800 dark:text-slate-200 font-medium text-lg leading-relaxed border border-slate-100 dark:border-slate-800 whitespace-pre-wrap">
-                {renderContent(previewQuestion.content)}
+                <RenderContent content={previewQuestion.content} />
               </div>
               <div className="space-y-3">
                 {previewQuestion.options && Array.isArray(previewQuestion.options) && previewQuestion.options.map((opt: string, i: number) => {
@@ -414,7 +276,7 @@ export function QuestionBankTab() {
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${previewQuestion.correct_option_index === i ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-700'}`}>
                       {previewQuestion.correct_option_index === i && <Check className="w-3 h-3" />}
                     </div>
-                    <span dir={isEnglish ? "ltr" : "rtl"} className={`block flex-1 font-medium ${isEnglish ? 'text-left' : ''} ${previewQuestion.correct_option_index === i ? 'text-emerald-800 dark:text-emerald-300' : 'text-slate-700 dark:text-slate-300'}`}>{renderContent(opt)}</span>
+                    <span dir={isEnglish ? "ltr" : "rtl"} className={`block flex-1 font-medium ${isEnglish ? 'text-left' : ''} ${previewQuestion.correct_option_index === i ? 'text-emerald-800 dark:text-emerald-300' : 'text-slate-700 dark:text-slate-300'}`}><RenderContent content={opt} /></span>
                   </div>
                 )})}
               </div>
@@ -435,148 +297,6 @@ export function QuestionBankTab() {
           onSave={fetchQuestions}
         />
       )}
-    </div>
-  );
-}
-
-function EditModal({ question, topics, onClose, onSave }: { question: any, topics: string[], onClose: () => void, onSave: () => void }) {
-  const [content, setContent] = useState(question.content || '');
-  const [options, setOptions] = useState<string[]>(Array.isArray(question.options) ? question.options : ['', '', '', '']);
-  const [correctIndex, setCorrectIndex] = useState(question.correct_option_index || 0);
-  const [topic, setTopic] = useState(question.topic || '');
-  const [score, setScore] = useState(question.point_value || 10);
-  const [loading, setLoading] = useState(false);
-  const supabase = createClient();
-
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      if (question.id) {
-        const { error } = await supabase.from('questions').update({
-          content,
-          options,
-          correct_option_index: correctIndex,
-          topic,
-          point_value: score
-        }).eq('id', question.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('questions').insert({
-          content,
-          options,
-          correct_option_index: correctIndex,
-          topic,
-          point_value: score
-        });
-        if (error) throw error;
-      }
-      onSave();
-      onClose();
-    } catch (err: any) {
-      console.error(err);
-      alert(`عملیات با خطا مواجه شد:\n${err.message || 'مشکل در برقراری ارتباط با سرور'}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden border border-slate-200 dark:border-slate-800">
-        <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 z-10">
-          <h3 className="font-bold text-lg flex items-center gap-2"><Edit className="w-5 h-5 text-primary" /> {question.id ? 'ویرایش سوال' : 'افزودن سوال جدید'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors"><X className="w-5 h-5" /></button>
-        </div>
-        <div className="p-6 overflow-y-auto space-y-6">
-          
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">عنوان سوال</label>
-            <textarea 
-               className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium min-h-[100px] resize-y"
-               value={content}
-               onChange={e => setContent(e.target.value)}
-               placeholder="متن سوال را اینجا بنویسید..."
-            />
-          </div>
-
-          <div className="space-y-3">
-             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">گزینهها (گزینه صحیح را تیک بزنید)</label>
-             {options.map((opt, idx) => {
-                const isEnglish = /[a-zA-Z]/.test(opt) || (opt.trim().length > 0 && !/[\u0600-\u06FF]/.test(opt));
-                return (
-                <div key={idx} className="flex items-center gap-3">
-                  <input 
-                    type="radio"
-                    name="edit-correct"
-                    checked={correctIndex === idx}
-                    onChange={() => setCorrectIndex(idx)}
-                    className="w-5 h-5 text-emerald-500 border-slate-300 focus:ring-emerald-500 mt-1 cursor-pointer bg-white dark:bg-slate-800"
-                  />
-                  <input 
-                    type="text"
-                    value={opt}
-                    dir={isEnglish ? "ltr" : "rtl"}
-                    onChange={e => {
-                       const newOpts = [...options];
-                       newOpts[idx] = e.target.value;
-                       setOptions(newOpts);
-                    }}
-                    placeholder={`گزینه ${toFarsiNumber(idx + 1)}`}
-                    className={`flex-1 p-3 rounded-xl border transition-all text-sm font-medium ${correctIndex === idx ? 'border-emerald-300 bg-emerald-50 dark:bg-emerald-900/10 dark:border-emerald-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-slate-300 dark:focus:border-slate-600 focus:ring-2 focus:ring-slate-500/10'} ${isEnglish ? 'text-left' : ''}`}
-                  />
-                </div>
-             )})}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 pt-2">
-             <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">موضوع</label>
-                <div className="relative">
-                  <select
-                     value={topic}
-                     onChange={e => setTopic(e.target.value)}
-                     className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none pr-4 pl-10"
-                  >
-                     <option value="">بدون موضوع</option>
-                     {topics.map(t => (
-                        <option key={t} value={t}>{t}</option>
-                     ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
-             </div>
-             <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">نمره</label>
-                <input 
-                  type="number"
-                  min={0.5}
-                  step={0.5}
-                  value={score}
-                  onChange={e => setScore(parseFloat(e.target.value))}
-                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold text-left"
-                  dir="ltr"
-                />
-             </div>
-          </div>
-        </div>
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 z-10 flex gap-3">
-          <button 
-             onClick={handleSave} 
-             disabled={loading || !content.trim()}
-             className="flex-1 bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 shadow-lg shadow-primary/20"
-          >
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            ذخیره سوال
-          </button>
-          <button 
-             onClick={onClose}
-             className="px-6 bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 py-3 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-all"
-          >
-            انصراف
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

@@ -1,77 +1,25 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { Search, Play, Edit, Trash, Plus, FileText, BarChart2, List, ChevronDown } from 'lucide-react';
-import { toFarsiNumber } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
+import { toFarsiNumber } from '@/utils/text.util';
+import { useExamsTab } from '@/hooks/useExamsTab';
 
 export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearchTerm = '' }: { initialExams: any[], onNavigate: (tab: string, param?: string) => void, onDataChanged: () => void, initialSearchTerm?: string }) {
-  const [exams, setExams] = useState(initialExams);
-  const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'active' | 'inactive'>('all');
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const supabase = createClient();
-
-  useEffect(() => {
-    setTimeout(() => setExams(initialExams), 0);
-  }, [initialExams]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowStatusDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('آیا از حذف این آزمون اطمینان دارید؟')) return;
-    setLoading(true);
-    const { error } = await supabase.from('exams').delete().eq('id', id);
-    if (!error) {
-      setExams(exams.filter(e => e.id !== id));
-      onDataChanged();
-    } else {
-      alert('خطا در حذف آزمون: ' + error.message);
-    }
-    setLoading(false);
-  };
-
-  const toggleStatus = async (exam: any) => {
-    if (loading) return;
-    setLoading(true);
-    const currentStatus = getStatus(exam);
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-    
-    const currentSettings = exam.settings || {};
-    const newSettings = { ...currentSettings, status: newStatus };
-    const isPublished = newStatus === 'active';
-
-    const { error } = await supabase.from('exams').update({ settings: newSettings, is_published: isPublished }).eq('id', exam.id);
-    
-    if (!error) {
-      onDataChanged();
-    } else {
-      alert('خطا در تغییر وضعیت');
-    }
-    setLoading(false);
-  };
-
-  const getStatus = (exam: any) => {
-    if (exam.settings?.status === 'inactive' || exam.settings?.status === 'draft') return 'inactive';
-    if (exam.settings?.status === 'active') return 'active';
-    return exam.is_published ? 'active' : 'inactive';
-  };
-
-  const filteredExams = exams.filter(e => {
-    const s = getStatus(e);
-    const matchesSearch = (e.title || '').includes(searchTerm);
-    const matchesStatus = selectedStatus === 'all' || s === selectedStatus;
-    return matchesSearch && matchesStatus;
-  });
+  const {
+    exams,
+    loading,
+    searchTerm,
+    setSearchTerm,
+    selectedStatus,
+    setSelectedStatus,
+    showStatusDropdown,
+    setShowStatusDropdown,
+    dropdownRef,
+    handleDelete,
+    toggleStatus,
+    getStatus,
+    filteredExams
+  } = useExamsTab(initialExams, onDataChanged, initialSearchTerm);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

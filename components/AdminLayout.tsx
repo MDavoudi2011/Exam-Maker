@@ -11,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
               <BrainCircuit className="h-6 w-6" />
-              <span>SaaS Quiz</span>
+              <span>آزمون ساز هوشیار</span>
             </Link>
           </div>
           <div className="flex-1 overflow-auto py-4">
@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 md:hidden">
             <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
               <BrainCircuit className="h-6 w-6" />
-              <span>SaaS Quiz</span>
+              <span>آزمون ساز هوشیار</span>
             </Link>
             <nav className="ms-auto flex gap-4 text-sm font-medium">
               <Link href="/dashboard" className="text-muted-foreground hover:text-primary">داشبورد</Link>

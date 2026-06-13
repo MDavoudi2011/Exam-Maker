@@ -1,70 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import React from 'react';
 import { BrainCircuit, Loader2, ArrowRight } from 'lucide-react';
-
-type Mode = 'login' | 'signup' | 'verify';
+import { useClientLogin } from '@/hooks/useClientLogin';
 
 export default function ClientLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [mode, setMode] = useState<Mode>('login');
-  
-  const supabase = createClient();
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      if (mode === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        window.location.reload();
-      } else if (mode === 'signup') {
-        const { error, data } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        // If sign-up requires email confirmation, switch to verify mode
-        if (data?.user && data.user.identities && data.user.identities.length === 0) {
-           setError('این ایمیل قبلاً ثبت شده است.');
-        } else {
-           setMode('verify');
-        }
-      }
-    } catch (err: any) {
-      setError(err.message || 'خطایی رخ داد.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        email,
-        token: otpCode,
-        type: 'signup',
-      });
-      
-      if (error) throw error;
-      
-      // If verification is successful, reload to go to dashboard
-      window.location.reload();
-    } catch (err: any) {
-      setError(err.message || 'کد وارد شده نامعتبر است یا منقضی شده.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    otpCode,
+    setOtpCode,
+    loading,
+    error,
+    setError,
+    mode,
+    setMode,
+    handleAuth,
+    handleVerify
+  } = useClientLogin();
 
   return (
     <div className="h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6 relative font-sans" dir="rtl">
