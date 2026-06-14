@@ -7,16 +7,34 @@ import { attemptService } from '@/services/attempt.service';
 export function useUsersPerformanceTab(initialExams: any[]) {
   const [searchTerm, setSearchTerm] = useState('');
   const [attempts, setAttempts] = useState<any[]>([]);
+  const [examMaxScores, setExamMaxScores] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [selectedAttemptId, setSelectedAttemptId] = useState<string | null>(null);
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const { data, error } = await attemptService.getAttemptsForPerformanceTab();
         
-        if (data) {
+        if (data && data.length > 0) {
+          const examIdsArray = Array.from(new Set(data.map(a => a.exam_id)));
+          const maxScoresRes = await examService.getExamMaxScores(examIdsArray as string[]);
+          const maxScoresData = maxScoresRes.data;
+          
+          const maxScoresMap: Record<string, number> = {};
+          if (maxScoresData) {
+            maxScoresData.forEach(eq => {
+              if (!maxScoresMap[eq.exam_id]) maxScoresMap[eq.exam_id] = 0;
+              const qObj = Array.isArray(eq.questions) ? eq.questions[0] : eq.questions;
+              maxScoresMap[eq.exam_id] += (qObj as any)?.point_value ?? 10;
+            });
+          }
+
+          setExamMaxScores(maxScoresMap);
           setAttempts(data);
+        } else {
+          setAttempts([]);
         }
       } catch (err) {
         console.error(err);
@@ -49,7 +67,11 @@ export function useUsersPerformanceTab(initialExams: any[]) {
       });
     }
     const userStats = usersMap.get(identifier)!;
-    const currentScore = parseFloat(attempt.score) || 0;
+    
+    // Calculate percentage
+    const rawScore = parseFloat(attempt.score) || 0;
+    const maxScore = examMaxScores[attempt.exam_id] || 1;
+    const currentScore = (rawScore / maxScore) * 100;
     
     if (!userStats.attempts[attempt.exam_id] || userStats.attempts[attempt.exam_id].score < currentScore) {
       if (userStats.attempts[attempt.exam_id]) {

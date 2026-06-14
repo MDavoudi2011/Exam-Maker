@@ -40,5 +40,9 @@ export const examService = {
   updateExamQuestionOrder: async (id: string, orderIndex: number) => {
     const supabase = createClient();
     return supabase.from('exam_questions').update({ order_index: orderIndex }).eq('id', id);
+  },
+  getExamMaxScores: async (examIds: string[]) => {
+    const supabase = createClient();
+    return supabase.from('exam_questions').select('exam_id, questions(point_value)').in('exam_id', examIds);
   }
 };

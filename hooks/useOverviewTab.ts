@@ -22,7 +22,25 @@ export function useOverviewTab(initialExams: any[]) {
     const examIds = initialExams.map(e => e.id);
 
     try {
-      const { data: attempts, error } = await attemptService.getCompletedAttemptsByExamIds(examIds);
+      const [attemptsRes, maxScoresRes] = await Promise.all([
+        attemptService.getCompletedAttemptsByExamIds(examIds),
+        examService.getExamMaxScores(examIds)
+      ]);
+      
+      const attempts = attemptsRes.data;
+      const examQuestions = maxScoresRes.data;
+
+      // Calculate max scores per exam
+      const examMaxScores: Record<string, number> = {};
+      if (examQuestions) {
+        examQuestions.forEach(eq => {
+          if (!examMaxScores[eq.exam_id]) examMaxScores[eq.exam_id] = 0;
+          // Extract point_value. Fallback to 10 if null/undefined.
+          const qObj = Array.isArray(eq.questions) ? eq.questions[0] : eq.questions;
+          const pts = (qObj as any)?.point_value ?? 10;
+          examMaxScores[eq.exam_id] += pts;
+        });
+      }
 
       if (attempts && attempts.length > 0) {
         const uniqueUsers = new Set();
@@ -44,7 +62,9 @@ export function useOverviewTab(initialExams: any[]) {
 
         attempts.forEach(attempt => {
           const score = attempt.score || 0;
-          totalPercentage += score;
+          const maxScore = examMaxScores[attempt.exam_id] || 1; // avoid division by zero
+          const percentage = (score / maxScore) * 100;
+          totalPercentage += percentage;
           
           if (attempt.created_at && attempt.completed_at) {
              const start = new Date(attempt.created_at).getTime();
