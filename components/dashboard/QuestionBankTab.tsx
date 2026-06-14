@@ -151,7 +151,7 @@ export function QuestionBankTab() {
           </div>
         </div>
 
-        <div className="overflow-x-auto -mx-4 md:-mx-6 -mb-6 pb-6">
+        <div className="overflow-x-auto -mx-4 md:-mx-6 pb-2 md:pb-4">
           {loading ? (
              <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
           ) : (
@@ -159,9 +159,9 @@ export function QuestionBankTab() {
             <table className="w-full text-right z-10 relative table-auto">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">
-                  <th className="hidden md:table-cell p-3 md:p-4 font-semibold w-px whitespace-nowrap text-center">موضوع</th>
-                  <th className="p-3 md:p-4 font-semibold text-right">عنوان سوال</th>
-                  <th className="p-3 md:p-4 font-semibold w-px whitespace-nowrap text-center">عملیات</th>
+                  <th className="hidden md:table-cell p-3 md:p-4 pr-4 md:pr-6 font-semibold w-px whitespace-nowrap text-center">موضوع</th>
+                  <th className="p-3 md:p-4 pr-4 md:pr-0 font-semibold text-right">عنوان سوال</th>
+                  <th className="p-3 md:p-4 pl-4 md:pl-6 font-semibold w-px whitespace-nowrap text-center">عملیات</th>
                 </tr>
               </thead>
               <tbody className="text-xs md:text-sm">
@@ -170,13 +170,13 @@ export function QuestionBankTab() {
 
                   return (
                   <tr key={q.id || idx} className={`transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0 group ${bgClass} !bg-opacity-40 dark:!bg-opacity-20 hover:!bg-opacity-60 dark:hover:!bg-opacity-40 md:!bg-transparent md:dark:!bg-transparent md:hover:!bg-slate-50 md:dark:hover:!bg-slate-800/50`}>
-                    <td className="hidden md:table-cell p-3 md:p-4 text-center w-px whitespace-nowrap font-bold">
+                    <td className="hidden md:table-cell p-3 md:p-4 pr-4 md:pr-6 text-center w-px whitespace-nowrap font-bold">
                       <span className={`px-2 md:px-3 py-1 md:py-1.5 rounded-lg inline-block align-middle text-[10px] md:text-xs ${getTopicColor(q.topic)}`}>{q.topic || 'بدون دسته‌بندی'}</span>
                     </td>
-                    <td className="p-3 md:p-4 font-medium text-slate-800 dark:text-slate-200 text-right">
+                    <td className="p-3 md:p-4 pr-4 md:pr-0 font-medium text-slate-800 dark:text-slate-200 text-right">
                        <p className="line-clamp-2 md:line-clamp-1">{q.content}</p>
                     </td>
-                    <td className="p-2 md:p-4 text-center w-px whitespace-nowrap">
+                    <td className="p-2 md:p-4 pl-4 md:pl-6 text-center w-px whitespace-nowrap">
                       <div className="inline-flex flex-row items-center justify-center gap-1.5 md:gap-2 opacity-100 md:opacity-70 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => setPreviewQuestion(q)} className="p-1.5 md:p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
                           <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />

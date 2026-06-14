@@ -25,6 +25,10 @@ export const attemptService = {
       .eq('exam_id', examId)
       .order('completed_at', { ascending: false });
   },
+  getAttemptCountsPerExam: async () => {
+    const supabase = createClient();
+    return supabase.from('test_attempts').select('exam_id');
+  },
   getAttemptById: async (id: string) => {
     const supabase = createClient();
     return supabase.from('test_attempts').select('*').eq('id', id).single();

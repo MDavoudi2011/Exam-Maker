@@ -102,7 +102,7 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
           </div>
         </div>
 
-        <div className="overflow-x-auto -mx-4 md:-mx-6 -mb-6">
+        <div className="overflow-x-auto -mx-4 md:-mx-6 pb-2 md:pb-4">
           <table className="w-full text-right border-collapse min-w-max md:min-w-[800px] z-10 relative">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">

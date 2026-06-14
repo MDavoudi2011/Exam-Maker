@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Users, Search, Loader2, Eye, X, BookOpen } from 'lucide-react';
-// removed import
+import React, { useState, useEffect, useRef } from 'react';
+import { Users, Search, Loader2, BookOpen, ArrowUpDown, ArrowUp, ArrowDown, ChevronDown, UserCheck } from 'lucide-react';
+import { toFarsiNumber } from '@/utils/text.util';
 import { ExamViewer } from '@/components/viewer/ExamViewer';
 import { useUsersPerformanceTab, useAttemptDetails } from '@/hooks/useUsersPerformanceTab';
 import { UserPerformanceModal } from './UserPerformanceModal';
@@ -11,12 +11,34 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
   const {
     searchTerm,
     setSearchTerm,
+    sortConfig,
+    requestSort,
+    identifierBasis,
+    setIdentifierBasis,
     loading,
     filteredUsers,
     filteredExams,
     selectedAttemptId,
     setSelectedAttemptId
   } = useUsersPerformanceTab(initialExams);
+
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isIdentDropdownOpen, setIsIdentDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
+  const identDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+        setIsSortDropdownOpen(false);
+      }
+      if (identDropdownRef.current && !identDropdownRef.current.contains(event.target as Node)) {
+        setIsIdentDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -30,63 +52,128 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20 w-full">
+          <div className="relative flex-1">
             <Search className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
               placeholder="جستجوی نام یا کد پرسنلی..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pr-12 pl-4 py-3.5 text-sm font-bold text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 transition-all outline-none"
+              className="w-full pl-4 pr-12 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
             />
+          </div>
+
+          <div className="relative w-full md:w-56 shrink-0" ref={identDropdownRef}>
+            <button 
+              onClick={() => setIsIdentDropdownOpen(!isIdentDropdownOpen)}
+              className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <span className="truncate">{identifierBasis === 'auto' ? 'کد ملی/پرسنلی' : identifierBasis === 'national_code' ? 'کد ملی' : 'کد پرسنلی'}</span>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-slate-400 md:mr-3 transition-transform ${isIdentDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isIdentDropdownOpen && (
+               <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50">
+                 <div className="space-y-1 p-1">
+                   {[
+                     { k: 'auto', l: 'هر دو (کدملی/پرسنلی)' },
+                     { k: 'national_code', l: 'فقط کد ملی' },
+                     { k: 'personnel_code', l: 'فقط کد پرسنلی' }
+                   ].map(opt => (
+                     <button 
+                       key={opt.k}
+                       onClick={() => { setIdentifierBasis(opt.k as any); setIsIdentDropdownOpen(false); }}
+                       className={`w-full flex px-3 py-2.5 rounded-xl text-sm font-bold transition-colors text-right ${identifierBasis === opt.k ? 'bg-primary/10 text-primary dark:bg-primary/20' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
+                     >
+                       {opt.l}
+                     </button>
+                   ))}
+                 </div>
+               </div>
+            )}
+          </div>
+
+          <div className="relative w-full md:w-56 shrink-0" ref={sortDropdownRef}>
+            <button 
+              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+              className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <span className="truncate">
+                  {sortConfig.key === 'fullName' ? 'نام شرکت‌کننده' : sortConfig.key === 'uniqueId' ? (identifierBasis === 'national_code' ? 'کد ملی' : identifierBasis === 'personnel_code' ? 'کد پرسنلی' : 'کد ملی/پرسنلی') : 'میانگین نمرات'}
+                </span>
+                {sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4 shrink-0 text-primary" /> : <ArrowDown className="w-4 h-4 shrink-0 text-primary" />}
+              </div>
+              <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 md:mr-3 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isSortDropdownOpen && (
+               <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50">
+                 <div className="space-y-1 p-1">
+                   {[
+                     { k: 'fullName', l: 'نام شرکت‌کننده' },
+                     { k: 'uniqueId', l: identifierBasis === 'national_code' ? 'کد ملی' : identifierBasis === 'personnel_code' ? 'کد پرسنلی' : 'کد ملی/پرسنلی' },
+                     { k: 'avgScore', l: 'میانگین نمرات' }
+                   ].map(opt => (
+                     <button 
+                       key={opt.k}
+                       onClick={() => { requestSort(opt.k as any); setIsSortDropdownOpen(false); }}
+                       className={`w-full flex flex-col px-3 py-2.5 rounded-xl text-sm font-bold transition-colors text-right ${sortConfig?.key === opt.k ? 'bg-primary/10 text-primary dark:bg-primary/20' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
+                     >
+                        <div className="flex justify-between items-center w-full">
+                          <span>{opt.l}</span>
+                          {sortConfig?.key === opt.k && (
+                            <span className="text-primary">{sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}</span>
+                          )}
+                        </div>
+                     </button>
+                   ))}
+                 </div>
+               </div>
+            )}
           </div>
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-12 text-slate-500">
-            <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-            <p className="font-bold text-sm">در حال دریافت اطلاعات...</p>
-          </div>
+          <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
         ) : filteredUsers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-slate-500">
-            <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center mb-4 transition-transform hover:scale-105 hover:-rotate-3">
-              <BookOpen className="w-8 h-8 text-slate-400" />
-            </div>
+          <div className="flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 m-4 text-slate-500">
+            <BookOpen className="w-12 h-12 text-slate-300 mb-4" />
             <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">نتیجه‌ای یافت نشد</h3>
             <p className="text-sm font-medium">هیچ شرکت‌کننده‌ای با کدملی/پرسنلی پیدا نشد.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto -mx-4 md:-mx-6 -mb-6">
-            <table className="w-full text-right border-collapse min-w-max md:min-w-0">
-              <thead className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
-                <tr className="bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm text-slate-500 text-xs md:text-sm">
-                  <th className="p-2 md:p-5 px-3 md:px-5 font-semibold">تکمیل کننده</th>
-                  <th className="p-2 md:p-5 font-semibold">کد ملی/پرسنلی</th>
+          <div className="overflow-x-auto -mx-4 md:-mx-6 pb-2 md:pb-4">
+            <table className="w-full text-right border-collapse min-w-max md:min-w-[800px] z-10 relative">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-1/3">تکمیل کننده</th>
+                  <th className="p-3 md:p-4 font-semibold text-center w-32">{identifierBasis === 'national_code' ? 'کد ملی' : identifierBasis === 'personnel_code' ? 'کد پرسنلی' : 'کد ملی/پرسنلی'}</th>
                   {filteredExams.map(exam => (
-                    <th key={exam.id} className="p-2 md:p-5 font-semibold">{exam.title}</th>
+                    <th key={exam.id} className="p-3 md:p-4 font-semibold text-center">{exam.title}</th>
                   ))}
-                  <th className="p-2 md:p-5 font-semibold text-center">میانگین</th>
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-24">میانگین</th>
                 </tr>
               </thead>
-              <tbody className="text-xs md:text-sm">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs md:text-sm">
                 {filteredUsers.map((user, idx) => {
                   const avgScore = user.examsCount > 0 ? (user.totalScore / user.examsCount).toFixed(1) : 0;
                   return (
-                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0 pl-4">
-                      <td className="p-2 md:p-5 px-3 md:px-5 font-bold text-slate-800 dark:text-slate-200">{user.fullName}</td>
-                      <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{user.uniqueId}</td>
+                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                      <td className="p-3 md:p-4 px-4 md:px-6 font-bold text-slate-800 dark:text-slate-200">{user.fullName}</td>
+                      <td className="p-3 md:p-4 font-medium text-slate-600 dark:text-slate-400 text-center">{user.uniqueId}</td>
                       {filteredExams.map(exam => {
                         const att = user.attempts[exam.id];
                         return (
-                          <td key={exam.id} className="p-2 md:p-5">
+                          <td key={exam.id} className="p-3 md:p-4 text-center">
                             {att ? (
                               <button 
                                 onClick={() => setSelectedAttemptId(att.attemptId)}
-                                className={`font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-sm transition-colors hover:scale-105 active:scale-95 ${att.score >= 50 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'}`}
+                                className={`font-bold px-3 py-1.5 rounded-xl text-xs transition-transform hover:scale-105 active:scale-95 ${att.score >= 50 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'}`}
                               >
-                                {att.score.toFixed(1)}%
+                                {toFarsiNumber(att.score.toFixed(1))}%
                               </button>
                             ) : (
                               <span className="text-slate-400">-</span>
@@ -94,8 +181,10 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
                           </td>
                         );
                       })}
-                      <td className="p-2 md:p-5 text-center font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10">
-                        {avgScore}%
+                      <td className="p-3 md:p-4 px-4 md:px-6 text-center">
+                        <span className="inline-block font-bold px-3 py-1.5 rounded-xl text-xs bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300">
+                          {toFarsiNumber(avgScore)}%
+                        </span>
                       </td>
                     </tr>
                   )

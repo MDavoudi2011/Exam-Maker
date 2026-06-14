@@ -6,6 +6,8 @@ import { attemptService } from '@/services/attempt.service';
 
 export function useUsersPerformanceTab(initialExams: any[]) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState<{ key: 'fullName' | 'uniqueId' | 'avgScore', direction: 'asc' | 'desc' }>({ key: 'avgScore', direction: 'desc' });
+  const [identifierBasis, setIdentifierBasis] = useState<'auto' | 'national_code' | 'personnel_code'>('auto');
   const [attempts, setAttempts] = useState<any[]>([]);
   const [examMaxScores, setExamMaxScores] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,11 @@ export function useUsersPerformanceTab(initialExams: any[]) {
   }>();
 
   attempts.forEach(attempt => {
-    const identifier = attempt.national_code || attempt.personnel_code;
+    let identifier = '';
+    if (identifierBasis === 'auto') identifier = attempt.national_code || attempt.personnel_code;
+    else if (identifierBasis === 'national_code') identifier = attempt.national_code;
+    else if (identifierBasis === 'personnel_code') identifier = attempt.personnel_code;
+
     if (!identifier) return;
 
     if (!usersMap.has(identifier)) {
@@ -87,7 +93,17 @@ export function useUsersPerformanceTab(initialExams: any[]) {
   const usersArray = Array.from(usersMap.values());
   const filteredUsers = usersArray.filter(u => 
     u.fullName.includes(searchTerm) || u.uniqueId.includes(searchTerm)
-  );
+  ).sort((a, b) => {
+    const isAsc = sortConfig.direction === 'asc' ? 1 : -1;
+    if (sortConfig.key === 'fullName') return a.fullName.localeCompare(b.fullName) * isAsc;
+    if (sortConfig.key === 'uniqueId') return a.uniqueId.localeCompare(b.uniqueId) * isAsc;
+    if (sortConfig.key === 'avgScore') {
+       const aAvg = a.examsCount > 0 ? (a.totalScore / a.examsCount) : 0;
+       const bAvg = b.examsCount > 0 ? (b.totalScore / b.examsCount) : 0;
+       return (aAvg - bAvg) * isAsc;
+    }
+    return 0;
+  });
 
   const activeExamIds = new Set<string>();
   filteredUsers.forEach(u => {
@@ -96,9 +112,19 @@ export function useUsersPerformanceTab(initialExams: any[]) {
 
   const filteredExams = initialExams.filter(e => activeExamIds.has(e.id));
 
+  const requestSort = (key: 'fullName' | 'uniqueId' | 'avgScore') => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+    setSortConfig({ key, direction });
+  };
+
   return {
     searchTerm,
     setSearchTerm,
+    sortConfig,
+    requestSort,
+    identifierBasis,
+    setIdentifierBasis,
     loading,
     filteredUsers,
     filteredExams,
