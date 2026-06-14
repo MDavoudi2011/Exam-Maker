@@ -6,6 +6,7 @@ import { toFarsiNumber } from '@/utils/text.util';
 import { ITEMS_PER_PAGE_OPTIONS } from '@/constants/exam.constant';
 import { getTopicColor } from '@/utils/styles.util';
 import { useQuestionBankTab, useEditModal } from '@/hooks/useQuestionBankTab';
+import { useResponsivePagination } from '@/hooks/useResponsivePagination';
 import { RenderContent } from '@/components/ui/RenderContent';
 import { EditModal } from '@/components/dashboard/QuestionBankEditModal';
 
@@ -43,6 +44,8 @@ export function QuestionBankTab() {
     totalPages,
     paginatedQuestions
   } = useQuestionBankTab();
+
+  const { getVisiblePages } = useResponsivePagination(currentPage, totalPages);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -153,25 +156,28 @@ export function QuestionBankTab() {
              <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
           ) : (
             <>
-            <table className="w-full text-right z-10 relative table-auto min-w-[500px] md:min-w-0">
+            <table className="w-full text-right z-10 relative table-auto">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">
-                  <th className="p-3 md:p-4 font-semibold w-px whitespace-nowrap text-center">موضوع</th>
-                  <th className="p-3 md:p-4 font-semibold text-right min-w-[200px]">عنوان سوال</th>
+                  <th className="hidden md:table-cell p-3 md:p-4 font-semibold w-px whitespace-nowrap text-center">موضوع</th>
+                  <th className="p-3 md:p-4 font-semibold text-right">عنوان سوال</th>
                   <th className="p-3 md:p-4 font-semibold w-px whitespace-nowrap text-center">عملیات</th>
                 </tr>
               </thead>
               <tbody className="text-xs md:text-sm">
-                {paginatedQuestions.length > 0 ? paginatedQuestions.map((q, idx) => (
-                  <tr key={q.id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0 group">
-                    <td className="p-3 md:p-4 text-center w-px whitespace-nowrap font-bold">
+                {paginatedQuestions.length > 0 ? paginatedQuestions.map((q, idx) => {
+                  const bgClass = getTopicColor(q.topic).split(' ').filter(c => c.startsWith('bg-') || c.startsWith('dark:bg-')).join(' ');
+
+                  return (
+                  <tr key={q.id || idx} className={`transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0 group ${bgClass} !bg-opacity-40 dark:!bg-opacity-20 hover:!bg-opacity-60 dark:hover:!bg-opacity-40 md:!bg-transparent md:dark:!bg-transparent md:hover:!bg-slate-50 md:dark:hover:!bg-slate-800/50`}>
+                    <td className="hidden md:table-cell p-3 md:p-4 text-center w-px whitespace-nowrap font-bold">
                       <span className={`px-2 md:px-3 py-1 md:py-1.5 rounded-lg inline-block align-middle text-[10px] md:text-xs ${getTopicColor(q.topic)}`}>{q.topic || 'بدون دسته‌بندی'}</span>
                     </td>
                     <td className="p-3 md:p-4 font-medium text-slate-800 dark:text-slate-200 text-right">
                        <p className="line-clamp-2 md:line-clamp-1">{q.content}</p>
                     </td>
                     <td className="p-2 md:p-4 text-center w-px whitespace-nowrap">
-                      <div className="inline-flex items-center justify-center gap-1.5 md:gap-2 opacity-100 md:opacity-70 group-hover:opacity-100 transition-opacity">
+                      <div className="inline-flex flex-row items-center justify-center gap-1.5 md:gap-2 opacity-100 md:opacity-70 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => setPreviewQuestion(q)} className="p-1.5 md:p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
                           <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
@@ -184,7 +190,8 @@ export function QuestionBankTab() {
                       </div>
                     </td>
                   </tr>
-                )) : (
+                  );
+                }) : (
                   <tr>
                     <td colSpan={3} className="p-10 text-center text-slate-500 font-medium">سوالاتی یافت نشد</td>
                   </tr>
@@ -193,24 +200,24 @@ export function QuestionBankTab() {
             </table>
 
             {filteredQuestions.length > 0 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 px-2">
-                <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
-                  <span>تعداد در هر صفحه:</span>
+              <div className="flex flex-row items-center justify-between gap-2 mt-6 px-2 w-full pb-2">
+                <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-slate-500 font-medium whitespace-nowrap">
+                  <span className="hidden sm:inline">تعداد در صفحه:</span>
                   <div className="relative" ref={itemsPerPageRef}>
                     <button 
                       onClick={() => setShowItemsPerPageDropdown(!showItemsPerPageDropdown)}
-                      className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 font-bold text-slate-700 dark:text-slate-300 min-w-[80px] flex items-center justify-between gap-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                      className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg px-2 md:px-3 py-1.5 font-bold text-slate-700 dark:text-slate-300 min-w-[48px] md:min-w-[80px] flex items-center justify-between gap-1 md:gap-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
                     >
-                      <span>{itemsPerPage === 'all' ? 'همه' : toFarsiNumber(itemsPerPage)}</span>
-                      <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${showItemsPerPageDropdown ? 'rotate-180' : ''}`} />
+                      <span className="text-xs md:text-sm">{itemsPerPage === 'all' ? 'همه' : toFarsiNumber(itemsPerPage)}</span>
+                      <ChevronDown className={`w-3 h-3 md:w-4 md:h-4 shrink-0 text-slate-400 transition-transform ${showItemsPerPageDropdown ? 'rotate-180' : ''}`} />
                     </button>
                     {showItemsPerPageDropdown && (
-                      <div className="absolute bottom-full mb-2 right-0 w-full min-w-[100px] bg-white dark:bg-slate-800 rounded-xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-1 animate-in fade-in zoom-in-95 origin-bottom z-50">
+                      <div className="absolute bottom-full mb-2 right-0 w-full min-w-full md:min-w-[100px] bg-white dark:bg-slate-800 rounded-xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-1 animate-in fade-in zoom-in-95 origin-bottom z-50">
                         {ITEMS_PER_PAGE_OPTIONS.map(val => (
                           <button 
                             key={val}
                             onClick={() => { setItemsPerPage(val as number | 'all'); setCurrentPage(1); setShowItemsPerPageDropdown(false); }}
-                            className={`px-3 py-2 text-right text-sm font-bold rounded-lg transition-colors ${itemsPerPage === val ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-300' : 'hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'}`}
+                            className={`px-2 md:px-3 py-1.5 md:py-2 text-right text-xs md:text-sm font-bold rounded-lg transition-colors ${itemsPerPage === val ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-300' : 'hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'}`}
                           >
                              {val === 'all' ? 'همه' : toFarsiNumber(val)}
                           </button>
@@ -221,39 +228,44 @@ export function QuestionBankTab() {
                 </div>
 
                 {totalPages > 1 && itemsPerPage !== 'all' && (
-                  <div className="flex items-center gap-2" dir="ltr">
+                  <div className="flex items-center gap-1 md:gap-2 shrink-0" dir="ltr">
                     <button 
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="w-9 h-9 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                      className="w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
                     </button>
                     
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <div className="flex items-center gap-0.5 md:gap-1">
+                      {getVisiblePages().map((page, i) => {
+                        if (page === '...') {
+                            return <span key={`ellipsis-${i}`} className="px-1 text-slate-400 font-bold">...</span>;
+                        }
+                        return (
                         <button
                           key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${currentPage === page ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                          onClick={() => setCurrentPage(page as number)}
+                          className={`w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors ${currentPage === page ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                         >
                           {toFarsiNumber(page)}
                         </button>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     <button 
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="w-9 h-9 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                      className="w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                     </button>
                   </div>
                 )}
               </div>
             )}
-            </>
+          </>
           )}
         </div>
       </div>

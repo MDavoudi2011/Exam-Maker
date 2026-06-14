@@ -52,24 +52,24 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
       </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden min-h-[400px]">
-        <div className="overflow-x-auto">
-          <table className="w-full text-right border-collapse min-w-[700px]">
+        <div className="overflow-x-auto -mx-4 md:-mx-6 -mb-6">
+          <table className="w-full text-right border-collapse min-w-max md:min-w-[700px]">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm border-b border-slate-100 dark:border-slate-800">
-                {showFullName && <th className="p-5 font-semibold">نام و نام خانوادگی</th>}
-                {showNationalCode && <th className="p-5 font-semibold">کد ملی</th>}
-                {showPersonnelCode && <th className="p-5 font-semibold">کد پرسنلی</th>}
-                {showOrgTitle && <th className="p-5 font-semibold">عنوان سازمانی</th>}
-                {showClassName && <th className="p-5 font-semibold">کلاس</th>}
-                {showSchool && <th className="p-5 font-semibold">مدرسه</th>}
-                {showDistrict && <th className="p-5 font-semibold">ناحیه/منطقه</th>}
-                <th className="p-5 font-semibold text-center w-24">نمره</th>
-                <th className="p-5 font-semibold text-center w-40">شروع</th>
-                <th className="p-5 font-semibold text-center w-40">پایان (ارسال)</th>
-                <th className="p-5 font-semibold text-center w-32">ریز نتایج</th>
+              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-b border-slate-100 dark:border-slate-800">
+                {showFullName && <th className="p-2 md:p-5 px-3 md:px-5 font-semibold">نام و نام خانوادگی</th>}
+                {showNationalCode && <th className="p-2 md:p-5 font-semibold">کد ملی</th>}
+                {showPersonnelCode && <th className="p-2 md:p-5 font-semibold">کد پرسنلی</th>}
+                {showOrgTitle && <th className="p-2 md:p-5 font-semibold">عنوان سازمانی</th>}
+                {showClassName && <th className="p-2 md:p-5 font-semibold">کلاس</th>}
+                {showSchool && <th className="p-2 md:p-5 font-semibold">مدرسه</th>}
+                {showDistrict && <th className="p-2 md:p-5 font-semibold">ناحیه/منطقه</th>}
+                <th className="p-2 md:p-5 font-semibold text-center w-20 md:w-24">نمره</th>
+                <th className="p-2 md:p-5 font-semibold text-center w-32 md:w-40">شروع</th>
+                <th className="p-2 md:p-5 font-semibold text-center w-32 md:w-40">پایان (ارسال)</th>
+                <th className="p-2 md:p-5 font-semibold text-center w-24 md:w-32">ریز نتایج</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs md:text-sm">
               {loading ? (
                 <tr>
                    <td colSpan={10} className="p-16 text-center">
@@ -82,28 +82,28 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
                 results.length > 0 ? results.map((res: any) => {
                   return (
                   <tr key={res.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    {showFullName && <td className="p-5 font-bold text-slate-800 dark:text-slate-200">{res.full_name || '-'}</td>}
-                    {showNationalCode && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.national_code || '-'}</td>}
-                    {showPersonnelCode && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.personnel_code || '-'}</td>}
-                    {showOrgTitle && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.org_title || '-'}</td>}
-                    {showClassName && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.class_name || '-'}</td>}
-                    {showSchool && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.school || '-'}</td>}
-                    {showDistrict && <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{res.district || '-'}</td>}
-                    <td className="p-5 text-center">
+                    {showFullName && <td className="p-2 md:p-5 px-3 md:px-5 font-bold text-slate-800 dark:text-slate-200">{res.full_name || '-'}</td>}
+                    {showNationalCode && <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{res.national_code || '-'}</td>}
+                    {showPersonnelCode && <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{res.personnel_code || '-'}</td>}
+                    {showOrgTitle && <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{res.org_title || '-'}</td>}
+                    {showClassName && <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{res.class_name || '-'}</td>}
+                    {showSchool && <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{res.school || '-'}</td>}
+                    {showDistrict && <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{res.district || '-'}</td>}
+                    <td className="p-2 md:p-5 text-center">
                       {res.status === 'completed' ? (
-                      <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300 px-3 py-1.5 rounded-xl text-sm font-black border border-indigo-200 dark:border-indigo-500/30 w-16 inline-block">
+                      <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300 px-2 md:px-3 py-1 md:py-1.5 rounded-xl text-[10px] md:text-sm font-black border border-indigo-200 dark:border-indigo-500/30 w-12 md:w-16 inline-block">
                         {res.score !== null ? toFarsiNumber(res.score) : '-'}
                       </span>
                       ) : (
-                        <span className="text-xs text-slate-400 font-bold">در حال انجام</span>
+                        <span className="text-[10px] md:text-xs text-slate-400 font-bold">در حال انجام</span>
                       )}
                     </td>
-                    <td className="p-5 text-slate-500 text-xs text-center" dir="ltr">{res.created_at ? toFarsiNumber(new Date(res.created_at).toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}</td>
-                    <td className="p-5 text-slate-500 text-xs text-center" dir="ltr">{res.completed_at ? toFarsiNumber(new Date(res.completed_at).toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}</td>
-                    <td className="p-5">
+                    <td className="p-2 md:p-5 text-slate-500 text-[10px] md:text-xs text-center whitespace-nowrap" dir="ltr">{res.created_at ? toFarsiNumber(new Date(res.created_at).toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}</td>
+                    <td className="p-2 md:p-5 text-slate-500 text-[10px] md:text-xs text-center whitespace-nowrap" dir="ltr">{res.completed_at ? toFarsiNumber(new Date(res.completed_at).toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}</td>
+                    <td className="p-2 md:p-5">
                       <div className="flex items-center justify-center">
-                        <button onClick={() => setViewingAttempt(res)} className="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white text-slate-600 dark:text-slate-300 rounded-xl transition-all shadow-sm" disabled={res.status !== 'completed'}>
-                          <Eye className={`w-5 h-5 ${res.status !== 'completed' ? 'opacity-30' : ''}`} />
+                        <button onClick={() => setViewingAttempt(res)} className="p-1.5 md:p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white text-slate-600 dark:text-slate-300 rounded-lg md:rounded-xl transition-all shadow-sm" disabled={res.status !== 'completed'}>
+                          <Eye className={`w-4 h-4 md:w-5 md:h-5 ${res.status !== 'completed' ? 'opacity-30' : ''}`} />
                         </button>
                       </div>
                     </td>

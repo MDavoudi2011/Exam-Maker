@@ -58,33 +58,33 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
             <p className="text-sm font-medium">هیچ شرکت‌کننده‌ای با کدملی/پرسنلی پیدا نشد.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-right">
-              <thead>
-                <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-sm border-b border-slate-100 dark:border-slate-800">
-                  <th className="p-5 font-semibold">تکمیل کننده</th>
-                  <th className="p-5 font-semibold">کد ملی/پرسنلی</th>
+          <div className="overflow-x-auto -mx-4 md:-mx-6 -mb-6">
+            <table className="w-full text-right border-collapse min-w-max md:min-w-0">
+              <thead className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
+                <tr className="bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm text-slate-500 text-xs md:text-sm">
+                  <th className="p-2 md:p-5 px-3 md:px-5 font-semibold">تکمیل کننده</th>
+                  <th className="p-2 md:p-5 font-semibold">کد ملی/پرسنلی</th>
                   {filteredExams.map(exam => (
-                    <th key={exam.id} className="p-5 font-semibold">{exam.title}</th>
+                    <th key={exam.id} className="p-2 md:p-5 font-semibold">{exam.title}</th>
                   ))}
-                  <th className="p-5 font-semibold text-center">میانگین</th>
+                  <th className="p-2 md:p-5 font-semibold text-center">میانگین</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-xs md:text-sm">
                 {filteredUsers.map((user, idx) => {
                   const avgScore = user.examsCount > 0 ? (user.totalScore / user.examsCount).toFixed(1) : 0;
                   return (
                     <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-0 pl-4">
-                      <td className="p-5 font-bold text-slate-800 dark:text-slate-200">{user.fullName}</td>
-                      <td className="p-5 font-medium text-slate-600 dark:text-slate-400">{user.uniqueId}</td>
+                      <td className="p-2 md:p-5 px-3 md:px-5 font-bold text-slate-800 dark:text-slate-200">{user.fullName}</td>
+                      <td className="p-2 md:p-5 font-medium text-slate-600 dark:text-slate-400">{user.uniqueId}</td>
                       {filteredExams.map(exam => {
                         const att = user.attempts[exam.id];
                         return (
-                          <td key={exam.id} className="p-5">
+                          <td key={exam.id} className="p-2 md:p-5">
                             {att ? (
                               <button 
                                 onClick={() => setSelectedAttemptId(att.attemptId)}
-                                className={`font-bold px-3 py-1.5 rounded-lg text-sm transition-colors hover:scale-105 active:scale-95 ${att.score >= 50 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'}`}
+                                className={`font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-sm transition-colors hover:scale-105 active:scale-95 ${att.score >= 50 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'}`}
                               >
                                 {att.score.toFixed(1)}%
                               </button>
@@ -94,7 +94,7 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
                           </td>
                         );
                       })}
-                      <td className="p-5 text-center font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10">
+                      <td className="p-2 md:p-5 text-center font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10">
                         {avgScore}%
                       </td>
                     </tr>
