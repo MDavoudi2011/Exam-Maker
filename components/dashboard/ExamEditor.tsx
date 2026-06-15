@@ -66,20 +66,20 @@ export function ExamEditorInner({ exam, initialQuestions, user, onNavigate, onDa
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl w-full mx-auto pb-20">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 px-2 md:px-0">
         <div>
-          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-3">
-            <Edit className="w-7 h-7 text-primary" />
+          <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 md:gap-3">
+            <Edit className="w-6 h-6 md:w-7 md:h-7 text-primary" />
             ویرایش آزمون
           </h2>
-          <p className="text-slate-500 font-medium mt-2">
+          <p className="text-sm md:text-base text-slate-500 font-medium mt-1.5 md:mt-2">
             {step === 1 ? 'مشخصات اولیه آزمون را ویرایش کنید' : 'سوالات مورد نظر خود را ویرایش کنید'}
           </p>
         </div>
         {step === 2 && (
           <button 
             onClick={handlePublish} disabled={saving || selectedQuestions.length === 0}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98]"
+            className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98]"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin"/> : <Save className="w-5 h-5" />}
             ثبت تغییرات آزمون

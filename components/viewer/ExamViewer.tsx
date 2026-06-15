@@ -177,7 +177,7 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
                               return (
                                 <td key={optIdx} className="py-2 md:py-4 px-0.5 md:px-4">
                                   <div className={`w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center mx-auto transition-all ${colors}`}>
-                                    {isUserSel && !isCorrect ? <X className="w-3 h-3 md:w-6 md:h-6 stroke-[3]" /> : (isCorrect ? <CheckCircle2 className="w-3 h-3 md:w-6 md:h-6 stroke-[3]" /> : null)}
+                                    {isUserSel && !isCorrect ? <X className="w-3.5 h-3.5 md:w-5 md:h-5 stroke-[2.5]" /> : (isCorrect ? <CheckCircle2 className="w-3.5 h-3.5 md:w-5 md:h-5 stroke-[2.5]" /> : null)}
                                   </div>
                                 </td>
                               );
