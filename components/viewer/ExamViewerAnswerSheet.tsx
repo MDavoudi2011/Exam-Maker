@@ -72,7 +72,7 @@ export function ExamViewerAnswerSheet({
           {isOpen && mounted && createPortal(
             <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:p-0" dir="rtl">
               <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsOpen(false)}></div>
-              <div className="relative bg-white dark:bg-slate-900 w-full sm:max-w-md rounded-3xl p-5 shadow-2xl flex flex-col animate-in slide-in-from-bottom-full duration-300 max-h-[75vh]">
+              <div className="relative bg-white dark:bg-slate-900 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl flex flex-col max-h-[75vh] animate-in fade-in zoom-in-95 duration-200">
                 <div className="font-bold mb-4 text-base text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-2">
                     <LayoutGrid className="w-5 h-5 text-primary" />

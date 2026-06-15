@@ -13,14 +13,14 @@ export function ExamViewerHeader({
   examTimeLimit
 }: any) {
   return (
-    <div className="w-full max-w-[1100px] flex items-center justify-between mb-8 z-40 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md p-4 rounded-3xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm shrink-0">
-      <button onClick={toggleDarkMode} className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm text-slate-600 dark:text-slate-300 hover:text-primary transition-colors border border-slate-200 dark:border-slate-700 shrink-0">
-        {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+    <div className="w-full max-w-[1100px] flex items-center justify-between mb-6 md:mb-8 z-40 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md px-3 py-2.5 md:p-4 rounded-2xl md:rounded-3xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm shrink-0">
+      <button onClick={toggleDarkMode} className="p-2 md:p-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm text-slate-600 dark:text-slate-300 hover:text-primary transition-colors border border-slate-200 dark:border-slate-700 shrink-0">
+        {isDarkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
       </button>
 
       {currentStep === 'question' && (
-        <div className="flex-1 mx-2 md:mx-8">
-          <div className="flex justify-between items-end mb-2 px-1">
+        <div className="flex-1 mx-2.5 md:mx-8">
+          <div className="flex justify-between items-end mb-1.5 px-0.5">
             <span className="font-bold text-primary text-xs md:text-sm">سوال {toFarsiNumber(activeQuestionIndex + 1)} از {toFarsiNumber(totalQuestions)}</span>
             <span className="text-[10px] md:text-xs font-bold text-slate-500">{toFarsiNumber(Math.round(((activeQuestionIndex + 1) / totalQuestions) * 100))}%</span>
           </div>
@@ -35,9 +35,9 @@ export function ExamViewerHeader({
       
       <div className="flex items-center gap-4 shrink-0">
         {currentStep === 'question' && timeLeft !== null && (
-          <div className={`flex items-center justify-center gap-1.5 md:gap-2 w-[85px] md:w-32 py-2.5 rounded-xl border font-bold text-[13px] md:text-sm transition-colors duration-500 ${timeLeft <= 60 ? 'bg-rose-500 text-white border-rose-500' : 'bg-white dark:bg-slate-800 text-primary border-slate-200 dark:border-slate-700'}`}>
+          <div className={`flex items-center justify-center gap-1.5 md:gap-2 w-[100px] md:w-[130px] py-1.5 md:py-2 rounded-xl border font-bold text-[13px] md:text-sm transition-colors duration-500 ${timeLeft <= 60 ? 'bg-rose-500 text-white border-rose-500' : 'bg-white dark:bg-slate-800 text-primary border-slate-200 dark:border-slate-700'}`}>
             <Timer className={`w-4 h-4 md:w-5 md:h-5 ${timeLeft <= 60 ? 'animate-pulse' : ''}`} />
-            <span className="dir-ltr inline-block tracking-widest">{formatTime(timeLeft)}</span>
+            <span className="dir-ltr inline-block tracking-widest min-w-[42px] md:min-w-[50px] text-center tabular-nums">{formatTime(timeLeft)}</span>
           </div>
         )}
         {currentStep === 'intro' && examTimeLimit && (
