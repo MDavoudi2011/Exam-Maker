@@ -72,7 +72,7 @@ export const RenderContent = ({ content }: { content: string }) => {
           }
 
           return textParts.map((t, idx) => {
-            if (t.isCode) {
+            if (t.isCode && /[a-zA-Z0-9]/.test(t.text)) {
               return (
                 <span key={`${j}-${idx}`} dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
                   {t.text}

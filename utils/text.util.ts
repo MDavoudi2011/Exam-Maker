@@ -7,4 +7,4 @@ export function toFarsiNumber(n: number | string): string {
 
 export const isFarsiChar = (char: string) => /[\u0600-\u06FF\u200C]/.test(char);
 
-export const isCodeStart = (char: string) => /[a-zA-Z0-9]/.test(char);
+export const isCodeStart = (char: string) => /[a-zA-Z0-9()\[\]{}"'<>]/.test(char);
