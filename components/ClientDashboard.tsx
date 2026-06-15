@@ -19,36 +19,13 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
     exams,
     handleNavigate,
     refreshExams,
-    handleLogout
+    handleLogout,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen,
+    isDarkMode,
+    toggleDarkMode,
+    handleTabClick
   } = useClientDashboard(initialTab, initialParam, initialExams);
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
-    setIsDarkMode(isDark);
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-      setIsDarkMode(false);
-    } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      setIsDarkMode(true);
-    }
-  };
-
-  const handleTabClick = (tab: string) => {
-    handleNavigate(tab);
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <div className="h-screen w-full bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col md:flex-row relative overflow-hidden" dir="rtl">

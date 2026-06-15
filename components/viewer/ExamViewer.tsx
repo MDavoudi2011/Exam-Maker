@@ -148,14 +148,14 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
                
                {/* Answer Sheet Table */}
                <div className="w-full overflow-x-auto rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
-                 <table className="w-full text-sm text-center min-w-[500px]">
+                 <table className="w-full text-xs md:text-sm text-center table-fixed">
                    <thead>
                      <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800">
-                       <th className="py-5 px-4 font-bold text-slate-600 dark:text-slate-400 w-24">سوال</th>
-                       <th className="py-5 px-4 font-bold text-slate-600 dark:text-slate-400 w-1/4">گزینه ۱</th>
-                       <th className="py-5 px-4 font-bold text-slate-600 dark:text-slate-400 w-1/4">گزینه ۲</th>
-                       <th className="py-5 px-4 font-bold text-slate-600 dark:text-slate-400 w-1/4">گزینه ۳</th>
-                       <th className="py-5 px-4 font-bold text-slate-600 dark:text-slate-400 w-1/4">گزینه ۴</th>
+                       <th className="py-3 md:py-5 px-1 md:px-4 font-bold text-slate-600 dark:text-slate-400 w-12 md:w-24 text-[10px] md:text-sm">سوال</th>
+                       <th className="py-3 md:py-5 px-1 md:px-4 font-bold text-slate-600 dark:text-slate-400 w-[22%] md:w-1/4 text-[10px] md:text-sm">گزینه ۱</th>
+                       <th className="py-3 md:py-5 px-1 md:px-4 font-bold text-slate-600 dark:text-slate-400 w-[22%] md:w-1/4 text-[10px] md:text-sm">گزینه ۲</th>
+                       <th className="py-3 md:py-5 px-1 md:px-4 font-bold text-slate-600 dark:text-slate-400 w-[22%] md:w-1/4 text-[10px] md:text-sm">گزینه ۳</th>
+                       <th className="py-3 md:py-5 px-1 md:px-4 font-bold text-slate-600 dark:text-slate-400 w-[22%] md:w-1/4 text-[10px] md:text-sm">گزینه ۴</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -164,20 +164,20 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
                        const correctAns = q.questions.correct_option_index;
                        return (
                          <tr key={q.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                           <td className="py-4 px-4 font-bold text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/10 border-l border-slate-100 dark:border-slate-800 text-lg">{toFarsiNumber(i + 1)}</td>
+                           <td className="py-2 md:py-4 px-1 md:px-4 font-bold text-slate-700 dark:text-slate-300 bg-slate-50/50 dark:bg-slate-800/10 border-l border-slate-100 dark:border-slate-800 text-sm md:text-lg">{toFarsiNumber(i + 1)}</td>
                            {[0, 1, 2, 3].map(optIdx => {
                               const isUserSel = userAns === optIdx;
                               const isCorrect = correctAns === optIdx;
                               
                               let colors = "bg-slate-100 dark:bg-slate-800/50 text-slate-300 dark:text-slate-600";
-                              if (isCorrect && isUserSel) colors = "bg-emerald-500 text-white shadow-md shadow-emerald-500/20 ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-slate-900";
+                              if (isCorrect && isUserSel) colors = "bg-emerald-500 text-white shadow-md shadow-emerald-500/20 ring-1 md:ring-2 ring-emerald-500 ring-offset-1 md:ring-offset-2 dark:ring-offset-slate-900";
                               else if (isCorrect && !isUserSel) colors = "bg-emerald-50 dark:bg-emerald-900/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30";
-                              else if (!isCorrect && isUserSel) colors = "bg-rose-500 text-white shadow-md shadow-rose-500/20 ring-2 ring-rose-500 ring-offset-2 dark:ring-offset-slate-900";
+                              else if (!isCorrect && isUserSel) colors = "bg-rose-500 text-white shadow-md shadow-rose-500/20 ring-1 md:ring-2 ring-rose-500 ring-offset-1 md:ring-offset-2 dark:ring-offset-slate-900";
 
                               return (
-                                <td key={optIdx} className="py-4 px-4">
-                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto transition-all ${colors}`}>
-                                    {isUserSel && !isCorrect ? <X className="w-6 h-6 stroke-[3]" /> : (isCorrect ? <CheckCircle2 className="w-6 h-6 stroke-[3]" /> : null)}
+                                <td key={optIdx} className="py-2 md:py-4 px-0.5 md:px-4">
+                                  <div className={`w-6 h-6 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center mx-auto transition-all ${colors}`}>
+                                    {isUserSel && !isCorrect ? <X className="w-3 h-3 md:w-6 md:h-6 stroke-[3]" /> : (isCorrect ? <CheckCircle2 className="w-3 h-3 md:w-6 md:h-6 stroke-[3]" /> : null)}
                                   </div>
                                 </td>
                               );

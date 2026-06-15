@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { authService } from '@/services/auth.service';
 import { questionService } from '@/services/question.service';
 import { examService } from '@/services/exam.service';
@@ -15,6 +16,14 @@ export function useReportsTab(initialSelectedExamId?: string | null) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
   const [attemptCounts, setAttemptCounts] = useState<Record<string, number>>({});
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const examDropdownRef = useRef<HTMLDivElement>(null);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(examDropdownRef, () => setIsDropdownOpen(false));
+  useClickOutside(sortDropdownRef, () => setIsSortDropdownOpen(false));
 
   useEffect(() => {
     async function fetchCounts() {
@@ -138,6 +147,12 @@ export function useReportsTab(initialSelectedExamId?: string | null) {
     showOrgTitle,
     showClassName,
     showSchool,
-    showDistrict
+    showDistrict,
+    isDropdownOpen,
+    setIsDropdownOpen,
+    isSortDropdownOpen,
+    setIsSortDropdownOpen,
+    examDropdownRef,
+    sortDropdownRef
   };
 }

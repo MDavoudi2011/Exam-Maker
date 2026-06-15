@@ -9,6 +9,38 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
   const [activeTab, setActiveTab] = useState(initialTab);
   const [navParam, setNavParam] = useState<string | null>(initialParam);
   const [exams, setExams] = useState(initialExams);
+  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDarkMode(true);
+    }
+  };
+
+  const handleTabClick = (tab: string) => {
+    handleNavigate(tab);
+    setIsMobileMenuOpen(false);
+  };
+
   useEffect(() => {
     setActiveTab(initialTab);
     setNavParam(initialParam);
@@ -88,6 +120,11 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
     exams,
     handleNavigate,
     refreshExams,
-    handleLogout
+    handleLogout,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen,
+    isDarkMode,
+    toggleDarkMode,
+    handleTabClick
   };
 }

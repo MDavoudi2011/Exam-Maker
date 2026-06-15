@@ -20,9 +20,9 @@ export function EditModal({ question, topics, onClose, onSave }: { question: any
   } = useEditModal(question, onSave, onClose);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed top-[72px] md:top-0 inset-x-0 bottom-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden border border-slate-200 dark:border-slate-800">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-xl flex flex-col h-full md:h-auto md:max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden border border-slate-200 dark:border-slate-800">
         <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 z-10">
           <h3 className="font-bold text-lg flex items-center gap-2"><Edit className="w-5 h-5 text-primary" /> {question.id ? 'ویرایش سوال' : 'افزودن سوال جدید'}</h3>
           <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-full transition-colors"><X className="w-5 h-5" /></button>

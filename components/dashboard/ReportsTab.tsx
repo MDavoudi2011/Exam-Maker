@@ -27,26 +27,14 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
     showOrgTitle,
     showClassName,
     showSchool,
-    showDistrict
+    showDistrict,
+    isDropdownOpen,
+    setIsDropdownOpen,
+    isSortDropdownOpen,
+    setIsSortDropdownOpen,
+    examDropdownRef,
+    sortDropdownRef
   } = useReportsTab(initialSelectedExamId);
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-  const examDropdownRef = React.useRef<HTMLDivElement>(null);
-  const sortDropdownRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (examDropdownRef.current && !examDropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
-        setIsSortDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
@@ -73,88 +61,90 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
             />
           </div>
           
-          <div className="relative w-full md:w-64 shrink-0" ref={examDropdownRef}>
-            <button 
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2">
-                <span className="truncate max-w-[150px] md:max-w-none">
-                  {selectedExamId && initialExams ? initialExams.find(e => e.id === selectedExamId)?.title || 'آزمون نامشخص' : 'انتخاب آزمون...'}
-                </span>
-                <span className="w-5 h-5 flex shrink-0 items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">
-                  {toFarsiNumber(selectedExamId ? attemptCounts[selectedExamId] || 0 : Object.values(attemptCounts).reduce((a,b)=>a+b,0))}
-                </span>
-              </div>
-              <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 md:mr-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-              
-            {isDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50 max-h-80 overflow-y-auto">
-                <div className="space-y-1 p-1">
-                  {initialExams?.map(exam => {
-                    const count = attemptCounts[exam.id] || 0;
-                    const isSelected = selectedExamId === exam.id;
-                    return (
-                      <button
-                        key={exam.id}
-                        onClick={() => {
-                          setSelectedExamId(exam.id);
-                          setIsDropdownOpen(false);
-                        }}
-                        className={`w-full flex justify-between items-center px-3 py-2 rounded-xl text-sm font-bold transition-colors text-right ${isSelected ? 'bg-primary/10 text-primary dark:bg-primary/20' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
-                      >
-                         <div className="flex items-center gap-2">
-                           <span className="truncate max-w-[180px]">{exam.title}</span>
-                         </div>
-                         <span className={`w-5 h-5 flex shrink-0 items-center justify-center text-[10px] rounded-full ${isSelected ? 'bg-primary/20 text-primary dark:bg-primary/30' : 'bg-slate-200 dark:bg-slate-700'}`}>{count > 0 ? toFarsiNumber(count) : '-'}</span>
-                      </button>
-                    )
-                  })}
+          <div className="flex flex-row items-center gap-4 w-full md:w-auto shrink-0 z-10">
+            <div className="relative flex-1 md:w-64 shrink-0" ref={examDropdownRef}>
+              <button 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <span className="truncate max-w-[120px] md:max-w-none">
+                    {selectedExamId && initialExams ? initialExams.find(e => e.id === selectedExamId)?.title || 'آزمون نامشخص' : 'انتخاب آزمون...'}
+                  </span>
+                  <span className="w-5 h-5 flex shrink-0 items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">
+                    {toFarsiNumber(selectedExamId ? attemptCounts[selectedExamId] || 0 : Object.values(attemptCounts).reduce((a,b)=>a+b,0))}
+                  </span>
                 </div>
-              </div>
-            )}
-          </div>
-            
-          <div className="relative w-full md:w-56 shrink-0" ref={sortDropdownRef}>
-            <button 
-              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              disabled={!selectedExamId}
-              className={`w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between ${!selectedExamId ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="truncate">
-                  {sortConfig?.key === 'full_name' ? 'نام و نام خانوادگی' : sortConfig?.key === 'score' ? 'نمره' : sortConfig?.key === 'created_at' ? 'تاریخ شروع' : sortConfig?.key === 'completed_at' ? 'تاریخ پایان' : 'مرتب‌سازی'}
-                </span>
-                {sortConfig && (sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4 shrink-0 text-primary" /> : <ArrowDown className="w-4 h-4 shrink-0 text-primary" />)}
-              </div>
-              <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 md:mr-3 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {isSortDropdownOpen && (
-               <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50">
-                 <div className="space-y-1 p-1">
-                   {[
-                     { k: 'full_name', l: 'نام و نام خانوادگی' },
-                     { k: 'score', l: 'نمره' },
-                     { k: 'created_at', l: 'تاریخ شروع' },
-                     { k: 'completed_at', l: 'تاریخ پایان' }
-                   ].map(opt => (
-                       <button 
-                         key={opt.k}
-                         onClick={() => { requestSort(opt.k); setIsSortDropdownOpen(false); }}
-                         className={`w-full flex flex-col px-3 py-2.5 rounded-xl text-sm font-bold transition-colors text-right ${sortConfig?.key === opt.k ? 'bg-primary/10 text-primary dark:bg-primary/20' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
-                       >
-                          <div className="flex justify-between items-center w-full">
-                            <span>{opt.l}</span>
-                            {sortConfig?.key === opt.k && (
-                              <span className="text-primary">{sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}</span>
-                            )}
-                          </div>
-                       </button>
-                     ))}
-                   </div>
-                 </div>
+                <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 mr-1 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+                
+              {isDropdownOpen && (
+                <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50 max-h-80 overflow-y-auto">
+                  <div className="space-y-1 p-1">
+                    {initialExams?.map(exam => {
+                      const count = attemptCounts[exam.id] || 0;
+                      const isSelected = selectedExamId === exam.id;
+                      return (
+                        <button
+                          key={exam.id}
+                          onClick={() => {
+                            setSelectedExamId(exam.id);
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`w-full flex justify-between items-center px-3 py-2 rounded-xl text-sm font-bold transition-colors text-right ${isSelected ? 'bg-primary/10 text-primary dark:bg-primary/20' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
+                        >
+                           <div className="flex items-center gap-2 truncate">
+                             <span className="truncate max-w-[140px]">{exam.title}</span>
+                           </div>
+                           <span className={`w-5 h-5 flex shrink-0 items-center justify-center text-[10px] rounded-full ${isSelected ? 'bg-primary/20 text-primary dark:bg-primary/30' : 'bg-slate-200 dark:bg-slate-700'}`}>{count > 0 ? toFarsiNumber(count) : '-'}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
               )}
+            </div>
+              
+            <div className="relative flex-1 md:w-56 shrink-0" ref={sortDropdownRef}>
+              <button 
+                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                disabled={!selectedExamId}
+                className={`w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between ${!selectedExamId ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <ArrowUpDown className="w-4 h-4 shrink-0 text-slate-400" />
+                  <span className="truncate">
+                    {sortConfig?.key === 'full_name' ? 'نام شرکت‌کننده' : sortConfig?.key === 'score' ? 'نمره' : sortConfig?.key === 'created_at' ? 'تاریخ شروع' : sortConfig?.key === 'completed_at' ? 'تاریخ پایان' : 'مرتب‌سازی'}
+                  </span>
+                </div>
+                {sortConfig && (sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4 shrink-0 text-primary mr-1" /> : <ArrowDown className="w-4 h-4 shrink-0 text-primary mr-1" />)}
+              </button>
+              {isSortDropdownOpen && (
+                 <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50">
+                   <div className="space-y-1 p-1">
+                     {[
+                       { k: 'full_name', l: 'نام شرکت‌کننده' },
+                       { k: 'score', l: 'نمره' },
+                       { k: 'created_at', l: 'تاریخ شروع' },
+                       { k: 'completed_at', l: 'تاریخ پایان' }
+                     ].map(opt => (
+                         <button 
+                           key={opt.k}
+                           onClick={() => { requestSort(opt.k); setIsSortDropdownOpen(false); }}
+                           className={`w-full flex flex-col px-3 py-2.5 rounded-xl text-sm font-bold transition-colors text-right ${sortConfig?.key === opt.k ? 'bg-primary/10 text-primary dark:bg-primary/20' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
+                         >
+                            <div className="flex justify-between items-center w-full">
+                              <span>{opt.l}</span>
+                              {sortConfig?.key === opt.k && (
+                                <span className="text-primary">{sortConfig.direction === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}</span>
+                              )}
+                            </div>
+                         </button>
+                       ))}
+                     </div>
+                   </div>
+                )}
+            </div>
           </div>
         </div>
 
@@ -249,10 +239,10 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
       </div>
 
       {viewingAttempt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12">
+        <div className="fixed top-[72px] md:top-0 inset-x-0 bottom-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setViewingAttempt(null)}></div>
-          <div className="relative w-full max-w-5xl h-full max-h-screen bg-slate-50 dark:bg-slate-950 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md z-10">
+          <div className="relative w-full max-w-5xl h-full bg-slate-50 dark:bg-slate-950 rounded-3xl md:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md z-10 shrink-0">
               <h3 className="font-bold">ریز نتایج: {viewingAttempt.full_name || 'کاربر بدون نام'}</h3>
               <button onClick={() => setViewingAttempt(null)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
                 <X className="w-6 h-6" />

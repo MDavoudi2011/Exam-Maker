@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { authService } from '@/services/auth.service';
 import { questionService } from '@/services/question.service';
 import { examService } from '@/services/exam.service';
@@ -12,6 +13,13 @@ export function useUsersPerformanceTab(initialExams: any[]) {
   const [examMaxScores, setExamMaxScores] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [selectedAttemptId, setSelectedAttemptId] = useState<string | null>(null);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isIdentDropdownOpen, setIsIdentDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
+  const identDropdownRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(sortDropdownRef, () => setIsSortDropdownOpen(false));
+  useClickOutside(identDropdownRef, () => setIsIdentDropdownOpen(false));
   
   useEffect(() => {
     const fetchData = async () => {
@@ -129,7 +137,13 @@ export function useUsersPerformanceTab(initialExams: any[]) {
     filteredUsers,
     filteredExams,
     selectedAttemptId,
-    setSelectedAttemptId
+    setSelectedAttemptId,
+    isSortDropdownOpen,
+    setIsSortDropdownOpen,
+    isIdentDropdownOpen,
+    setIsIdentDropdownOpen,
+    sortDropdownRef,
+    identDropdownRef
   };
 }
 

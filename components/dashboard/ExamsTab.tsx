@@ -106,7 +106,7 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
           <table className="w-full text-right border-collapse min-w-max md:min-w-[800px] z-10 relative">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">
-                <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-1/3">عنوان آزمون</th>
+                <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-32 md:w-2/5">عنوان آزمون</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-24 md:w-32">وضعیت</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">سوالات</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">زمان</th>
