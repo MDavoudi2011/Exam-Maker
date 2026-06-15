@@ -69,20 +69,20 @@ export function ExamViewerAnswerSheet({
             مشاهده پاسخ‌برگ ({toFarsiNumber(Object.keys(answers).length)} از {toFarsiNumber(questions.length)})
           </button>
 
-          {isOpen && mounted && createPortal(
-            <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:p-0" dir="rtl">
+          {isOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0" dir="rtl">
               <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsOpen(false)}></div>
-              <div className="relative bg-white dark:bg-slate-900 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl flex flex-col max-h-[75vh] animate-in fade-in zoom-in-95 duration-200">
+              <div className="relative bg-white dark:bg-slate-900 w-full max-w-sm sm:max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh] z-10 border border-slate-200 dark:border-slate-800">
                 <div className="font-bold mb-4 text-base text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-2">
                     <LayoutGrid className="w-5 h-5 text-primary" />
                     پاسخ‌برگ
                   </div>
                   <button onClick={() => setIsOpen(false)} className="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                     <X className="w-4 h-4" />
+                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="overflow-y-auto pr-2 space-y-1.5 custom-scrollbar flex-1 pb-4">
+                <div className="overflow-y-auto pr-2 space-y-2 custom-scrollbar flex-1 pb-2">
                   {questions.map((q: any, i: number) => (
                     <div 
                       key={q.id} 
@@ -94,8 +94,8 @@ export function ExamViewerAnswerSheet({
                         {q.questions.options.map((_: any, optIdx: number) => {
                           const isSelected = answers[q.id] === optIdx;
                           return (
-                            <div key={optIdx} className={`w-full aspect-square rounded-lg flex items-center justify-center border transition-all ${isSelected ? 'bg-emerald-500 border-emerald-500 shadow-sm shadow-emerald-500/20' : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700'}`}>
-                                {isSelected && <div className="w-2 h-2 rounded-sm bg-white" />}
+                            <div key={optIdx} className={`w-full aspect-square max-w-[2.5rem] rounded-lg flex items-center justify-center border transition-all ${isSelected ? 'bg-emerald-500 border-emerald-500 shadow-sm shadow-emerald-500/20' : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700'}`}>
+                                {isSelected && <div className="w-2.5 h-2.5 rounded-sm bg-white" />}
                             </div>
                           );
                         })}
@@ -104,8 +104,7 @@ export function ExamViewerAnswerSheet({
                   ))}
                 </div>
               </div>
-            </div>,
-            document.body
+            </div>
           )}
         </>
       )}

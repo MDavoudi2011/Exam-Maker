@@ -28,12 +28,23 @@ export const RenderContent = ({ content }: { content: string }) => {
             const char = part[k];
             if (inCode) {
               if (isFarsiChar(char)) {
-                const match = currentStr.match(/(\s+)$/);
+                // We reached Farsi character. Code block ends.
+                const match = currentStr.match(/([()[\]{}،,.:؛;'"\s]+)$/);
                 if (match) {
-                  const spaces = match[1];
-                  const code = currentStr.slice(0, currentStr.length - spaces.length);
-                  if (code) textParts.push({ text: code, isCode: true });
-                  currentStr = spaces + char;
+                  // trailing punctuation should stay with code if it matches opening
+                  // but for simplicity, we just keep it in code if it's not space?
+                  // Actually, let's move trailing spaces and Farsi-specific punctuation out.
+                  const trailing = match[1];
+                  const trailingSpacesAndArabicPunc = trailing.match(/([\s،؛]+)$/);
+                  if (trailingSpacesAndArabicPunc) {
+                     const pureTrailing = trailingSpacesAndArabicPunc[1];
+                     const code = currentStr.slice(0, currentStr.length - pureTrailing.length);
+                     if (code) textParts.push({ text: code, isCode: true });
+                     currentStr = pureTrailing + char;
+                  } else {
+                     textParts.push({ text: currentStr, isCode: true });
+                     currentStr = char;
+                  }
                 } else {
                   textParts.push({ text: currentStr, isCode: true });
                   currentStr = char;
@@ -44,10 +55,21 @@ export const RenderContent = ({ content }: { content: string }) => {
               }
             } else {
               if (isCodeStart(char)) {
-                if (currentStr) {
-                  textParts.push({ text: currentStr, isCode: false });
+                // Transitioning to code. Check if currentStr ends with brackets or quotes
+                const match = currentStr.match(/([()[\]{}"']+\s*)$/);
+                if (match) {
+                  const pre = match[1];
+                  const nonCode = currentStr.slice(0, currentStr.length - pre.length);
+                  if (nonCode) {
+                    textParts.push({ text: nonCode, isCode: false });
+                  }
+                  currentStr = pre + char;
+                } else {
+                  if (currentStr) {
+                    textParts.push({ text: currentStr, isCode: false });
+                  }
+                  currentStr = char;
                 }
-                currentStr = char;
                 inCode = true;
               } else {
                 currentStr += char;
