@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { LayoutGrid, X } from 'lucide-react';
 import { toFarsiNumber } from '@/utils/text.util';
 
@@ -11,6 +12,12 @@ export function ExamViewerAnswerSheet({
   isMobile
 }: any) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   return (
     <div className={`${isMobile ? 'md:hidden w-full' : 'hidden md:flex w-72 relative shrink-0 flex-col'}`}>
@@ -62,8 +69,8 @@ export function ExamViewerAnswerSheet({
             مشاهده پاسخ‌برگ ({toFarsiNumber(Object.keys(answers).length)} از {toFarsiNumber(questions.length)})
           </button>
 
-          {isOpen && (
-            <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:p-0">
+          {isOpen && mounted && createPortal(
+            <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:p-0" dir="rtl">
               <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsOpen(false)}></div>
               <div className="relative bg-white dark:bg-slate-900 w-full sm:max-w-md rounded-3xl p-5 shadow-2xl flex flex-col animate-in slide-in-from-bottom-full duration-300 max-h-[75vh]">
                 <div className="font-bold mb-4 text-base text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between shrink-0">
@@ -97,7 +104,8 @@ export function ExamViewerAnswerSheet({
                   ))}
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </>
       )}

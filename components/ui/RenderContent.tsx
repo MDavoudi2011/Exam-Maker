@@ -73,10 +73,23 @@ export const RenderContent = ({ content }: { content: string }) => {
 
           return textParts.map((t, idx) => {
             if (t.isCode && /[a-zA-Z0-9]/.test(t.text)) {
+              const match = t.text.match(/^([()[\]{}،,.:؛;'"\s]*)(.*?)([()[\]{}،,.:؛;'"\s]*)$/);
+              const pre = match ? match[1] : '';
+              const codeText = match && match[2] ? match[2] : t.text;
+              const post = match ? match[3] : '';
+              
+              if (!codeText) {
+                return <span key={`${j}-${idx}`}>{t.text}</span>;
+              }
+
               return (
-                <span key={`${j}-${idx}`} dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
-                  {t.text}
-                </span>
+                <React.Fragment key={`${j}-${idx}`}>
+                  {pre && <span>{pre}</span>}
+                  <span dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
+                    {codeText}
+                  </span>
+                  {post && <span>{post}</span>}
+                </React.Fragment>
               );
             }
             return <span key={`${j}-${idx}`}>{t.text}</span>;
