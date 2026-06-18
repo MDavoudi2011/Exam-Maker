@@ -10,7 +10,7 @@ import { useResponsivePagination } from '@/hooks/useResponsivePagination';
 import { RenderContent } from '@/components/ui/RenderContent';
 import { EditModal } from '@/components/dashboard/QuestionBankEditModal';
 
-export function QuestionBankTab() {
+export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
   const {
     questions,
     topics,
@@ -181,12 +181,16 @@ export function QuestionBankTab() {
                         <button onClick={() => setPreviewQuestion(q)} className="p-1.5 md:p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
                           <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
-                        <button onClick={() => setEditingQuestion(q)} className="p-1.5 md:p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="ویرایش">
-                          <Edit className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        </button>
-                        <button onClick={() => handleDelete(q.id)} className="p-1.5 md:p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="حذف">
-                          <Trash className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        </button>
+                        {userRole === 'admin' && (
+                          <>
+                            <button onClick={() => setEditingQuestion(q)} className="p-1.5 md:p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="ویرایش">
+                              <Edit className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            </button>
+                            <button onClick={() => handleDelete(q.id)} className="p-1.5 md:p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="حذف">
+                              <Trash className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

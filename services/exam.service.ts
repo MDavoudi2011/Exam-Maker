@@ -3,7 +3,9 @@ import { createClient } from '@/lib/supabase/client';
 export const examService = {
   getExams: async () => {
     const supabase = createClient();
-    return supabase.from('exams').select('*, exam_questions(count)').order('created_at', { ascending: false }).order('id');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { data: null, error: new Error('User not authenticated') };
+    return supabase.from('exams').select('*, exam_questions(count)').eq('created_by', user.id).order('created_at', { ascending: false }).order('id');
   },
   getExamById: async (id: string) => {
     const supabase = createClient();

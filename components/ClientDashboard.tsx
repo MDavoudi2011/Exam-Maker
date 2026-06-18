@@ -12,7 +12,7 @@ import { ExamEditor } from '@/components/dashboard/ExamEditor';
 import { useClientDashboard } from '@/hooks/useClientDashboard';
 import { Exam } from '@/types/exam.type';
 
-export default function ClientDashboard({ user, initialExams, initialTab = 'overview', initialParam = null, initialExam = null, initialQuestions = [] }: { user: any, initialExams: any[], initialTab?: string, initialParam?: string | null, initialExam?: any, initialQuestions?: any[] }) {
+export default function ClientDashboard({ user, initialExams, userRole = 'user', initialTab = 'overview', initialParam = null, initialExam = null, initialQuestions = [] }: { user: any, initialExams: any[], userRole?: string, initialTab?: string, initialParam?: string | null, initialExam?: any, initialQuestions?: any[] }) {
   const {
     activeTab,
     navParam,
@@ -107,7 +107,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
              </div>
              <div className="flex-1 overflow-hidden">
                <p className="text-sm font-bold truncate text-slate-800 dark:text-slate-200">{user?.email}</p>
-               <p className="text-xs text-slate-500 font-medium">مدیر سیستم</p>
+               <p className="text-xs text-slate-500 font-medium">{userRole === 'admin' ? 'مدیر سیستم' : 'کاربر'}</p>
              </div>
            </div>
 
@@ -140,7 +140,7 @@ export default function ClientDashboard({ user, initialExams, initialTab = 'over
           )}
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
           {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
-          {activeTab === 'question-bank' && <QuestionBankTab />}
+          {activeTab === 'question-bank' && <QuestionBankTab userRole={userRole} />}
         </div>
       </main>
     </div>

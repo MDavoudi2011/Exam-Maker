@@ -13,8 +13,19 @@ export default async function DashboardPage() {
   }
 
   let initialExams: any[] = [];
+  let userRole = 'user';
+  
   try {
-    const { data } = await supabase.from('exams').select('*, exam_questions(count)').order('created_at', { ascending: false });
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (profile?.role) {
+      userRole = profile.role;
+    }
+  } catch(err) {
+    console.error("Profile fetch failed (migration might be missing)", err)
+  }
+
+  try {
+    const { data } = await supabase.from('exams').select('*, exam_questions(count)').eq('created_by', user.id).order('created_at', { ascending: false });
     if (data) {
       initialExams = data;
     }
@@ -22,5 +33,5 @@ export default async function DashboardPage() {
     console.error("Supabase fetch failed", err);
   }
 
-  return <ClientDashboard user={user} initialExams={initialExams} />;
+  return <ClientDashboard user={user} initialExams={initialExams} userRole={userRole} />;
 }
