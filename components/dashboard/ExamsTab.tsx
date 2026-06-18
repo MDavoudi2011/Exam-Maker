@@ -4,7 +4,7 @@ import { Search, Play, Edit, Trash, Plus, FileText, BarChart2, List, ChevronDown
 import { toFarsiNumber } from '@/utils/text.util';
 import { useExamsTab } from '@/hooks/useExamsTab';
 
-export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearchTerm = '' }: { initialExams: any[], onNavigate: (tab: string, param?: string) => void, onDataChanged: () => void, initialSearchTerm?: string }) {
+export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearchTerm = '', isAdmin = false }: { initialExams: any[], onNavigate: (tab: string, param?: string) => void, onDataChanged: () => void, initialSearchTerm?: string, isAdmin?: boolean }) {
   const {
     exams,
     loading,
@@ -91,14 +91,16 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
               )}
             </div>
             
-            <button 
-              onClick={() => onNavigate('create')}
-              className="flex whitespace-nowrap items-center justify-center gap-1.5 md:gap-2 px-3 md:px-5 py-3 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all font-bold text-xs md:text-sm shrink-0 shadow-lg shadow-primary/25"
-            >
-              <Plus className="w-4 h-4 md:w-5 md:h-5" /> 
-              <span className="hidden sm:inline">ساخت آزمون جدید</span>
-              <span className="sm:hidden inline">آزمون جدید</span>
-            </button>
+            {!isAdmin && (
+              <button 
+                onClick={() => onNavigate('create')}
+                className="flex whitespace-nowrap items-center justify-center gap-1.5 md:gap-2 px-3 md:px-5 py-3 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all font-bold text-xs md:text-sm shrink-0 shadow-lg shadow-primary/25"
+              >
+                <Plus className="w-4 h-4 md:w-5 md:h-5" /> 
+                <span className="hidden sm:inline">ساخت آزمون جدید</span>
+                <span className="sm:hidden inline">آزمون جدید</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -107,6 +109,7 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs md:text-sm border-y border-slate-100 dark:border-slate-800">
                 <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-32 md:w-2/5">عنوان آزمون</th>
+                {isAdmin && <th className="p-3 md:p-4 font-semibold text-center w-32">سازنده</th>}
                 <th className="p-3 md:p-4 font-semibold text-center w-24 md:w-32">وضعیت</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">سوالات</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">زمان</th>
@@ -120,6 +123,11 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
                 return (
                  <tr key={exam.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                    <td className="p-3 md:p-4 px-4 md:px-6 font-bold text-slate-800 dark:text-slate-200">{exam.title}</td>
+                   {isAdmin && (
+                     <td className="p-3 md:p-4 text-center text-slate-500 font-medium truncate max-w-[150px]" title={exam.profiles?.email || 'نامشخص'}>
+                       {exam.profiles?.email || 'نامشخص'}
+                     </td>
+                   )}
                    <td className="p-2 md:p-4 text-center">
                      <button 
                        onClick={() => toggleStatus(exam)}
@@ -164,7 +172,7 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
               })}
               {filteredExams.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-500">
+                  <td colSpan={isAdmin ? 7 : 6} className="p-8 text-center text-slate-500">
                     <div className="flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 m-4">
                       {exams.length > 0 ? (
                         <>
@@ -175,7 +183,9 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
                         <>
                           <FileText className="w-12 h-12 text-slate-300 mb-4" />
                           <p className="font-medium">هنوز هیچ آزمونی ساخته نشده است.</p>
-                          <button onClick={() => onNavigate('create')} className="mt-4 text-primary hover:underline text-sm font-bold">همین الان اولین آزمون را بسازید</button>
+                          {!isAdmin && (
+                            <button onClick={() => onNavigate('create')} className="mt-4 text-primary hover:underline text-sm font-bold">همین الان اولین آزمون را بسازید</button>
+                          )}
                         </>
                       )}
                     </div>

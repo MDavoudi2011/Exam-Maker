@@ -7,6 +7,14 @@ export const examService = {
     if (!user) return { data: null, error: new Error('User not authenticated') };
     return supabase.from('exams').select('*, exam_questions(count)').eq('created_by', user.id).order('created_at', { ascending: false }).order('id');
   },
+  getAllExams: async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { data: null, error: new Error('User not authenticated') };
+    
+    // Admin only method
+    return supabase.from('exams').select('*, exam_questions(count), profiles(email)').order('created_at', { ascending: false }).order('id');
+  },
   getExamById: async (id: string) => {
     const supabase = createClient();
     return supabase.from('exams').select('*').eq('id', id).single();

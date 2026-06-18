@@ -5,7 +5,7 @@ import { questionService } from '@/services/question.service';
 import { examService } from '@/services/exam.service';
 import { attemptService } from '@/services/attempt.service';
 
-export function useClientDashboard(initialTab: string = 'overview', initialParam: string | null = null, initialExams: any[] = []) {
+export function useClientDashboard(initialTab: string = 'overview', initialParam: string | null = null, initialExams: any[] = [], isAdmin: boolean = false) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [navParam, setNavParam] = useState<string | null>(initialParam);
   const [exams, setExams] = useState(initialExams);
@@ -82,21 +82,21 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
     setActiveTab(tab);
     setNavParam(param || null);
     
-    let newUrl = '/dashboard';
-    if (tab === 'exams') newUrl = '/exams';
+    let newUrl = isAdmin ? '/admin' : '/dashboard';
+    if (tab === 'exams') newUrl = isAdmin ? '/admin/exams' : '/exams';
     if (tab === 'edit') newUrl = param ? `/edit/${param}` : '/exams';
     if (tab === 'create') newUrl = '/create';
-    if (tab === 'users') newUrl = '/users';
-    if (tab === 'question-bank') newUrl = '/questions';
+    if (tab === 'users') newUrl = isAdmin ? '/admin/users' : '/users';
+    if (tab === 'question-bank') newUrl = isAdmin ? '/admin/questions' : '/questions';
     if (tab === 'reports') {
-      newUrl = param ? `/result/${param}` : '/result';
+      newUrl = param ? (isAdmin ? `/admin/result/${param}` : `/result/${param}`) : (isAdmin ? '/admin/result' : '/result');
     }
     window.history.pushState(null, '', newUrl);
   };
 
   const refreshExams = async () => {
     try {
-      const { data } = await examService.getExams();
+      const { data } = isAdmin ? await examService.getAllExams() : await examService.getExams();
       if (data) setExams(data);
     } catch (err) {
       console.error(err);

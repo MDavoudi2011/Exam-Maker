@@ -24,6 +24,10 @@ export default async function DashboardPage() {
     console.error("Profile fetch failed (migration might be missing)", err)
   }
 
+  if (userRole === 'admin') {
+    redirect('/admin');
+  }
+
   try {
     const { data } = await supabase.from('exams').select('*, exam_questions(count)').eq('created_by', user.id).order('created_at', { ascending: false });
     if (data) {
