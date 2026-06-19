@@ -17,9 +17,9 @@ export const RenderContent = ({ content }: { content: string }) => {
       <span key={i} className="whitespace-pre-wrap leading-relaxed inline">
         {inlineParts.map((part, j) => {
           if (j % 2 === 1) {
-            return <code key={j} className="inline-block px-1.5 py-0.5 mx-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-mono text-sm rounded-md dir-ltr text-left" dir="ltr">{part}</code>;
+            return <code key={j} className="inline-block px-1.5 py-0.5 mx-1 bg-muted text-foreground font-mono text-sm rounded-md dir-ltr text-left" dir="ltr">{part}</code>;
           }
-          
+ 
           const textParts: { text: string; isCode: boolean }[] = [];
           let currentStr = '';
           let inCode = false;
@@ -37,13 +37,13 @@ export const RenderContent = ({ content }: { content: string }) => {
                   const trailing = match[1];
                   const trailingSpacesAndArabicPunc = trailing.match(/([\s،؛]+)$/);
                   if (trailingSpacesAndArabicPunc) {
-                     const pureTrailing = trailingSpacesAndArabicPunc[1];
-                     const code = currentStr.slice(0, currentStr.length - pureTrailing.length);
-                     if (code) textParts.push({ text: code, isCode: true });
-                     currentStr = pureTrailing + char;
+                    const pureTrailing = trailingSpacesAndArabicPunc[1];
+                    const code = currentStr.slice(0, currentStr.length - pureTrailing.length);
+                    if (code) textParts.push({ text: code, isCode: true });
+                    currentStr = pureTrailing + char;
                   } else {
-                     textParts.push({ text: currentStr, isCode: true });
-                     currentStr = char;
+                    textParts.push({ text: currentStr, isCode: true });
+                    currentStr = char;
                   }
                 } else {
                   textParts.push({ text: currentStr, isCode: true });
@@ -76,7 +76,7 @@ export const RenderContent = ({ content }: { content: string }) => {
               }
             }
           }
-          
+ 
           if (currentStr) {
             if (inCode) {
               const match = currentStr.match(/(\s+)$/);
@@ -96,7 +96,7 @@ export const RenderContent = ({ content }: { content: string }) => {
           return textParts.map((t, idx) => {
             if (t.isCode && /[a-zA-Z0-9]/.test(t.text)) {
               return (
-                <span key={`${j}-${idx}`} dir="ltr" className="inline-block font-mono bg-slate-200/70 dark:bg-slate-700/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
+                <span key={`${j}-${idx}`} dir="ltr" className="inline-block font-mono bg-secondary/70 px-1.5 py-0.5 rounded-md text-[0.9em] mx-1 align-middle whitespace-pre">
                   {t.text}
                 </span>
               );

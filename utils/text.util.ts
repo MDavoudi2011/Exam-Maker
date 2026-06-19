@@ -1,5 +1,9 @@
 export const isFarsi = (text: string) => /[\u0600-\u06FF]/.test(text);
 
+export const isEnglishText = (text: string) => {
+  return /[a-zA-Z]/.test(text) || (text.trim().length > 0 && !isFarsi(text));
+};
+
 export function toFarsiNumber(n: number | string): string {
   const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
   return n.toString().replace(/\d/g, (x) => farsiDigits[parseInt(x)]);

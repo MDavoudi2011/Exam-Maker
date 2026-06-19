@@ -5,6 +5,7 @@ import { useCreateTab } from '@/hooks/useCreateTab';
 import { ExamFormStep1 } from './ExamFormStep1';
 import { ExamFormStep2 } from './ExamFormStep2';
 import { ExamFormStep3 } from './ExamFormStep3';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCancel: () => void }) {
   const {
@@ -59,22 +60,18 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl w-full mx-auto pb-20">
-      
+ 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 px-2 md:px-0">
-        <div>
-          <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2 md:gap-3">
-            <PlusCircle className="w-6 h-6 md:w-7 md:h-7 text-primary" />
-            ساخت آزمون جدید
-          </h2>
-          <p className="text-sm md:text-base text-slate-500 font-medium mt-1.5 md:mt-2">
-            {step === 1 ? 'مشخصات اولیه آزمون را وارد کنید' : 'سوالات مورد نظر خود را انتخاب کنید'}
-          </p>
-        </div>
+        <SectionHeader 
+          icon={PlusCircle} 
+          title="ساخت آزمون جدید" 
+          description={step === 1 ? 'مشخصات اولیه آزمون را وارد کنید' : 'سوالات مورد نظر خود را انتخاب کنید'} 
+        />
         {step === 2 && (
           <button 
             onClick={handlePublish} disabled={saving || selectedQuestions.length === 0}
-            className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98]"
+            className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 px-6 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-[0.98]"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin"/> : <CheckCircle2 className="w-5 h-5" />}
             انتشار نهایی آزمون
@@ -82,8 +79,8 @@ export function CreateTab({ onCreated, onCancel }: { onCreated: () => void, onCa
         )}
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-hidden">
-        
+      <div className="bg-card dark:bg-background rounded-[2rem] shadow-xl shadow-black/5 border border-border overflow-hidden">
+ 
         {step === 1 && (
           <ExamFormStep1
             title={title} setTitle={setTitle}

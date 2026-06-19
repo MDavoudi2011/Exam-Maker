@@ -8,6 +8,7 @@ import { ChevronRight, ChevronLeft, CheckCircle2, Clock } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { useExamRunner } from '@/hooks/useExamRunner';
 import { ExamRunnerProps, RunnerQuestion } from '@/types/runner.type';
+import { toFarsiNumber } from '@/utils/text.util';
 
 export default function ExamRunner({ title, timeLimit, questions }: ExamRunnerProps) {
   const {
@@ -25,7 +26,7 @@ export default function ExamRunner({ title, timeLimit, questions }: ExamRunnerPr
   if (isFinished) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 space-y-6">
-        <CheckCircle2 className="w-20 h-20 text-green-500" />
+        <CheckCircle2 className="w-20 h-20 text-success" />
         <h2 className="text-3xl font-bold">آزمون به پایان رسید!</h2>
         <p className="text-muted-foreground text-lg">پاسخ‌های شما با موفقیت ثبت شد.</p>
         <Button onClick={() => window.location.href = '/dashboard'} size="lg">بازگشت به داشبورد</Button>
@@ -45,8 +46,8 @@ export default function ExamRunner({ title, timeLimit, questions }: ExamRunnerPr
 
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>سوال {currentIndex + 1} از {questions.length}</span>
-          <span>{Math.round(progress)}% پیشرفت</span>
+          <span>سوال {toFarsiNumber(currentIndex + 1)} از {toFarsiNumber(questions.length)}</span>
+          <span>{toFarsiNumber(Math.round(progress))}٪ پیشرفت</span>
         </div>
         <Progress value={progress} className="h-2 rotate-180" />
       </div>
@@ -73,20 +74,20 @@ export default function ExamRunner({ title, timeLimit, questions }: ExamRunnerPr
         </CardContent>
         <CardFooter className="flex justify-between border-t p-5 bg-muted/20 rounded-b-xl">
           <Button variant="outline" onClick={handlePrev} disabled={currentIndex === 0} className="shadow-sm">
-           <ChevronRight className="w-4 h-4 ms-2" /> 
-           قبلی
+            <ChevronRight className="w-4 h-4 ms-2" /> 
+            قبلی
           </Button>
 
           {currentIndex === questions.length - 1 ? (
-             <Button onClick={handleSubmit} className="bg-primary text-primary-foreground shadow-md gap-2">
-               پایان آزمون
-               <CheckCircle2 className="w-5 h-5" /> 
-             </Button>
+            <Button onClick={handleSubmit} className="bg-primary text-primary-foreground shadow-md gap-2">
+              پایان آزمون
+              <CheckCircle2 className="w-5 h-5" /> 
+            </Button>
           ) : (
-             <Button onClick={handleNext} className="shadow-md gap-2">
-               بعدی
-               <ChevronLeft className="w-4 h-4" /> 
-             </Button>
+            <Button onClick={handleNext} className="shadow-md gap-2">
+              بعدی
+              <ChevronLeft className="w-4 h-4" /> 
+            </Button>
           )}
         </CardFooter>
       </Card>

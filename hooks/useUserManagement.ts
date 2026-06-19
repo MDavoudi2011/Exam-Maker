@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
 import { userService } from '@/services/user.service';
 
@@ -12,10 +13,6 @@ export function useUserManagement(onDataChanged?: () => void) {
   const [newPassword, setNewPassword] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -28,6 +25,10 @@ export function useUserManagement(onDataChanged?: () => void) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const toggleRole = async (user: any) => {
     const newRole = user.role === 'admin' ? 'user' : 'admin';

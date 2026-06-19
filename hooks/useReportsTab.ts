@@ -14,7 +14,8 @@ export function useReportsTab(initialSelectedExamId?: string | null) {
   const [questions, setQuestions] = useState<any[]>([]);
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
+  const [sortKey, setSortKey] = useState<string>('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [attemptCounts, setAttemptCounts] = useState<Record<string, number>>({});
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -88,13 +89,13 @@ export function useReportsTab(initialSelectedExamId?: string | null) {
       });
     }
 
-    if (sortConfig !== null) {
+    if (sortKey) {
       processableResults.sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
+        const aVal = a[sortKey];
+        const bVal = b[sortKey];
         if (aVal === bVal) return 0;
         
-        const isAsc = sortConfig.direction === 'asc' ? 1 : -1;
+        const isAsc = sortDirection === 'asc' ? 1 : -1;
         if (aVal === null || aVal === undefined) return 1 * isAsc;
         if (bVal === null || bVal === undefined) return -1 * isAsc;
 
@@ -107,14 +108,10 @@ export function useReportsTab(initialSelectedExamId?: string | null) {
     }
 
     return processableResults;
-  }, [results, searchTerm, sortConfig]);
+  }, [results, searchTerm, sortKey, sortDirection]);
 
-  const requestSort = (key: string) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
+  const toggleSortDirection = () => {
+    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
   };
 
   const requiredFields = examData?.settings?.studentDetails || {};
@@ -138,8 +135,10 @@ export function useReportsTab(initialSelectedExamId?: string | null) {
     questions,
     searchTerm,
     setSearchTerm,
-    sortConfig,
-    requestSort,
+    sortKey,
+    setSortKey,
+    sortDirection,
+    toggleSortDirection,
     attemptCounts,
     showFullName,
     showNationalCode,

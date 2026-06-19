@@ -119,6 +119,7 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
     if (activeTab === 'exams' || activeTab === 'overview' || activeTab === 'edit' || activeTab === 'reports') {
       refreshExams();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const handleLogout = async () => {

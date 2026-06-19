@@ -13,7 +13,7 @@ export default async function ViewExamPage({ params }: { params: Promise<{ id: s
   const { data: exam, error } = await supabase.from('exams').select('*').eq('id', id).single();
   
   if (error || !exam) {
-    return <div className="p-10 text-center font-bold text-red-500">آزمون یافت نشد.</div>;
+    return <div className="p-10 text-center font-bold text-destructive">آزمون یافت نشد.</div>;
   }
 
   const { data: questions } = await supabase.from('exam_questions').select('*, questions(*)').eq('exam_id', id).order('order_index', { ascending: true });

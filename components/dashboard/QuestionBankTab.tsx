@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
 import { Search, Loader2, Edit, Trash, Eye, Plus, ChevronDown, Check, X, ChevronRight, ChevronLeft, Database } from 'lucide-react';
-// removed import
 import { toFarsiNumber } from '@/utils/text.util';
 import { ITEMS_PER_PAGE_OPTIONS } from '@/constants/exam.constant';
 import { getTopicColor } from '@/utils/styles.util';
@@ -9,6 +8,13 @@ import { useQuestionBankTab, useEditModal } from '@/hooks/useQuestionBankTab';
 import { useResponsivePagination } from '@/hooks/useResponsivePagination';
 import { RenderContent } from '@/components/ui/RenderContent';
 import { EditModal } from '@/components/dashboard/QuestionBankEditModal';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { DashboardCard } from '@/components/ui/DashboardCard';
+import { SearchBar } from '@/components/ui/SearchBar';
+import { FilterDropdown } from '@/components/ui/FilterDropdown';
+import { ActionButton, ActionButtonGroup } from '@/components/ui/ActionButton';
+import { PrimaryButton } from '@/components/ui/PrimaryButton';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
   const {
@@ -49,105 +55,72 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3">
-            <Database className="w-7 h-7 text-primary" />
-            بانک سوالات
-          </h2>
-          <p className="text-slate-500 font-medium mt-2">مدیریت و دسته‌بندی تمامی سوالات سیستم</p>
-        </div>
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+        <SectionHeader icon={Database} title="بانک سوالات" description="مدیریت و دسته‌بندی تمامی سوالات سیستم" />
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 md:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+      <DashboardCard>
         <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20 w-full">
-          <div className="relative w-full md:flex-[6]">
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="جستجو در متن سوالات..." 
+          <div className="relative flex-1">
+            <SearchBar 
               value={searchTerm}
-              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-4 pr-12 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+              onChange={(val) => { setSearchTerm(val); setCurrentPage(1); }}
+              placeholder="جستجو در متن سوالات..."
             />
           </div>
           
-          <div className="flex flex-row items-center gap-2 md:gap-3 w-full md:flex-[4]">
-            <div className="relative flex-1" ref={dropdownRef}>
-              <button 
-                onClick={() => setShowTopicDropdown(!showTopicDropdown)}
-                className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="truncate max-w-[100px] md:max-w-none">{selectedTopic === 'all' ? 'همه موضوعات' : selectedTopic}</span>
-                  <span className="w-5 h-5 flex shrink-0 items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">{toFarsiNumber(selectedTopic === 'all' ? questions.length : questions.filter(q => q.topic === selectedTopic).length)}</span>
-                </div>
-                <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 md:mr-3 transition-transform ${showTopicDropdown ? 'rotate-180' : ''}`} />
-              </button>
-              {showTopicDropdown && (
-                <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top">
-                  <div className="max-h-[200px] overflow-y-auto space-y-1 p-1 custom-scrollbar">
-                    <button 
-                      onClick={() => { setSelectedTopic('all'); setShowTopicDropdown(false); setCurrentPage(1); }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold transition-colors ${selectedTopic === 'all' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
-                    >
-                      <span>همه موضوعات</span>
-                      <span className={`w-5 h-5 flex items-center justify-center text-[10px] rounded-full ${selectedTopic === 'all' ? 'bg-indigo-200 dark:bg-indigo-800' : 'bg-slate-200 dark:bg-slate-700'}`}>{toFarsiNumber(questions.length)}</span>
-                    </button>
-                    {topics.map(t => (
-                      <button 
-                        key={t}
-                        onClick={() => { setSelectedTopic(t); setShowTopicDropdown(false); setCurrentPage(1); }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold transition-colors ${selectedTopic === t ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
-                      >
-                        <span>{t}</span>
-                        <span className={`w-5 h-5 flex items-center justify-center text-[10px] rounded-full ${selectedTopic === t ? 'bg-indigo-200 dark:bg-indigo-800' : 'bg-slate-200 dark:bg-slate-700'}`}>{toFarsiNumber(questions.filter(q => q.topic === t).length)}</span>
-                      </button>
-                    ))}
+          <div className="flex flex-row items-center gap-4 w-full md:w-auto shrink-0 z-10">
+            <FilterDropdown
+              value={selectedTopic}
+              options={[
+                { value: 'all', label: 'همه موضوعات', count: questions.length },
+                ...topics.map(t => ({ value: t, label: t, count: questions.filter(q => q.topic === t).length }))
+              ]}
+              onChange={(val) => { setSelectedTopic(val); setCurrentPage(1); }}
+              isOpen={showTopicDropdown}
+              onToggle={() => setShowTopicDropdown(!showTopicDropdown)}
+              onClose={() => setShowTopicDropdown(false)}
+              className="md:w-64"
+              footer={
+                !showAddTopic ? (
+                  <button 
+                    onClick={() => setShowAddTopic(true)}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> افزودن موضوع جدید
+                  </button>
+                ) : (
+                  <div className="flex flex-col gap-2 p-1">
+                    <input 
+                      type="text" 
+                      placeholder="نام موضوع..." 
+                      value={newTopic}
+                      onChange={(e) => setNewTopic(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddTopic();
+                        }
+                      }}
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                       <button onClick={handleAddTopic} className="flex-1 py-2 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors">ثبت</button>
+                       <button onClick={() => {setShowAddTopic(false); setNewTopic('');}} className="flex-1 py-2 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors">انصراف</button>
+                    </div>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                    {!showAddTopic ? (
-                      <button 
-                        onClick={() => setShowAddTopic(true)}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-colors"
-                      >
-                        <Plus className="w-4 h-4" /> افزودن موضوع جدید
-                      </button>
-                    ) : (
-                      <div className="flex flex-col gap-2 p-1">
-                        <input 
-                          type="text" 
-                          placeholder="نام موضوع..." 
-                          value={newTopic}
-                          onChange={(e) => setNewTopic(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleAddTopic();
-                            }
-                          }}
-                          autoFocus
-                        />
-                        <div className="flex gap-2">
-                           <button onClick={handleAddTopic} className="flex-1 py-2 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors">ثبت</button>
-                           <button onClick={() => {setShowAddTopic(false); setNewTopic('');}} className="flex-1 py-2 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors">انصراف</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+                )
+              }
+            />
             
-            <button 
-              onClick={() => setEditingQuestion({ content: '', options: ['', '', '', ''], correct_option_index: 0, topic: '', point_value: 10 })}
-              className="flex whitespace-nowrap items-center justify-center gap-1.5 md:gap-2 px-3 md:px-5 py-3 bg-primary text-white rounded-2xl hover:bg-primary/90 transition-all font-bold text-xs md:text-sm shrink-0 shadow-lg shadow-primary/25"
-            >
-              <Plus className="w-4 h-4 md:w-5 md:h-5" /> 
-              <span className="hidden sm:inline">افزودن سوال</span>
-              <span className="sm:hidden inline">سوال جدید</span>
-            </button>
+              <PrimaryButton 
+                onClick={() => setEditingQuestion({ content: '', options: ['', '', '', ''], correct_option_index: 0, topic: '', point_value: 10 })}
+                icon={<Plus className="w-4 h-4 md:w-5 md:h-5" />}
+              >
+                <span className="hidden sm:inline">افزودن سوال</span>
+                <span className="sm:hidden inline">سوال جدید</span>
+              </PrimaryButton>
           </div>
         </div>
 
@@ -177,27 +150,23 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
                        <p className="line-clamp-2 md:line-clamp-1">{q.content}</p>
                     </td>
                     <td className="p-2 md:p-4 pl-4 md:pl-6 text-center w-px whitespace-nowrap">
-                      <div className="inline-flex flex-row items-center justify-center gap-1.5 md:gap-2 opacity-100 md:opacity-70 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => setPreviewQuestion(q)} className="p-1.5 md:p-2 bg-sky-50 text-sky-600 hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="پیش‌نمایش">
-                          <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        </button>
+                      <ActionButtonGroup>
+                        <ActionButton onClick={() => setPreviewQuestion(q)} icon={Eye} title="پیش‌نمایش" color="sky" />
                         {userRole === 'admin' && (
                           <>
-                            <button onClick={() => setEditingQuestion(q)} className="p-1.5 md:p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="ویرایش">
-                              <Edit className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                            </button>
-                            <button onClick={() => handleDelete(q.id)} className="p-1.5 md:p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 rounded-lg md:rounded-xl transition-colors tooltip-trigger" title="حذف">
-                              <Trash className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                            </button>
+                            <ActionButton onClick={() => setEditingQuestion(q)} icon={Edit} title="ویرایش" color="emerald" />
+                            <ActionButton onClick={() => handleDelete(q.id)} icon={Trash} title="حذف" color="rose" />
                           </>
                         )}
-                      </div>
+                      </ActionButtonGroup>
                     </td>
                   </tr>
                   );
                 }) : (
                   <tr>
-                    <td colSpan={3} className="p-10 text-center text-slate-500 font-medium">سوالاتی یافت نشد</td>
+                    <td colSpan={3} className="px-4 md:px-6 py-8">
+                       <EmptyState icon={Database} title="سوالاتی یافت نشد" description="" />
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -272,7 +241,7 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
           </>
           )}
         </div>
-      </div>
+      </DashboardCard>
 
       {previewQuestion && (
         <div className="fixed top-[72px] md:top-0 inset-x-0 bottom-0 z-50 flex items-center justify-center p-4">

@@ -28,33 +28,33 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
   } = useClientDashboard(initialTab, initialParam, initialExams);
 
   return (
-    <div className="h-screen w-full bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col md:flex-row relative overflow-hidden" dir="rtl">
-      
+    <div className="h-screen w-full bg-muted/50 dark:bg-background font-sans text-foreground flex flex-col md:flex-row relative overflow-hidden" dir="rtl">
+ 
       {/* Background Decor */}
       <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-primary/10 blur-[100px] rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
-      <div className="absolute top-64 -right-64 w-[500px] h-[500px] bg-sky-400/10 blur-[100px] rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
+      <div className="absolute top-64 -right-64 w-[500px] h-[500px] bg-primary/10 blur-[100px] rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
 
       {/* Mobile Top Bar */}
-      <div className="md:hidden flex shrink-0 items-center justify-between p-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-30">
+      <div className="md:hidden flex shrink-0 items-center justify-between p-4 bg-card/70 dark:bg-background/70 backdrop-blur-xl border-b border-border z-30">
         <div className="flex items-center gap-3">
-          <button onClick={() => setIsMobileMenuOpen(true)} className="p-1 -mr-1 text-slate-700 dark:text-slate-200" aria-label="Open Menu">
+          <button onClick={() => setIsMobileMenuOpen(true)} className="p-1 -mr-1 text-foreground " aria-label="Open Menu">
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
             <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-1.5 rounded-xl border border-primary/10">
               <BrainCircuit className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-lg font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-sky-600">هوشیار</h2>
+            <h2 className="text-lg font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-primary/60">پنل مدیریت</h2>
           </div>
         </div>
-        
+ 
         <button
-           onClick={toggleDarkMode}
-           className="relative flex items-center w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors p-1"
+          onClick={toggleDarkMode}
+          className="relative flex items-center w-12 h-6 rounded-full bg-secondary transition-colors p-1"
         >
-           <div className={`absolute top-1 max-w-full w-4 h-4 rounded-full bg-white dark:bg-slate-800 shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
-              {isDarkMode ? <Moon className="w-2.5 h-2.5 text-indigo-500" /> : <Sun className="w-2.5 h-2.5 text-yellow-500" />}
-           </div>
+          <div className={`absolute top-1 max-w-full w-4 h-4 rounded-full bg-card shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
+            {isDarkMode ? <Moon className="w-2.5 h-2.5 text-primary" /> : <Sun className="w-2.5 h-2.5 text-warning" />}
+          </div>
         </button>
       </div>
 
@@ -64,29 +64,29 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed md:static inset-y-0 right-0 w-72 bg-white/95 md:bg-white/70 dark:bg-slate-900/95 dark:md:bg-slate-900/70 backdrop-blur-2xl border-l border-slate-200 dark:border-slate-800 p-6 flex flex-col z-50 md:z-10 shadow-2xl md:shadow-none h-full transition-transform duration-300 shrink-0 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0`}>
+      <aside className={`fixed md:static inset-y-0 right-0 w-72 bg-card/95 md:bg-card/70 dark:bg-background/95 dark:md:bg-background/70 backdrop-blur-2xl border-l border-border p-6 flex flex-col z-50 md:z-10 shadow-2xl md:shadow-none h-full transition-transform duration-300 shrink-0 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0`}>
         <div className="flex items-center justify-between mb-8 md:mb-12">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-2.5 rounded-2xl shadow-inner border border-primary/10">
               <BrainCircuit className="w-7 h-7 text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-sky-600">هوشیار</h2>
-              <p className="text-xs text-slate-500 font-medium tracking-tight">آزمون‌ساز هوشمند</p>
+              <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-primary/60">پنل مدیریت</h2>
+              <p className="text-xs text-muted-foreground font-medium tracking-tight">آزمون‌ساز هوشیار</p>
             </div>
           </div>
-          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 text-muted-foreground bg-muted rounded-xl hover:bg-secondary transition-colors">
             <X className="w-5 h-5" />
           </button>
-          
+ 
           <div className="hidden md:block">
             <button
-               onClick={toggleDarkMode}
-               className="relative flex items-center w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors p-1"
+              onClick={toggleDarkMode}
+              className="relative flex items-center w-12 h-6 rounded-full bg-secondary transition-colors p-1"
             >
-               <div className={`absolute top-1 w-4 h-4 rounded-full bg-white dark:bg-slate-800 shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
-                  {isDarkMode ? <Moon className="w-2.5 h-2.5 text-indigo-500" /> : <Sun className="w-2.5 h-2.5 text-yellow-500" />}
-               </div>
+              <div className={`absolute top-1 w-4 h-4 rounded-full bg-card shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
+                {isDarkMode ? <Moon className="w-2.5 h-2.5 text-primary" /> : <Sun className="w-2.5 h-2.5 text-warning" />}
+              </div>
             </button>
           </div>
         </div>
@@ -96,22 +96,22 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
           <NavItem active={activeTab === 'exams' || activeTab === 'edit'} onClick={() => handleTabClick('exams')} icon={<List />} label="لیست آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleTabClick('create')} icon={<PlusCircle />} label="ساخت آزمون" />
           <NavItem active={activeTab === 'reports'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
-          <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="تحلیل عملکرد کاربران" />
+          <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="عملکرد کاربران" />
           <NavItem active={activeTab === 'question-bank'} onClick={() => handleTabClick('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
 
-        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-2 shrink-0">
-           <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-slate-100/80 dark:bg-slate-800/50 mb-4 border border-slate-200/50 dark:border-slate-800">
-             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-md ring-2 ring-white dark:ring-slate-900">
-               {user?.email?.charAt(0).toUpperCase() || 'A'}
-             </div>
-             <div className="flex-1 overflow-hidden">
-               <p className="text-sm font-bold truncate text-slate-800 dark:text-slate-200">{user?.email}</p>
-               <p className="text-xs text-slate-500 font-medium">{userRole === 'admin' ? 'مدیر سیستم' : 'کاربر'}</p>
-             </div>
-           </div>
+        <div className="mt-6 pt-6 border-t border-border space-y-2 shrink-0">
+          <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-muted/80 mb-4 border border-border/50 ">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold shadow-md ring-2 ring-background ">
+              {user?.email?.charAt(0).toUpperCase() || 'A'}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm font-bold truncate text-foreground ">{user?.email}</p>
+              <p className="text-xs text-muted-foreground font-medium">{userRole === 'admin' ? 'مدیر سیستم' : 'کاربر'}</p>
+            </div>
+          </div>
 
-           <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all border border-transparent">
+          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-destructive hover:bg-destructive/10 rounded-xl transition-all border border-transparent">
             <LogOut className="w-4 h-4" />
             <span>خروج از سیستم</span>
           </button>
@@ -125,18 +125,18 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
           {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={handleNavigate} onDataChanged={refreshExams} initialSearchTerm={navParam || ''} />}
           {activeTab === 'create' && (
             <CreateTab 
-               onCreated={() => { refreshExams(); handleNavigate('exams'); }} 
-               onCancel={() => handleNavigate('exams')} 
+              onCreated={() => { refreshExams(); handleNavigate('exams'); }} 
+              onCancel={() => handleNavigate('exams')} 
             />
           )}
           {activeTab === 'edit' && navParam && (
-             <ExamEditor 
-                examId={navParam} 
-                initialExam={initialExam} 
-                initialQuestions={initialQuestions} 
-                onNavigate={handleNavigate} 
-                onDataChanged={refreshExams} 
-             />
+            <ExamEditor 
+              examId={navParam} 
+              initialExam={initialExam} 
+              initialQuestions={initialQuestions} 
+              onNavigate={handleNavigate} 
+              onDataChanged={refreshExams} 
+            />
           )}
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
           {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
@@ -154,10 +154,10 @@ function NavItem({ active, onClick, icon, label }: { active: boolean, onClick: (
       className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group ${
         active 
           ? 'bg-primary text-white shadow-lg shadow-primary/25 translate-x-1' 
-          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
+          : 'text-muted-foreground dark:text-muted-foreground hover:bg-muted hover:text-foreground '
       }`}
     >
-      <div className={`transition-colors [&>svg]:w-5 [&>svg]:h-5 ${active ? 'opacity-100' : 'text-slate-400 group-hover:text-primary'}`}>
+      <div className={`transition-colors [&>svg]:w-5 [&>svg]:h-5 ${active ? 'opacity-100' : 'text-muted-foreground group-hover:text-primary'}`}>
         {icon}
       </div>
       <span className="flex-1 text-right">{label}</span>

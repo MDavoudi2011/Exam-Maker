@@ -34,7 +34,7 @@ function SelectTrigger({
   children,
   ...props
 }: SelectPrimitive.Trigger.Props & {
-  size?: "sm" | "default"
+ size?: "sm" | "default"
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -66,10 +66,10 @@ function SelectContent({
   alignItemWithTrigger = true,
   ...props
 }: SelectPrimitive.Popup.Props &
-  Pick<
-    SelectPrimitive.Positioner.Props,
-    "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
-  >) {
+ Pick<
+ SelectPrimitive.Positioner.Props,
+ "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
+ >) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
