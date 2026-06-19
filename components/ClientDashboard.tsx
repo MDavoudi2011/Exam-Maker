@@ -103,10 +103,10 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
         <div className="mt-6 pt-6 border-t border-border space-y-2 shrink-0">
           <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-muted/80 mb-4 border border-border/50 ">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold shadow-md ring-2 ring-background ">
-              {user?.email?.charAt(0).toUpperCase() || 'A'}
+              {(user?.user_metadata?.username || user?.email)?.charAt(0).toUpperCase() || 'A'}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-bold truncate text-foreground ">{user?.email}</p>
+              <p className="text-sm font-bold truncate text-foreground dir-ltr text-right">{user?.user_metadata?.username || user?.email}</p>
               <p className="text-xs text-muted-foreground font-medium">{userRole === 'admin' ? 'مدیر سیستم' : 'کاربر'}</p>
             </div>
           </div>

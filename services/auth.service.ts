@@ -1,17 +1,61 @@
 import { createClient } from '@/lib/supabase/client';
 
 export const authService = {
-  signIn: async ({ email, password }: any) => {
+  signIn: async ({ email, password }: any): Promise<{ data: any, error: any }> => {
     const supabase = createClient();
-    return supabase.auth.signInWithPassword({ email, password });
+    let identifier = email;
+
+    if (!identifier.includes('@')) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('username', identifier)
+        .single();
+        
+      if (data && data.email) {
+        identifier = data.email;
+      } else {
+        return { data: null, error: new Error('نام کاربری یافت نشد') };
+      }
+    }
+
+    return supabase.auth.signInWithPassword({ email: identifier, password });
   },
-  signUp: async ({ email, password }: any) => {
+  signUp: async ({ email, username, password }: any): Promise<{ data: any, error: any }> => {
     const supabase = createClient();
-    return supabase.auth.signUp({ email, password });
+    
+    if (username) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', username)
+        .maybeSingle();
+
+      if (data) {
+        return { data: null, error: new Error('این نام کاربری از قبل ثبت شده است') };
+      }
+    }
+
+    return supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        data: { username }
+      }
+    });
   },
   verifyOtp: async ({ email, token }: any) => {
     const supabase = createClient();
     return supabase.auth.verifyOtp({ email, token, type: 'email' });
+  },
+  signInWithGoogle: async () => {
+    const supabase = createClient();
+    return supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`
+      }
+    });
   },
   signOut: async () => {
     const supabase = createClient();

@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { authService } from '@/services/auth.service';
-import { questionService } from '@/services/question.service';
-import { examService } from '@/services/exam.service';
-import { attemptService } from '@/services/attempt.service';
 import { AuthMode } from '@/types/auth.type';
 
 export function useClientLogin() {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +22,7 @@ export function useClientLogin() {
         if (error) throw error;
         window.location.reload();
       } else if (mode === 'signup') {
-        const { error, data } = await authService.signUp({ email, password });
+        const { error, data } = await authService.signUp({ email, username, password });
         if (error) throw error;
         if (data?.user && data.user.identities && data.user.identities.length === 0) {
            setError('این ایمیل قبلاً ثبت شده است.');
@@ -48,7 +46,6 @@ export function useClientLogin() {
       const { error } = await authService.verifyOtp({
         email,
         token: otpCode,
-        type: 'signup',
       });
       
       if (error) throw error;
@@ -60,9 +57,23 @@ export function useClientLogin() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const { error } = await authService.signInWithGoogle();
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || 'خطایی در ورود با گوگل رخ داد.');
+      setLoading(false);
+    }
+  };
+
   return {
     email,
     setEmail,
+    username,
+    setUsername,
     password,
     setPassword,
     otpCode,
@@ -73,6 +84,7 @@ export function useClientLogin() {
     mode,
     setMode,
     handleAuth,
-    handleVerify
+    handleVerify,
+    handleGoogleLogin
   };
 }

@@ -12,10 +12,15 @@ export const dashboardServer = {
     }
 
     let userRole = 'user';
+    let username = '';
     try {
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+      const { data: profile } = await supabase.from('profiles').select('role, username').eq('id', user.id).single();
       if (profile?.role) {
         userRole = profile.role;
+      }
+      if (profile?.username) {
+        username = profile.username;
+        user.user_metadata = { ...user.user_metadata, username };
       }
     } catch(err) {
       console.error("Profile fetch failed", err);
