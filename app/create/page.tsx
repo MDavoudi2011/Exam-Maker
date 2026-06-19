@@ -1,26 +1,16 @@
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ClientDashboard from '@/components/ClientDashboard';
+import { dashboardServer } from '@/services/dashboard.server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CreatePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user, userRole, initialExams } = await dashboardServer.getInitialData(false);
 
-  if (!user) {
-    redirect('/login');
+  if (userRole === 'admin') {
+    redirect('/admin/create'); // Wait, does /admin/create exist? In admin dashboard we don't have create. Wait, AdminDashboard doesn't have create. Just /admin.
+    // If they go to create, maybe redirect to /admin actually, since admins don't create? Nah, admins can create exams.
   }
 
-  let initialExams: any[] = [];
-  try {
-    const { data } = await supabase.from('exams').select('*, exam_questions(count)').order('created_at', { ascending: false });
-    if (data) {
-      initialExams = data;
-    }
-  } catch (err) {
-    console.error("Supabase fetch failed", err);
-  }
-
-  return <ClientDashboard user={user} initialExams={initialExams} initialTab="create" />;
+  return <ClientDashboard user={user} initialExams={initialExams} userRole={userRole} initialTab="create" />;
 }

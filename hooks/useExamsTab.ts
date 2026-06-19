@@ -11,21 +11,35 @@ export function useExamsTab(initialExams: any[], onDataChanged: () => void, init
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm || '');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [selectedCreator, setSelectedCreator] = useState<string>('all');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showCreatorDropdown, setShowCreatorDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const creatorDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setTimeout(() => setExams(initialExams), 0);
   }, [initialExams]);
 
   useEffect(() => {
-    setSearchTerm(initialSearchTerm || '');
+    // If the search term is a UUID, we treat it as a creator filter (as passed by UserManagementTab onNavigate('exams', user.id))
+    if (initialSearchTerm && initialSearchTerm.length === 36 && initialSearchTerm.includes('-')) {
+       // UUID heuristics 
+       setSelectedCreator(initialSearchTerm);
+       setSearchTerm('');
+    } else {
+       setSearchTerm(initialSearchTerm || '');
+       setSelectedCreator('all');
+    }
   }, [initialSearchTerm]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowStatusDropdown(false);
+      }
+      if (creatorDropdownRef.current && !creatorDropdownRef.current.contains(event.target as Node)) {
+        setShowCreatorDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -70,9 +84,25 @@ export function useExamsTab(initialExams: any[], onDataChanged: () => void, init
       const s = getStatus(e);
       const matchesSearch = (e.title || '').includes(searchTerm);
       const matchesStatus = selectedStatus === 'all' || s === selectedStatus;
-      return matchesSearch && matchesStatus;
+      const matchesCreator = selectedCreator === 'all' || e.created_by === selectedCreator;
+      return matchesSearch && matchesStatus && matchesCreator;
     });
-  }, [exams, searchTerm, selectedStatus]);
+  }, [exams, searchTerm, selectedStatus, selectedCreator]);
+
+  const creators = useMemo(() => {
+    const creatorMap = new Map<string, { id: string, email: string, count: number }>();
+    exams.forEach(e => {
+      if (e.created_by) {
+        const email = e.profiles?.email || 'نامشخص';
+        if (creatorMap.has(e.created_by)) {
+          creatorMap.get(e.created_by)!.count++;
+        } else {
+          creatorMap.set(e.created_by, { id: e.created_by, email, count: 1 });
+        }
+      }
+    });
+    return Array.from(creatorMap.values());
+  }, [exams]);
 
   return {
     exams,
@@ -81,12 +111,18 @@ export function useExamsTab(initialExams: any[], onDataChanged: () => void, init
     setSearchTerm,
     selectedStatus,
     setSelectedStatus,
+    selectedCreator,
+    setSelectedCreator,
     showStatusDropdown,
     setShowStatusDropdown,
+    showCreatorDropdown,
+    setShowCreatorDropdown,
     dropdownRef,
+    creatorDropdownRef,
     handleDelete,
     toggleStatus,
     getStatus,
-    filteredExams
+    filteredExams,
+    creators
   };
 }

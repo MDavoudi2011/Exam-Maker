@@ -53,9 +53,17 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
         setActiveTab('edit');
         const parts = path.split('/');
         setNavParam(parts.length > 2 ? parts[2] : null);
-      } else if (path.startsWith('/exams')) {
+      } else if (path.startsWith('/admin/exams') || path.startsWith('/exams')) {
         setActiveTab('exams');
-        setNavParam(null);
+        const parts = path.split('/');
+        // for /exams/:id  length is 3, for /admin/exams/:id length is 4
+        if (path.startsWith('/admin/exams') && parts.length > 3) {
+          setNavParam(parts[3]);
+        } else if (path.startsWith('/exams') && !path.startsWith('/admin') && parts.length > 2) {
+           setNavParam(parts[2]);
+        } else {
+          setNavParam(null);
+        }
       } else if (path.startsWith('/create')) {
         setActiveTab('create');
         setNavParam(null);
@@ -65,6 +73,9 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
         setNavParam(parts.length > 2 ? parts[2] : null);
       } else if (path.startsWith('/users')) {
         setActiveTab('users');
+        setNavParam(null);
+      } else if (path.startsWith('/user-management')) {
+        setActiveTab('user-management');
         setNavParam(null);
       } else if (path.startsWith('/questions')) {
         setActiveTab('question-bank');
@@ -83,10 +94,11 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
     setNavParam(param || null);
     
     let newUrl = isAdmin ? '/admin' : '/dashboard';
-    if (tab === 'exams') newUrl = isAdmin ? '/admin/exams' : '/exams';
+    if (tab === 'exams') newUrl = param ? (isAdmin ? `/admin/exams/${param}` : `/exams/${param}`) : (isAdmin ? '/admin/exams' : '/exams');
     if (tab === 'edit') newUrl = param ? `/edit/${param}` : '/exams';
     if (tab === 'create') newUrl = '/create';
     if (tab === 'users') newUrl = isAdmin ? '/admin/users' : '/users';
+    if (tab === 'user-management') newUrl = '/user-management';
     if (tab === 'question-bank') newUrl = isAdmin ? '/admin/questions' : '/questions';
     if (tab === 'reports') {
       newUrl = param ? (isAdmin ? `/admin/result/${param}` : `/result/${param}`) : (isAdmin ? '/admin/result' : '/result');

@@ -12,13 +12,19 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
     setSearchTerm,
     selectedStatus,
     setSelectedStatus,
+    selectedCreator,
+    setSelectedCreator,
     showStatusDropdown,
     setShowStatusDropdown,
+    showCreatorDropdown,
+    setShowCreatorDropdown,
     dropdownRef,
+    creatorDropdownRef,
     handleDelete,
     toggleStatus,
     getStatus,
-    filteredExams
+    filteredExams,
+    creators
   } = useExamsTab(initialExams, onDataChanged, initialSearchTerm);
 
   return (
@@ -90,6 +96,48 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
                 </div>
               )}
             </div>
+
+            {isAdmin && (
+              <div className="relative flex-1" ref={creatorDropdownRef}>
+                <button 
+                  onClick={() => setShowCreatorDropdown(!showCreatorDropdown)}
+                  className="w-full px-3 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="truncate max-w-[100px] md:max-w-none">
+                      {selectedCreator === 'all' ? 'همه سازندگان' : creators?.find(c => c.id === selectedCreator)?.email || 'نامشخص'}
+                    </span>
+                    <span className="w-5 h-5 flex shrink-0 items-center justify-center bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] rounded-full">
+                      {toFarsiNumber(selectedCreator === 'all' ? exams.length : exams.filter(e => e.created_by === selectedCreator).length)}
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 shrink-0 text-slate-400 md:mr-3 transition-transform ${showCreatorDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                {showCreatorDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50 max-h-64 overflow-y-auto custom-scrollbar">
+                    <div className="space-y-1 p-1">
+                      <button 
+                        onClick={() => { setSelectedCreator('all'); setShowCreatorDropdown(false); }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold transition-colors ${selectedCreator === 'all' ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
+                      >
+                        <span>همه سازندگان</span>
+                        <span className={`w-5 h-5 flex items-center justify-center text-[10px] rounded-full ${selectedCreator === 'all' ? 'bg-primary/20 dark:bg-primary/30' : 'bg-slate-200 dark:bg-slate-700'}`}>{toFarsiNumber(exams.length)}</span>
+                      </button>
+                      {creators?.map(creator => (
+                        <button 
+                          key={creator.id}
+                          onClick={() => { setSelectedCreator(creator.id); setShowCreatorDropdown(false); }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold transition-colors ${selectedCreator === creator.id ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300' : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-slate-700/50 dark:text-slate-300'}`}
+                        >
+                          <span className="truncate max-w-[150px]" dir="ltr">{creator.email}</span>
+                          <span className={`w-5 h-5 flex items-center justify-center text-[10px] rounded-full shrink-0 ${selectedCreator === creator.id ? 'bg-emerald-200 dark:bg-emerald-800' : 'bg-slate-200 dark:bg-slate-700'}`}>{toFarsiNumber(creator.count)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             
             {!isAdmin && (
               <button 

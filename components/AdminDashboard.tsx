@@ -7,6 +7,7 @@ import { ExamsTab } from '@/components/dashboard/ExamsTab';
 import { ReportsTab } from '@/components/dashboard/ReportsTab';
 import { UsersPerformanceTab } from '@/components/dashboard/UsersPerformanceTab';
 import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
+import { UserManagementTab } from '@/components/dashboard/UserManagementTab';
 import { useClientDashboard } from '@/hooks/useClientDashboard';
 import { Exam } from '@/types/exam.type';
 
@@ -94,6 +95,7 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
           <NavItem active={activeTab === 'exams'} onClick={() => handleTabClick('exams')} icon={<List />} label="همه آزمون‌ها" />
           <NavItem active={activeTab === 'reports'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
           <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="تحلیل عملکرد سیستم" />
+          <NavItem active={activeTab === 'user-management'} onClick={() => handleTabClick('user-management')} icon={<Users />} label="مدیریت کاربران" />
           <NavItem active={activeTab === 'question-bank'} onClick={() => handleTabClick('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
 
@@ -122,6 +124,7 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
           {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={handleNavigate} onDataChanged={refreshExams} initialSearchTerm={navParam || ''} isAdmin={true} />}
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
           {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
+          {activeTab === 'user-management' && <UserManagementTab onNavigate={handleNavigate} onDataChanged={refreshExams} />}
           {activeTab === 'question-bank' && <QuestionBankTab userRole={userRole} />}
         </div>
       </main>

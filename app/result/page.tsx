@@ -1,26 +1,15 @@
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ClientDashboard from '@/components/ClientDashboard';
+import { dashboardServer } from '@/services/dashboard.server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ResultPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user, userRole, initialExams } = await dashboardServer.getInitialData(false);
 
-  if (!user) {
-    redirect('/login');
+  if (userRole === 'admin') {
+    redirect('/admin/result');
   }
 
-  let initialExams: any[] = [];
-  try {
-    const { data } = await supabase.from('exams').select('*, exam_questions(count)').order('created_at', { ascending: false });
-    if (data) {
-      initialExams = data;
-    }
-  } catch (err) {
-    console.error("Supabase fetch failed", err);
-  }
-
-  return <ClientDashboard user={user} initialExams={initialExams} initialTab="reports" />;
+  return <ClientDashboard user={user} initialExams={initialExams} userRole={userRole} initialTab="reports" />;
 }
