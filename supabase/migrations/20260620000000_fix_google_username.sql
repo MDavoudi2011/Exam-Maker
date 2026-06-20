@@ -22,6 +22,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- رفع مشکل مقادیر اشتباه که قبلا در username ذخیره شده بودند
+UPDATE public.profiles
+SET username = NULL
+WHERE id IN (
+  SELECT p.id FROM public.profiles p
+  JOIN auth.users u ON p.id = u.id
+  WHERE p.username = u.raw_user_meta_data->>'full_name'
+  OR p.username = split_part(u.email, '@', 1)
+);
+
 -- بک‌فیل (Backfill) برای پر کردن display_name کاربران موجود
 UPDATE public.profiles p
 SET display_name = COALESCE(

@@ -6,7 +6,7 @@ export const userService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { data: null, error: new Error('User not authenticated') };
     
-    return supabase.from('profiles').select('id, email, role, created_at').order('created_at', { ascending: false });
+    return supabase.from('profiles').select('id, email, role, created_at, username, display_name').order('created_at', { ascending: false });
   },
 
   updateUserRole: async (userId: string, newRole: string) => {

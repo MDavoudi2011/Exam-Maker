@@ -24,7 +24,7 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
     isDarkMode,
     toggleDarkMode,
     handleTabClick
-  } = useClientDashboard(initialTab, initialParam, initialExams);
+  } = useClientDashboard(initialTab, initialParam, initialExams, true);
 
   return (
     <div className="h-screen w-full bg-muted/50 dark:bg-background font-sans text-foreground flex flex-col md:flex-row relative overflow-hidden" dir="rtl">

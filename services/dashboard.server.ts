@@ -41,7 +41,7 @@ export const dashboardServer = {
     let initialExams: any[] = [];
     try {
       if (userRole === 'admin') {
-        const { data } = await examService.getAllExams(); // Admin sees all
+        const { data } = await supabase.from('exams').select('*, exam_questions(count), profiles(email)').order('created_at', { ascending: false }).order('id');
         if (data) initialExams = data;
       } else {
         const { data } = await supabase.from('exams').select('*, exam_questions(count)').eq('created_by', user.id).order('created_at', { ascending: false });

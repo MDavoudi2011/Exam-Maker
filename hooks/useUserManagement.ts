@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { userService } from '@/services/user.service';
 
 export function useUserManagement(onDataChanged?: () => void) {
@@ -12,6 +12,15 @@ export function useUserManagement(onDataChanged?: () => void) {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [newPassword, setNewPassword] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Search & Filter state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState('all');
+  const [sortKey, setSortKey] = useState('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -93,8 +102,41 @@ export function useUserManagement(onDataChanged?: () => void) {
     setPasswordModalOpen(true);
   };
 
+  const filteredUsers = useMemo(() => {
+    let result = [...users];
+
+    if (searchTerm) {
+      const p = searchTerm.toLowerCase();
+      result = result.filter(u => 
+        u.email?.toLowerCase().includes(p) || 
+        u.display_name?.toLowerCase().includes(p) ||
+        u.username?.toLowerCase().includes(p)
+      );
+    }
+
+    if (selectedRole !== 'all') {
+      result = result.filter(u => u.role === selectedRole);
+    }
+
+    result.sort((a, b) => {
+      let comparison = 0;
+      if (sortKey === 'date') {
+        const da = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const db = b.created_at ? new Date(b.created_at).getTime() : 0;
+        comparison = da - db;
+      } else if (sortKey === 'role') {
+        if (a.role === b.role) comparison = 0;
+        else comparison = a.role === 'admin' ? 1 : -1;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    return result;
+  }, [users, searchTerm, selectedRole, sortKey, sortDirection]);
+
   return {
     users,
+    filteredUsers,
     loading,
     error,
     actionLoading,
@@ -103,6 +145,18 @@ export function useUserManagement(onDataChanged?: () => void) {
     selectedUser,
     newPassword,
     setNewPassword,
+    searchTerm,
+    setSearchTerm,
+    selectedRole,
+    setSelectedRole,
+    sortKey,
+    setSortKey,
+    sortDirection,
+    setSortDirection,
+    isRoleDropdownOpen,
+    setIsRoleDropdownOpen,
+    isSortDropdownOpen,
+    setIsSortDropdownOpen,
     toggleRole,
     handleDeleteUser,
     handlePasswordChange,

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useRef } from 'react';
 import { User, Shield, ShieldAlert, Trash2, KeyRound, Loader2, Eye, LayoutDashboard, BrainCircuit, Users, ArrowUpDown } from 'lucide-react';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { toFarsiNumber } from '@/utils/text.util';
@@ -12,7 +12,7 @@ import { SortDropdown } from '@/components/ui/SortDropdown';
 
 export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (tab: string, param?: string) => void, onDataChanged?: () => void }) {
   const {
-    users,
+    filteredUsers,
     loading,
     error,
     actionLoading,
@@ -21,49 +21,23 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
     selectedUser,
     newPassword,
     setNewPassword,
+    searchTerm,
+    setSearchTerm,
+    selectedRole,
+    setSelectedRole,
+    sortKey,
+    setSortKey,
+    sortDirection,
+    setSortDirection,
+    isRoleDropdownOpen,
+    setIsRoleDropdownOpen,
+    isSortDropdownOpen,
+    setIsSortDropdownOpen,
     toggleRole,
     handleDeleteUser,
     handlePasswordChange,
     openPasswordModal
   } = useUserManagement(onDataChanged);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRole, setSelectedRole] = useState('all');
-  const [sortKey, setSortKey] = useState('date');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
-  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-  
-  const roleDropdownRef = useRef<HTMLDivElement>(null);
-  const sortDropdownRef = useRef<HTMLDivElement>(null);
-
-  const filteredUsers = useMemo(() => {
-    let result = [...users];
-
-    if (searchTerm) {
-      result = result.filter(u => u.email?.toLowerCase().includes(searchTerm.toLowerCase()));
-    }
-
-    if (selectedRole !== 'all') {
-      result = result.filter(u => u.role === selectedRole);
-    }
-
-    result.sort((a, b) => {
-      let comparison = 0;
-      if (sortKey === 'date') {
-        const da = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const db = b.created_at ? new Date(b.created_at).getTime() : 0;
-        comparison = da - db;
-      } else if (sortKey === 'role') {
-        if (a.role === b.role) comparison = 0;
-        else comparison = a.role === 'admin' ? 1 : -1;
-      }
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-
-    return result;
-  }, [users, searchTerm, selectedRole, sortKey, sortDirection]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
@@ -74,7 +48,7 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
       <DashboardCard>
         <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20 w-full">
           <div className="relative flex-1">
-            <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="جستجو در ایمیل‌ها..." />
+            <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="جستجو نام کاربری، نام، ایمیل..." />
           </div>
           
           <div className="flex flex-row items-center gap-4 w-full md:w-auto shrink-0 z-10">
@@ -112,7 +86,7 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
             <thead>
               <tr className="bg-muted/50 text-muted-foreground text-xs md:text-sm border-y border-border dark:border-border">
                 <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-16 text-center">ردیف</th>
-                <th className="p-3 md:p-4 font-semibold text-right">ایمیل</th>
+                <th className="p-3 md:p-4 font-semibold text-right">کاربر</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-32 md:w-40 text-nowrap">تاریخ ثبت‌نام</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-32 md:w-36">نقش</th>
                 <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-32 md:w-40">عملیات</th>
@@ -137,7 +111,16 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
                 filteredUsers.map((u, index) => (
                   <tr key={u.id} className="hover:bg-muted/50 transition-colors group">
                     <td className="p-3 md:p-4 px-4 md:px-6 font-medium text-muted-foreground dark:text-muted-foreground text-center">{toFarsiNumber(index + 1)}</td>
-                    <td className="p-3 md:p-4 font-bold text-foreground text-right" dir="ltr">{u.email || u.id}</td>
+                    <td className="p-3 md:p-4 text-right">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-foreground text-base truncate max-w-[150px] md:max-w-[300px]">
+                          {u.display_name || u.username || u.email?.split('@')[0]}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[150px] md:max-w-[300px] dir-ltr text-left">
+                          {u.email}
+                        </span>
+                      </div>
+                    </td>
                     <td className="p-3 md:p-4 text-muted-foreground text-[10px] md:text-sm text-center whitespace-nowrap" dir="ltr">
                       {u.created_at ? toFarsiNumber(new Date(u.created_at).toLocaleString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}
                     </td>
