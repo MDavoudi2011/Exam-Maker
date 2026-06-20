@@ -49,10 +49,13 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
-      if (path.startsWith('/edit')) {
+      if (path.startsWith('/edit') || path.startsWith('/admin/edit')) {
         setActiveTab('edit');
         const parts = path.split('/');
-        setNavParam(parts.length > 2 ? parts[2] : null);
+        // /edit/123 -> parts: ['', 'edit', '123']
+        // /admin/edit/123 -> parts: ['', 'admin', 'edit', '123']
+        const paramIndex = path.startsWith('/admin') ? 3 : 2;
+        setNavParam(parts.length > paramIndex ? parts[paramIndex] : null);
       } else if (path.startsWith('/admin/exams') || path.startsWith('/exams')) {
         setActiveTab('exams');
         const parts = path.split('/');
@@ -64,7 +67,7 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
         } else {
           setNavParam(null);
         }
-      } else if (path.startsWith('/create')) {
+      } else if (path.startsWith('/create') || path.startsWith('/admin/create')) {
         setActiveTab('create');
         setNavParam(null);
       } else if (path.startsWith('/result')) {
@@ -95,8 +98,8 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
     
     let newUrl = isAdmin ? '/admin' : '/dashboard';
     if (tab === 'exams') newUrl = param ? (isAdmin ? `/admin/exams/${param}` : `/exams/${param}`) : (isAdmin ? '/admin/exams' : '/exams');
-    if (tab === 'edit') newUrl = param ? `/edit/${param}` : '/exams';
-    if (tab === 'create') newUrl = '/create';
+    if (tab === 'edit') newUrl = param ? (isAdmin ? `/admin/edit/${param}` : `/edit/${param}`) : (isAdmin ? '/admin/exams' : '/exams');
+    if (tab === 'create') newUrl = isAdmin ? '/admin/create' : '/create';
     if (tab === 'users') newUrl = isAdmin ? '/admin/users' : '/users';
     if (tab === 'user-management') newUrl = '/user-management';
     if (tab === 'question-bank') newUrl = isAdmin ? '/admin/questions' : '/questions';

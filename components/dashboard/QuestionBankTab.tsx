@@ -82,38 +82,41 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
               onClose={() => setShowTopicDropdown(false)}
               className="md:w-64"
               footer={
-                !showAddTopic ? (
-                  <button 
-                    onClick={() => setShowAddTopic(true)}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground rounded-xl text-sm font-bold transition-colors"
-                  >
-                    <Plus className="w-4 h-4" /> افزودن موضوع جدید
-                  </button>
-                ) : (
-                  <div className="flex flex-col gap-2 p-1">
-                    <input 
-                      type="text" 
-                      placeholder="نام موضوع..." 
-                      value={newTopic}
-                      onChange={(e) => setNewTopic(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddTopic();
-                        }
-                      }}
-                      autoFocus
-                    />
-                    <div className="flex gap-2">
-                       <button onClick={handleAddTopic} className="flex-1 py-2 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors">ثبت</button>
-                       <button onClick={() => {setShowAddTopic(false); setNewTopic('');}} className="flex-1 py-2 bg-muted text-muted-foreground hover:bg-muted/80 rounded-xl text-xs font-bold transition-colors">انصراف</button>
+                userRole === 'admin' ? (
+                  !showAddTopic ? (
+                    <button 
+                      onClick={() => setShowAddTopic(true)}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground rounded-xl text-sm font-bold transition-colors"
+                    >
+                      <Plus className="w-4 h-4" /> افزودن موضوع جدید
+                    </button>
+                  ) : (
+                    <div className="flex flex-col gap-2 p-1">
+                      <input 
+                        type="text" 
+                        placeholder="نام موضوع..." 
+                        value={newTopic}
+                        onChange={(e) => setNewTopic(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddTopic();
+                          }
+                        }}
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                         <button onClick={handleAddTopic} className="flex-1 py-2 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary/90 transition-colors">ثبت</button>
+                         <button onClick={() => {setShowAddTopic(false); setNewTopic('');}} className="flex-1 py-2 bg-muted text-muted-foreground hover:bg-muted/80 rounded-xl text-xs font-bold transition-colors">انصراف</button>
+                      </div>
                     </div>
-                  </div>
-                )
+                  )
+                ) : undefined
               }
             />
             
+            {userRole === 'admin' && (
               <PrimaryButton 
                 onClick={() => setEditingQuestion({ content: '', options: ['', '', '', ''], correct_option_index: 0, topic: '', point_value: 10 })}
                 icon={<Plus className="w-4 h-4 md:w-5 md:h-5" />}
@@ -121,6 +124,7 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
                 <span className="hidden sm:inline">افزودن سوال</span>
                 <span className="sm:hidden inline">سوال جدید</span>
               </PrimaryButton>
+            )}
           </div>
         </div>
 

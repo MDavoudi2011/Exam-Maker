@@ -56,7 +56,7 @@ export function useUsersPerformanceTab(initialExams: any[]) {
       }
     };
     fetchData();
-  }, [examIdsStr]);
+  }, [examIdsStr, initialExams]);
 
   const usersMap = new Map<string, {
     fullName: string,

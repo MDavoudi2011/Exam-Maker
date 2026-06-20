@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BrainCircuit, LayoutDashboard, List, LogOut, BarChart3, ChevronRight, Users, Database, Menu, X, Moon, Sun } from 'lucide-react';
+import { BrainCircuit, LayoutDashboard, List, LogOut, BarChart3, ChevronRight, Users, Database, Menu, X, Moon, Sun, PlusCircle } from 'lucide-react';
 import { OverviewTab } from '@/components/dashboard/OverviewTab';
 import { ExamsTab } from '@/components/dashboard/ExamsTab';
+import { CreateTab } from '@/components/dashboard/CreateTab';
+import { ExamEditor } from '@/components/dashboard/ExamEditor';
 import { ReportsTab } from '@/components/dashboard/ReportsTab';
 import { UsersPerformanceTab } from '@/components/dashboard/UsersPerformanceTab';
 import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
@@ -12,7 +14,7 @@ import { useClientDashboard } from '@/hooks/useClientDashboard';
 import { Exam } from '@/types/exam.type';
 import { Footer } from '@/components/Footer';
 
-export default function AdminDashboard({ user, initialExams, userRole = 'admin', initialTab = 'overview', initialParam = null }: { user: any, initialExams: any[], userRole?: string, initialTab?: string, initialParam?: string | null }) {
+export default function AdminDashboard({ user, initialExams, userRole = 'admin', initialTab = 'overview', initialParam = null, initialExam, initialQuestions }: { user: any, initialExams: any[], userRole?: string, initialTab?: string, initialParam?: string | null, initialExam?: any, initialQuestions?: any[] }) {
   const {
     activeTab,
     navParam,
@@ -95,6 +97,7 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
         <nav className="flex-1 space-y-1.5 focus:outline-none overflow-y-auto pr-2 custom-scrollbar">
           <NavItem active={activeTab === 'overview'} onClick={() => handleTabClick('overview')} icon={<LayoutDashboard />} label="داشبورد" />
           <NavItem active={activeTab === 'exams'} onClick={() => handleTabClick('exams')} icon={<List />} label="همه آزمون‌ها" />
+          <NavItem active={activeTab === 'create'} onClick={() => handleTabClick('create')} icon={<PlusCircle />} label="ساخت آزمون" />
           <NavItem active={activeTab === 'reports'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
           <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="عملکرد کاربران" />
           <NavItem active={activeTab === 'user-management'} onClick={() => handleTabClick('user-management')} icon={<Users />} label="مدیریت کاربران" />
@@ -124,8 +127,23 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
         <div className="p-4 md:p-8 lg:p-10 lg:pr-8 flex-1">
           <div className="max-w-7xl mx-auto pb-10">
             {activeTab === 'overview' && <OverviewTab initialExams={exams} onNavigate={handleNavigate} />}
-          {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={handleNavigate} onDataChanged={refreshExams} initialSearchTerm={navParam || ''} isAdmin={true} />}
-          {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
+            {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={handleNavigate} onDataChanged={refreshExams} initialSearchTerm={navParam || ''} isAdmin={true} />}
+            {activeTab === 'create' && (
+              <CreateTab 
+                onCreated={() => { refreshExams(); handleNavigate('exams'); }} 
+                onCancel={() => handleNavigate('exams')} 
+              />
+            )}
+            {activeTab === 'edit' && navParam && (
+              <ExamEditor 
+                examId={navParam} 
+                initialExam={initialExam}
+                initialQuestions={initialQuestions}
+                onNavigate={handleNavigate} 
+                onDataChanged={refreshExams} 
+              />
+            )}
+            {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
           {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
           {activeTab === 'user-management' && <UserManagementTab onNavigate={handleNavigate} onDataChanged={refreshExams} />}
           {activeTab === 'question-bank' && <QuestionBankTab userRole={userRole} />}

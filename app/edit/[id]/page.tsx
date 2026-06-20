@@ -10,13 +10,7 @@ export default async function EditExamPage({ params }: { params: Promise<{ id: s
   const { user, userRole, initialExams } = await dashboardServer.getInitialData(false);
 
   if (userRole === 'admin') {
-    // maybe redirect to /admin/exams/edit/:id or something? Actually admin can just use old link or standard one?
-    // Wait, we don't have a distinct edit page for admin, it's just /dashboard for user. Let's redirect to /admin if they are admin.
-    // Wait, admins might want to edit. If so, they can stay on this page?
-    // Or we should redirect to /admin? Edit isn't in admin dashboard...
-    // Actually we'll just let them use this page but with ClientDashboard, this component itself doesn't have an admin version.
-    // wait AdminDashboard doesn't have an edit tab!
-    // So edit remains a separate page for everyone?
+    redirect(`/admin/edit/${id}`);
   }
 
   const supabase = await createClient();

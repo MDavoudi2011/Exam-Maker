@@ -73,7 +73,7 @@ export function ReportsTab({ initialExams, initialSelectedExamId }: { initialExa
               isOpen={isDropdownOpen}
               onToggle={() => setIsDropdownOpen(!isDropdownOpen)}
               onClose={() => setIsDropdownOpen(false)}
-              placeholder="انتخاب آزمون"
+              placeholder="انتخاب آزمون ..."
               icon={<ChevronDown className="w-4 h-4 hidden" />} /* Disable default icon */
             />
  
