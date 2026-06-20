@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { BrainCircuit, Loader2, ArrowRight } from 'lucide-react';
+import { ArrowRight, BrainCircuit, Loader2 } from 'lucide-react';
 import { useClientLogin } from '@/hooks/useClientLogin';
+import { Footer } from '@/components/Footer';
 
 export default function ClientLogin() {
   const {
@@ -25,12 +26,13 @@ export default function ClientLogin() {
   } = useClientLogin();
 
   return (
-    <div className="min-h-screen w-full bg-muted/50 dark:bg-background flex items-center justify-center p-4 py-8 font-sans overflow-x-hidden relative" dir="rtl">
+    <div className="min-h-screen w-full bg-muted/50 flex flex-col justify-between dark:bg-background font-sans overflow-x-hidden relative" dir="rtl">
       {/* Decorative Orbs */}
       <div className="fixed top-1/4 -right-20 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none hidden md:block z-0"></div>
       <div className="fixed bottom-1/4 -left-20 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none hidden md:block z-0"></div>
 
-      <div className="w-full max-w-4xl bg-card rounded-[2rem] shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 grid md:grid-cols-2 overflow-hidden border border-border">
+      <div className="w-full flex-1 flex flex-col items-center justify-center p-4 py-8">
+        <div className="w-full max-w-4xl bg-card rounded-[2rem] shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 grid md:grid-cols-2 overflow-hidden border border-border">
         
         {/* Branding Side (Desktop Only) */}
         <div className="hidden md:flex flex-col items-center justify-center p-12 bg-primary/5 text-center border-l border-border">
@@ -171,6 +173,9 @@ export default function ClientLogin() {
           )}
         </div>
       </div>
+      </div>
+      
+      <Footer className="border-none mt-auto" />
     </div>
   );
 }

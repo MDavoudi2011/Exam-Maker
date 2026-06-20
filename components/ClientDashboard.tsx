@@ -11,6 +11,7 @@ import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
 import { ExamEditor } from '@/components/dashboard/ExamEditor';
 import { useClientDashboard } from '@/hooks/useClientDashboard';
 import { Exam } from '@/types/exam.type';
+import { Footer } from '@/components/Footer';
 
 export default function ClientDashboard({ user, initialExams, userRole = 'user', initialTab = 'overview', initialParam = null, initialExam = null, initialQuestions = [] }: { user: any, initialExams: any[], userRole?: string, initialTab?: string, initialParam?: string | null, initialExam?: any, initialQuestions?: any[] }) {
   const {
@@ -28,7 +29,8 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
   } = useClientDashboard(initialTab, initialParam, initialExams);
 
   return (
-    <div className="h-screen w-full bg-muted/50 dark:bg-background font-sans text-foreground flex flex-col md:flex-row relative overflow-hidden" dir="rtl">
+    <div className="h-screen w-full bg-muted/50 dark:bg-background font-sans text-foreground flex flex-col relative overflow-hidden" dir="rtl">
+      <div className="flex-1 min-h-0 w-full flex flex-col md:flex-row relative">
  
       {/* Background Decor */}
       <div className="absolute top-0 -left-64 w-[500px] h-[500px] bg-primary/10 blur-[100px] rounded-full mix-blend-multiply opacity-50 pointer-events-none"></div>
@@ -119,9 +121,10 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 p-4 md:p-8 lg:p-10 lg:pr-8 overflow-y-auto z-10 relative">
-        <div className="max-w-7xl mx-auto pb-10">
-          {activeTab === 'overview' && <OverviewTab initialExams={exams} onNavigate={handleNavigate} />}
+      <main className="flex-1 min-w-0 overflow-y-auto z-10 relative flex flex-col">
+        <div className="p-4 md:p-8 lg:p-10 lg:pr-8 flex-1">
+          <div className="max-w-7xl mx-auto pb-10">
+            {activeTab === 'overview' && <OverviewTab initialExams={exams} onNavigate={handleNavigate} />}
           {activeTab === 'exams' && <ExamsTab initialExams={exams} onNavigate={handleNavigate} onDataChanged={refreshExams} initialSearchTerm={navParam || ''} />}
           {activeTab === 'create' && (
             <CreateTab 
@@ -141,8 +144,11 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
           {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
           {activeTab === 'question-bank' && <QuestionBankTab userRole={userRole} />}
+          </div>
         </div>
+        <Footer className="border-none mt-auto" />
       </main>
+      </div>
     </div>
   );
 }

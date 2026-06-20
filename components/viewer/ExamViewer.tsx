@@ -7,6 +7,7 @@ import { isFarsi } from '@/utils/text.util';
 import { formatTime } from '@/utils/time.util';
 import { RenderContent } from '@/components/ui/RenderContent';
 import { useExamViewer } from '@/hooks/useExamViewer';
+import { Footer } from '@/components/Footer';
 import { ExamViewerHeader } from './ExamViewerHeader';
 import { ExamViewerStudentForm } from './ExamViewerStudentForm';
 import { ExamViewerAnswerSheet } from './ExamViewerAnswerSheet';
@@ -48,28 +49,30 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
   if (!adminViewAttemptId) {
     if (examStatus === 'draft' && !hasParticipated) {
       return (
-        <div className="min-h-screen bg-muted/50 dark:bg-background flex flex-col items-center justify-center p-4 font-sans text-foreground " dir="rtl">
-          <div className="w-full max-w-md bg-card dark:bg-background rounded-3xl p-10 text-center shadow-xl border border-border dark:border-border animate-in fade-in zoom-in duration-500">
+        <div className="min-h-screen bg-muted/50 dark:bg-background flex flex-col items-center justify-between font-sans text-foreground " dir="rtl">
+          <div className="w-full max-w-md bg-card dark:bg-background rounded-3xl p-10 text-center shadow-xl border border-border dark:border-border animate-in fade-in zoom-in duration-500 my-auto mx-4">
             <div className="bg-muted w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-muted-foreground">
               <Timer className="w-10 h-10" />
             </div>
             <h1 className="text-2xl font-extrabold mb-4">آزمون هنوز شروع نشده است</h1>
             <p className="text-muted-foreground font-medium">لطفاً در زمان مقرر مراجعه کنید.</p>
           </div>
+          <Footer className="border-none bg-transparent" />
         </div>
       );
     }
  
     if (examStatus === 'completed' && !hasParticipated) {
       return (
-        <div className="min-h-screen bg-muted/50 dark:bg-background flex flex-col items-center justify-center p-4 font-sans text-foreground " dir="rtl">
-          <div className="w-full max-w-md bg-card dark:bg-background rounded-3xl p-10 text-center shadow-xl border border-border dark:border-border animate-in fade-in zoom-in duration-500">
+        <div className="min-h-screen bg-muted/50 dark:bg-background flex flex-col items-center justify-between font-sans text-foreground " dir="rtl">
+          <div className="w-full max-w-md bg-card dark:bg-background rounded-3xl p-10 text-center shadow-xl border border-border dark:border-border animate-in fade-in zoom-in duration-500 my-auto mx-4">
             <div className="bg-destructive/10 text-destructive w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertOctagon className="w-10 h-10" />
             </div>
             <h1 className="text-2xl font-extrabold mb-4">آزمون به پایان رسیده است</h1>
             <p className="text-muted-foreground font-medium">زمان شرکت در این آزمون گذشته است.</p>
           </div>
+          <Footer className="border-none bg-transparent" />
         </div>
       );
     }
@@ -77,14 +80,15 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
 
   if (hasParticipated && !submitted) {
     return (
-      <div className="min-h-screen bg-muted/50 dark:bg-background flex flex-col items-center justify-center py-20 px-4 font-sans text-foreground " dir="rtl">
-        <div className="w-full max-w-md bg-card dark:bg-background rounded-3xl p-10 text-center shadow-xl border border-border dark:border-border animate-in fade-in zoom-in duration-500">
+      <div className="min-h-screen bg-muted/50 dark:bg-background flex flex-col items-center justify-between font-sans text-foreground " dir="rtl">
+        <div className="w-full max-w-md bg-card dark:bg-background rounded-3xl p-10 text-center shadow-xl border border-border dark:border-border animate-in fade-in zoom-in duration-500 mx-4 my-auto">
           <div className="bg-warning/10 text-warning w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10" />
           </div>
           <h1 className="text-2xl font-extrabold mb-4">آزمون شما ثبت شده است</h1>
           <p className="text-muted-foreground font-medium mb-8">شما در این آزمون شرکت کرده‌اید. اما به دلیل محدودیت‌های شبکه مشخصات دقیق یافت نشد.</p>
         </div>
+        <Footer className="border-none bg-transparent" />
       </div>
     );
   }
@@ -101,8 +105,8 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
     const correctPct = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
  
     return (
-      <div className={`${adminViewAttemptId ? 'pb-32 pt-6' : 'min-h-screen pt-10 pb-20'} bg-muted/50 dark:bg-background flex flex-col items-center px-4 font-sans text-foreground `} dir="rtl">
-        <div className={`w-full max-w-3xl ${adminViewAttemptId ? '' : 'bg-card dark:bg-background rounded-3xl p-8 md:p-10 shadow-sm border border-border dark:border-border'} animate-in fade-in zoom-in duration-500`}>
+      <div className={`${adminViewAttemptId ? 'pb-8 pt-6' : 'min-h-screen pt-10 flex flex-col justify-between'} bg-muted/50 dark:bg-background flex flex-col items-center font-sans text-foreground `} dir="rtl">
+        <div className={`w-full max-w-3xl px-4 ${adminViewAttemptId ? '' : 'bg-card dark:bg-background rounded-3xl p-8 md:p-10 shadow-sm border border-border dark:border-border'} animate-in fade-in zoom-in duration-500 mb-10`}>
  
           {!adminViewAttemptId && (
             <div className="text-center mb-10">
@@ -191,16 +195,18 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
             </div>
           )}
         </div>
+        {!adminViewAttemptId && <Footer className="border-none mt-auto" />}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-muted/50 dark:bg-background font-sans text-foreground flex flex-col items-center py-6 px-4 transition-colors duration-300 relative" dir="rtl">
- 
-      {/* Top Navigation / Status Bar */}
-      <ExamViewerHeader 
-        isDarkMode={isDarkMode}
+    <div className="min-h-screen bg-muted/50 flex flex-col justify-between dark:bg-background font-sans text-foreground items-center pt-6 transition-colors duration-300 relative" dir="rtl">
+      
+      <div className="w-full flex-1 flex flex-col items-center px-4">
+        {/* Top Navigation / Status Bar */}
+        <ExamViewerHeader 
+          isDarkMode={isDarkMode}
         toggleDarkMode={toggleDarkMode}
         currentStep={currentStep}
         activeQuestionIndex={activeQuestionIndex}
@@ -329,6 +335,9 @@ export function ExamViewer({ exam, questions, user, adminViewAttemptId }: any) {
         )}
 
       </div>
+
+      </div>
+      <Footer className="border-none mt-auto" />
     </div>
   );
 }
