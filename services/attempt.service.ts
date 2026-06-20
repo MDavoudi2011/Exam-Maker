@@ -12,11 +12,20 @@ export const attemptService = {
       .in('exam_id', examIds)
       .eq('status', 'completed');
   },
-  getAttemptsForPerformanceTab: async () => {
+  getAttemptsForPerformanceTab: async (examIds?: string[]) => {
     const supabase = createClient();
-    return supabase.from('test_attempts')
+    let query = supabase.from('test_attempts')
       .select('id, full_name, national_code, personnel_code, score, exam_id')
       .order('created_at', { ascending: false });
+      
+    if (examIds && examIds.length > 0) {
+      query = query.in('exam_id', examIds);
+    } else if (examIds && examIds.length === 0) {
+      // If array is empty, return empty result instead of all
+      return { data: [], error: null };
+    }
+      
+    return query;
   },
   getAttemptsByExamId: async (examId: string) => {
     const supabase = createClient();

@@ -21,11 +21,14 @@ export function useUsersPerformanceTab(initialExams: any[]) {
   useClickOutside(sortDropdownRef, () => setIsSortDropdownOpen(false));
   useClickOutside(identDropdownRef, () => setIsIdentDropdownOpen(false));
   
+  const examIdsStr = initialExams.map(e => e.id).sort().join(',');
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const { data, error } = await attemptService.getAttemptsForPerformanceTab();
+        const examIds = initialExams.map(e => e.id);
+        const { data, error } = await attemptService.getAttemptsForPerformanceTab(examIds);
         
         if (data && data.length > 0) {
           const examIdsArray = Array.from(new Set(data.map(a => a.exam_id)));
@@ -53,7 +56,7 @@ export function useUsersPerformanceTab(initialExams: any[]) {
       }
     };
     fetchData();
-  }, []);
+  }, [examIdsStr]);
 
   const usersMap = new Map<string, {
     fullName: string,

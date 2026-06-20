@@ -25,10 +25,10 @@ export default function ClientLogin() {
   } = useClientLogin();
 
   return (
-    <div className="min-h-screen w-full bg-muted/50 dark:bg-background flex items-center justify-center p-4 font-sans overflow-x-hidden" dir="rtl">
+    <div className="min-h-screen w-full bg-muted/50 dark:bg-background flex items-center justify-center p-4 py-8 font-sans overflow-x-hidden relative" dir="rtl">
       {/* Decorative Orbs */}
-      <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none hidden md:block"></div>
-      <div className="absolute bottom-1/4 -left-20 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none hidden md:block"></div>
+      <div className="fixed top-1/4 -right-20 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none hidden md:block z-0"></div>
+      <div className="fixed bottom-1/4 -left-20 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none hidden md:block z-0"></div>
 
       <div className="w-full max-w-4xl bg-card rounded-[2rem] shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 grid md:grid-cols-2 overflow-hidden border border-border">
         
@@ -68,7 +68,7 @@ export default function ClientLogin() {
                 </button>
               </div>
 
-              <form onSubmit={handleAuth} className="space-y-6">
+              <form onSubmit={handleAuth} className="flex flex-col gap-5">
                 {error && (
                   <div className="p-4 text-sm tracking-tight rounded-2xl font-medium bg-destructive/10 text-destructive border border-destructive/20">
                     {error}
@@ -76,8 +76,8 @@ export default function ClientLogin() {
                 )}
 
                 {mode === 'signup' && (
-                  <div className="space-y-3">
-                    <label className="text-base font-bold text-foreground">نام کاربری</label>
+                  <div className="flex flex-col gap-3">
+                    <label className="text-sm font-bold text-foreground px-1">نام کاربری</label>
                     <input 
                       type="text" 
                       value={username}
@@ -89,8 +89,8 @@ export default function ClientLogin() {
                   </div>
                 )}
 
-                <div className="space-y-3">
-                  <label className="text-base font-bold text-foreground">
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-bold text-foreground px-1">
                     {mode === 'login' ? 'ایمیل یا نام کاربری' : 'آدرس ایمیل'}
                   </label>
                   <input 
@@ -103,8 +103,8 @@ export default function ClientLogin() {
                   />
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-base font-bold text-foreground">رمز عبور</label>
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-bold text-foreground px-1">رمز عبور</label>
                   <input 
                     type="password" 
                     value={password}
@@ -125,7 +125,7 @@ export default function ClientLogin() {
                   </button>
                 </div>
 
-                <div className="relative flex items-center py-2">
+                <div className="relative flex items-center my-[-4px]">
                   <div className="flex-grow border-t border-border"></div>
                   <span className="flex-shrink-0 mx-4 text-muted-foreground text-sm font-medium">یا</span>
                   <div className="flex-grow border-t border-border"></div>
