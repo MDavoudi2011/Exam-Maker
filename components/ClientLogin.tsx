@@ -83,7 +83,7 @@ export default function ClientLogin() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       className="w-full bg-muted/50 border border-border px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium dir-ltr text-left"
-                      placeholder="Example: MDavoudi"
+                      placeholder="MDavoudi"
                       required
                     />
                   </div>
@@ -98,7 +98,7 @@ export default function ClientLogin() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-muted/50 border border-border px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all dir-ltr text-left font-medium"
-                    placeholder={mode === 'login' ? 'Example: MDavoudi' : 'Example: MDavoudi2011@gmail.com'}
+                    placeholder={mode === 'login' ? 'MDavoudi' : 'name@example.com'}
                     required
                   />
                 </div>
