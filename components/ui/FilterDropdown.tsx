@@ -20,6 +20,7 @@ interface FilterDropdownProps {
   className?: string;
   footer?: React.ReactNode;
   disabled?: boolean;
+  direction?: 'up' | 'down';
 }
 
 export function FilterDropdown({
@@ -33,7 +34,8 @@ export function FilterDropdown({
   placeholder = 'فیلتر...',
   className = '',
   footer,
-  disabled = false
+  disabled = false,
+  direction = 'down'
 }: FilterDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -72,8 +74,8 @@ export function FilterDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-full bg-popover rounded-2xl shadow-xl shadow-black/5 border border-border overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 origin-top z-50">
-          <div className="space-y-1 p-1">
+        <div className={`absolute left-0 w-full bg-popover rounded-2xl shadow-xl shadow-black/5 border border-border overflow-hidden flex flex-col p-2 animate-in fade-in zoom-in-95 duration-100 z-[60] ${direction === 'up' ? 'bottom-full mb-2 origin-bottom' : 'top-full mt-2 origin-top'}`}>
+          <div className="space-y-1 p-1 max-h-60 overflow-y-auto custom-scrollbar">
             {options.map((option) => (
               <button
                 key={option.value}

@@ -122,7 +122,7 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
                 icon={<Plus className="w-4 h-4 md:w-5 md:h-5" />}
               >
                 <span className="hidden sm:inline">افزودن سوال</span>
-                <span className="sm:hidden inline">سوال جدید</span>
+                <span className="sm:hidden inline">افزودن</span>
               </PrimaryButton>
             )}
           </div>
@@ -248,33 +248,33 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
       </DashboardCard>
 
       {previewQuestion && (
-        <div className="fixed top-[72px] md:top-0 inset-x-0 bottom-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setPreviewQuestion(null)}></div>
-          <div className="relative w-full max-w-2xl bg-background rounded-3xl shadow-xl border border-border p-6 flex flex-col animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6 border-b border-border pb-4">
-              <h3 className="font-bold text-lg flex items-center gap-2"><Eye className="w-5 h-5 text-primary" /> پیش‌نمایش سوال</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setPreviewQuestion(null)}></div>
+          <div className="relative w-full max-w-2xl bg-background rounded-3xl shadow-xl border border-border flex flex-col max-h-[100dvh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="flex justify-between items-center p-4 md:p-6 border-b border-border bg-muted/30 shrink-0">
+              <h3 className="font-bold text-base md:text-lg flex items-center gap-2"><Eye className="w-5 h-5 text-primary" /> پیش‌نمایش سوال</h3>
               <button onClick={() => setPreviewQuestion(null)} className="p-2 hover:bg-muted rounded-full transition-colors"><X className="w-5 h-5" /></button>
             </div>
-            <div className="mb-6">
-              <div className="bg-muted/50 p-4 rounded-2xl mb-6 text-foreground font-medium text-lg leading-relaxed border border-border whitespace-pre-wrap">
+            <div className="p-4 md:p-6 overflow-y-auto space-y-4 md:space-y-6 custom-scrollbar">
+              <div className="bg-muted/50 p-3 md:p-4 rounded-xl text-foreground font-medium text-sm md:text-base leading-relaxed border border-border whitespace-pre-wrap">
                 <RenderContent content={previewQuestion.content} />
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 {previewQuestion.options && Array.isArray(previewQuestion.options) && previewQuestion.options.map((opt: string, i: number) => {
                   const isEnglish = /[a-zA-Z]/.test(opt) || (opt.trim().length > 0 && !/[\u0600-\u06FF]/.test(opt));
                   return (
-                  <div key={i} className={`p-4 rounded-xl border flex items-center gap-3 transition-colors ${previewQuestion.correct_option_index === i ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 'bg-background border-border'}`}>
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${previewQuestion.correct_option_index === i ? 'bg-emerald-500 text-white' : 'bg-muted'}`}>
+                  <div key={i} className={`p-3 md:p-4 rounded-xl border flex items-center gap-3 transition-colors ${previewQuestion.correct_option_index === i ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 'bg-background border-border'}`}>
+                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center shrink-0 ${previewQuestion.correct_option_index === i ? 'bg-emerald-500 text-white' : 'bg-muted'}`}>
                       {previewQuestion.correct_option_index === i && <Check className="w-3 h-3 text-white" />}
                     </div>
-                    <span dir={isEnglish ? "ltr" : "rtl"} className={`block flex-1 font-medium ${isEnglish ? 'text-left' : ''} ${previewQuestion.correct_option_index === i ? 'text-emerald-800 dark:text-emerald-300' : 'text-foreground'}`}><RenderContent content={opt} /></span>
+                    <span dir={isEnglish ? "ltr" : "rtl"} className={`block flex-1 text-xs md:text-sm font-medium ${isEnglish ? 'text-left' : ''} ${previewQuestion.correct_option_index === i ? 'text-emerald-800 dark:text-emerald-300' : 'text-foreground'}`}><RenderContent content={opt} /></span>
                   </div>
                 )})}
               </div>
             </div>
-            <div className="flex gap-4 border-t border-border pt-4 mt-auto">
-               <span className={`text-xs font-bold px-3 py-1.5 rounded-lg ${getTopicColor(previewQuestion.topic)}`}>{previewQuestion.topic || 'بدون دسته‌بندی'}</span>
-               <span className="text-xs font-bold bg-muted text-muted-foreground px-3 py-1.5 rounded-lg">نمره: {toFarsiNumber(previewQuestion.point_value || 1)}</span>
+            <div className="flex gap-2 md:gap-4 p-3 md:p-4 border-t border-border bg-muted/30 shrink-0">
+               <span className={`text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-lg ${getTopicColor(previewQuestion.topic)}`}>{previewQuestion.topic || 'بدون دسته‌بندی'}</span>
+               <span className="text-[10px] md:text-xs font-bold bg-background text-muted-foreground px-3 py-1.5 rounded-lg border border-border">نمره: {toFarsiNumber(previewQuestion.point_value || 1)}</span>
             </div>
           </div>
         </div>
