@@ -13,7 +13,7 @@ export const examService = {
     if (!user) return { data: null, error: new Error('User not authenticated') };
     
     // Admin only method
-    return supabase.from('exams').select('*, exam_questions(count), profiles(email)').order('created_at', { ascending: false }).order('id');
+    return supabase.from('exams').select('*, exam_questions(count), profiles(email, username, display_name)').order('created_at', { ascending: false }).order('id');
   },
   getExamById: async (id: string) => {
     const supabase = createClient();

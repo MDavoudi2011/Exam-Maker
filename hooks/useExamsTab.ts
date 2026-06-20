@@ -90,14 +90,15 @@ export function useExamsTab(initialExams: any[], onDataChanged: () => void, init
   }, [exams, searchTerm, selectedStatus, selectedCreator]);
 
   const creators = useMemo(() => {
-    const creatorMap = new Map<string, { id: string, email: string, count: number }>();
+    const creatorMap = new Map<string, { id: string, name: string, count: number }>();
     exams.forEach(e => {
       if (e.created_by) {
-        const email = e.profiles?.email || 'نامشخص';
+        const profile = e.profiles || {};
+        const name = profile.display_name || profile.username || profile.email?.split('@')[0] || 'نامشخص';
         if (creatorMap.has(e.created_by)) {
           creatorMap.get(e.created_by)!.count++;
         } else {
-          creatorMap.set(e.created_by, { id: e.created_by, email, count: 1 });
+          creatorMap.set(e.created_by, { id: e.created_by, name, count: 1 });
         }
       }
     });

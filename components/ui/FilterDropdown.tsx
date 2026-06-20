@@ -47,7 +47,7 @@ export function FilterDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose]);
 
-  const selectedOption = options.find(o => o.value === value) || options[0];
+  const selectedOption = options.find(o => o.value === value);
 
   return (
     <div className={`relative flex-1 md:w-56 shrink-0 w-full min-w-0 ${className}`} ref={dropdownRef}>

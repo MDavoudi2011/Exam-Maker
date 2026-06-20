@@ -43,7 +43,7 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
 
   const creatorOptions = [
     { value: 'all', label: 'همه سازندگان', count: exams.length },
-    ...(creators?.map(c => ({ value: c.id, label: c.email || 'نامشخص', count: c.count })) || [])
+    ...(creators?.map(c => ({ value: c.id, label: c.name, count: c.count })) || [])
   ];
 
   return (
@@ -92,8 +92,8 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
           <table className={`w-full text-right border-collapse z-10 relative ${filteredExams.length > 0 ? 'min-w-max md:min-w-[800px]' : 'min-w-full'}`}>
             <thead>
               <tr className="bg-muted/50 text-muted-foreground text-xs md:text-sm border-y border-border dark:border-border">
-                <th className="p-3 md:p-4 px-4 md:px-6 font-semibold min-w-[200px] md:w-2/5">عنوان آزمون</th>
-                {isAdmin && <th className="p-3 md:p-4 font-semibold text-center w-32">سازنده</th>}
+                <th className={`p-3 md:p-4 px-4 md:px-6 font-semibold ${isAdmin ? 'min-w-[120px] md:w-auto' : 'min-w-[200px] md:w-2/5'}`}>عنوان آزمون</th>
+                {isAdmin && <th className="p-3 md:p-4 font-semibold text-center min-w-[100px] md:w-1/4">سازنده</th>}
                 <th className="p-3 md:p-4 font-semibold text-center w-24 md:w-32">وضعیت</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">سوالات</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-20 md:w-28">زمان</th>
@@ -104,12 +104,13 @@ export function ExamsTab({ initialExams, onNavigate, onDataChanged, initialSearc
             <tbody className="divide-y divide-border  text-xs md:text-sm">
               {filteredExams.map((exam) => {
                 const status = getStatus(exam);
+                const creatorName = exam.profiles?.display_name || exam.profiles?.username || exam.profiles?.email?.split('@')[0] || 'نامشخص';
                 return (
                   <tr key={exam.id} className="hover:bg-muted/50 transition-colors group">
-                    <td className="p-3 md:p-4 px-4 md:px-6 font-bold text-foreground ">{exam.title}</td>
+                    <td className={`p-3 md:p-4 px-4 md:px-6 font-bold text-foreground ${isAdmin ? 'truncate max-w-[150px] md:max-w-[250px]' : ''}`} title={isAdmin ? exam.title : undefined}>{exam.title}</td>
                     {isAdmin && (
-                      <td className="p-3 md:p-4 text-center text-muted-foreground font-medium truncate max-w-[150px]" title={exam.profiles?.email || 'نامشخص'}>
-                        {exam.profiles?.email || 'نامشخص'}
+                      <td className="p-3 md:p-4 text-center text-muted-foreground font-medium truncate max-w-[120px] md:max-w-[200px]" title={creatorName}>
+                        {creatorName}
                       </td>
                     )}
                     <td className="p-2 md:p-4 text-center">

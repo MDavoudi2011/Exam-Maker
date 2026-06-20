@@ -86,7 +86,8 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
             <thead>
               <tr className="bg-muted/50 text-muted-foreground text-xs md:text-sm border-y border-border dark:border-border">
                 <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-16 text-center">ردیف</th>
-                <th className="p-3 md:p-4 font-semibold text-right">کاربر</th>
+                <th className="p-3 md:p-4 font-semibold text-right">نام کاربر</th>
+                <th className="p-3 md:p-4 font-semibold text-right">ایمیل</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-32 md:w-40 text-nowrap">تاریخ ثبت‌نام</th>
                 <th className="p-3 md:p-4 font-semibold text-center w-32 md:w-36">نقش</th>
                 <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-32 md:w-40">عملیات</th>
@@ -95,7 +96,7 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
             <tbody className="divide-y divide-border  text-xs md:text-sm">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="p-16 text-center">
+                  <td colSpan={6} className="p-16 text-center">
                     <div className="flex justify-center items-center">
                       <Loader2 className="w-8 h-8 animate-spin text-primary" />
                     </div>
@@ -103,7 +104,7 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-destructive bg-destructive/10 rounded-2xl border border-destructive/20 m-4 block w-auto">
+                  <td colSpan={6} className="p-8 text-center text-destructive bg-destructive/10 rounded-2xl border border-destructive/20 m-4 block w-auto">
                     {error}
                   </td>
                 </tr>
@@ -111,15 +112,11 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
                 filteredUsers.map((u, index) => (
                   <tr key={u.id} className="hover:bg-muted/50 transition-colors group">
                     <td className="p-3 md:p-4 px-4 md:px-6 font-medium text-muted-foreground dark:text-muted-foreground text-center">{toFarsiNumber(index + 1)}</td>
-                    <td className="p-3 md:p-4 text-right">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-foreground text-base truncate max-w-[150px] md:max-w-[300px]">
-                          {u.display_name || u.username || u.email?.split('@')[0]}
-                        </span>
-                        <span className="text-xs text-muted-foreground truncate max-w-[150px] md:max-w-[300px] dir-ltr text-left">
-                          {u.email}
-                        </span>
-                      </div>
+                    <td className="p-3 md:p-4 font-bold text-foreground text-right max-w-[200px] truncate">
+                      {u.display_name || u.username || '-'}
+                    </td>
+                    <td className="p-3 md:p-4 text-muted-foreground text-right" dir="ltr">
+                      {u.email}
                     </td>
                     <td className="p-3 md:p-4 text-muted-foreground text-[10px] md:text-sm text-center whitespace-nowrap" dir="ltr">
                       {u.created_at ? toFarsiNumber(new Date(u.created_at).toLocaleString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' })) : '-'}
@@ -163,7 +160,7 @@ export function UserManagementTab({ onNavigate, onDataChanged }: { onNavigate: (
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 md:px-6 py-8">
+                  <td colSpan={6} className="px-4 md:px-6 py-8">
                     <EmptyState icon={Users} title="هنوز کاربری ثبت نشده است." description="" />
                   </td>
                 </tr>
