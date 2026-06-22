@@ -8,8 +8,8 @@ import { UserPerformanceModal } from './UserPerformanceModal';
 import { SortDropdown } from '@/components/ui/SortDropdown';
 import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { SearchBar } from '@/components/ui/SearchBar';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { DashboardCard } from '@/components/ui/DashboardCard';
 
 export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
   const {
@@ -33,10 +33,8 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
   } = useUsersPerformanceTab(initialExams);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
-      <SectionHeader icon={Users} title="عملکرد کاربران" description="مشاهده کارنامه کلی و میانگین نمرات کاربران" />
-
-      <div className="bg-card dark:bg-background rounded-3xl p-4 md:p-6 shadow-xl shadow-black/5 border border-border">
+    <>
+      <DashboardCard>
         <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20 w-full">
           <div className="relative flex-1">
             <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="جستجوی نام، کد ملی یا پرسنلی..." />
@@ -129,11 +127,11 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
             </table>
           </div>
         )}
-      </div>
+      </DashboardCard>
 
       {selectedAttemptId && (
         <UserPerformanceModal attemptId={selectedAttemptId} onClose={() => setSelectedAttemptId(null)} />
       )}
-    </div>
+    </>
   );
 }

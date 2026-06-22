@@ -6,7 +6,6 @@ import { OverviewTab } from '@/components/dashboard/OverviewTab';
 import { ExamsTab } from '@/components/dashboard/ExamsTab';
 import { CreateTab } from '@/components/dashboard/CreateTab';
 import { ReportsTab } from '@/components/dashboard/ReportsTab';
-import { UsersPerformanceTab } from '@/components/dashboard/UsersPerformanceTab';
 import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
 import { ExamEditor } from '@/components/dashboard/ExamEditor';
 import { useClientDashboard } from '@/hooks/useClientDashboard';
@@ -98,7 +97,6 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
           <NavItem active={activeTab === 'exams' || activeTab === 'edit'} onClick={() => handleTabClick('exams')} icon={<List />} label="لیست آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleTabClick('create')} icon={<PlusCircle />} label="ساخت آزمون" />
           <NavItem active={activeTab === 'reports'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
-          <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="عملکرد کاربران" />
           <NavItem active={activeTab === 'question-bank'} onClick={() => handleTabClick('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
 
@@ -142,7 +140,6 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
             />
           )}
           {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
-          {activeTab === 'users' && <UsersPerformanceTab initialExams={exams} />}
           {activeTab === 'question-bank' && <QuestionBankTab userRole={userRole} />}
           </div>
         </div>
