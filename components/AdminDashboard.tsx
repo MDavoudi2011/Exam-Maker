@@ -10,6 +10,7 @@ import { ReportsTab } from '@/components/dashboard/ReportsTab';
 import { QuestionBankTab } from '@/components/dashboard/QuestionBankTab';
 import { UserManagementTab } from '@/components/dashboard/UserManagementTab';
 import { useClientDashboard } from '@/hooks/useClientDashboard';
+import { UserProfileDropdown } from '@/components/ui/UserProfileDropdown';
 import { Exam } from '@/types/exam.type';
 import { Footer } from '@/components/Footer';
 
@@ -30,6 +31,14 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
 
   return (
     <div className="h-screen w-full bg-muted/50 dark:bg-background font-sans text-foreground flex flex-col relative overflow-hidden" dir="rtl">
+      <UserProfileDropdown 
+        user={user} 
+        userRole={userRole} 
+        onLogout={handleLogout} 
+        onDashboardClick={() => handleNavigate('overview')} 
+        isDarkMode={isDarkMode} 
+        toggleDarkMode={toggleDarkMode} 
+      />
       <div className="flex-1 min-h-0 w-full flex flex-col md:flex-row relative">
  
       {/* Background Decor */}
@@ -49,15 +58,6 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
             <h2 className="text-lg font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary to-primary/70">پنل مدیریت</h2>
           </div>
         </div>
- 
-        <button
-          onClick={toggleDarkMode}
-          className="relative flex items-center w-12 h-6 rounded-full bg-secondary transition-colors p-1"
-        >
-          <div className={`absolute top-1 max-w-full w-4 h-4 rounded-full bg-card shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
-            {isDarkMode ? <Moon className="w-2.5 h-2.5 text-primary" /> : <Sun className="w-2.5 h-2.5 text-warning" />}
-          </div>
-        </button>
       </div>
 
       {/* Overlay for mobile menu */}
@@ -80,44 +80,15 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
           <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden p-2 text-muted-foreground bg-muted rounded-xl hover:bg-secondary transition-colors">
             <X className="w-5 h-5" />
           </button>
- 
-          <div className="hidden md:block">
-            <button
-              onClick={toggleDarkMode}
-              className="relative flex items-center w-12 h-6 rounded-full bg-secondary transition-colors p-1"
-            >
-              <div className={`absolute top-1 w-4 h-4 rounded-full bg-card shadow-sm transition-transform duration-300 flex items-center justify-center ${isDarkMode ? 'translate-x-0' : '-translate-x-6'}`}>
-                {isDarkMode ? <Moon className="w-2.5 h-2.5 text-primary" /> : <Sun className="w-2.5 h-2.5 text-warning" />}
-              </div>
-            </button>
-          </div>
         </div>
 
         <nav className="flex-1 space-y-1.5 focus:outline-none overflow-y-auto pr-2 custom-scrollbar">
-          <NavItem active={activeTab === 'overview'} onClick={() => handleTabClick('overview')} icon={<LayoutDashboard />} label="داشبورد" />
           <NavItem active={activeTab === 'exams'} onClick={() => handleTabClick('exams')} icon={<List />} label="همه آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleTabClick('create')} icon={<PlusCircle />} label="ساخت آزمون" />
           <NavItem active={activeTab === 'reports' || activeTab === 'user-performance'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
           <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="مدیریت کاربران" />
           <NavItem active={activeTab === 'question-bank'} onClick={() => handleTabClick('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
-
-        <div className="mt-6 pt-6 border-t border-border space-y-2 shrink-0">
-          <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-primary/10 mb-4 border border-primary/20">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold shadow-md ring-2 ring-background ">
-              {(user?.user_metadata?.display_name || user?.user_metadata?.username || user?.email)?.charAt(0).toUpperCase() || 'A'}
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-bold truncate text-foreground dir-ltr text-right">{user?.user_metadata?.display_name || user?.user_metadata?.username || user?.email}</p>
-              <p className="text-xs text-primary font-medium">مدیر کل سیستم</p>
-            </div>
-          </div>
-
-          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-destructive hover:bg-destructive/10 rounded-xl transition-all border border-transparent">
-            <LogOut className="w-4 h-4" />
-            <span>خروج از سیستم</span>
-          </button>
-        </div>
       </aside>
 
       {/* Main Content Area */}
