@@ -74,11 +74,14 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
         setActiveTab('reports');
         const parts = path.split('/');
         setNavParam(parts.length > 2 ? parts[2] : null);
-      } else if (path.startsWith('/users')) {
+      } else if (path.startsWith('/users') && !path.startsWith('/admin')) {
         setActiveTab('users');
         setNavParam(null);
-      } else if (path.startsWith('/user-management')) {
-        setActiveTab('user-management');
+      } else if (path.startsWith('/admin/users')) {
+        setActiveTab('users');
+        setNavParam(null);
+      } else if (path.startsWith('/user-performance') || path.startsWith('/admin/user-performance')) {
+        setActiveTab('user-performance');
         setNavParam(null);
       } else if (path.startsWith('/questions')) {
         setActiveTab('question-bank');
@@ -101,7 +104,7 @@ export function useClientDashboard(initialTab: string = 'overview', initialParam
     if (tab === 'edit') newUrl = param ? (isAdmin ? `/admin/edit/${param}` : `/edit/${param}`) : (isAdmin ? '/admin/exams' : '/exams');
     if (tab === 'create') newUrl = isAdmin ? '/admin/create' : '/create';
     if (tab === 'users') newUrl = isAdmin ? '/admin/users' : '/users';
-    if (tab === 'user-management') newUrl = '/user-management';
+    if (tab === 'user-performance') newUrl = isAdmin ? '/admin/user-performance' : '/user-performance';
     if (tab === 'question-bank') newUrl = isAdmin ? '/admin/questions' : '/questions';
     if (tab === 'reports') {
       newUrl = param ? (isAdmin ? `/admin/result/${param}` : `/result/${param}`) : (isAdmin ? '/admin/result' : '/result');

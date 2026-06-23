@@ -48,7 +48,7 @@ export default async function AdminCatchAllPage({ params }: { params: Promise<{ 
     if (first === 'users') initialTab = 'users';
 
     // ... continue as before
-    if (first === 'user-management') initialTab = 'user-management';
+    if (first === 'user-performance') initialTab = 'user-performance';
     if (first === 'questions') initialTab = 'question-bank';
     if (first === 'result') {
       initialTab = 'reports';

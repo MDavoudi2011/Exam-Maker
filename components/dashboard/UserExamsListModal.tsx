@@ -6,6 +6,8 @@ import { toFarsiNumber } from '@/utils/text.util';
 import { ActionButtonGroup, ActionButton } from '@/components/ui/ActionButton';
 import { useUserExamsListModal } from '@/hooks/useUserExamsListModal';
 
+import { ScoreBadge } from '@/components/ui/ScoreBadge';
+
 export function UserExamsListModal({
   user,
   exams,
@@ -54,9 +56,7 @@ export function UserExamsListModal({
                       {attempt.completedAt}
                     </td>
                     <td className="p-3 md:p-4 text-center">
-                      <span className="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-xs font-black inline-block min-w-[3rem]">
-                        {attempt.score !== null && attempt.score !== undefined ? `${toFarsiNumber(Number(attempt.score).toFixed(1).replace(/\.0$/, ''))}٪` : '-'}
-                      </span>
+                      <ScoreBadge score={attempt.score} />
                     </td>
                     <td className="p-2 md:p-4 px-4 md:px-6 text-center whitespace-nowrap">
                       <ActionButtonGroup>

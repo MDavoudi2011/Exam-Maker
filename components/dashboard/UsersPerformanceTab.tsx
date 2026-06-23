@@ -11,6 +11,10 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DashboardCard } from '@/components/ui/DashboardCard';
 import { UserExamsListModal } from './UserExamsListModal';
+import { ActionButtonGroup, ActionButton } from '@/components/ui/ActionButton';
+import { ScoreBadge } from '@/components/ui/ScoreBadge';
+import { List } from 'lucide-react';
+
 
 export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
   const {
@@ -43,7 +47,6 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
 
   return (
     <>
-      <DashboardCard>
         <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20 w-full">
           <div className="relative flex-1">
             <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="جستجوی نام، کد ملی یا پرسنلی..." />
@@ -101,8 +104,9 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
                   {showClassName && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">کلاس/پایه</th>}
                   {showSchool && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">مدرسه</th>}
                   {showDistrict && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">ناحیه/منطقه</th>}
-                  <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap min-w-[120px]">مجموع آزمون‌ها</th>
-                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-32">میانگین نمرات</th>
+                  <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap w-32 md:w-48">تعداد آزمون‌ها</th>
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-32 md:w-48">میانگین نمرات</th>
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-24 md:w48">آزمون‌ها</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-xs md:text-sm">
@@ -128,12 +132,17 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
                         </span>
                       </td>
                       <td className="p-3 md:p-4 px-4 md:px-6 text-center">
-                        <button 
-                          onClick={() => setSelectedUserForExams(user)}
-                          className="inline-block font-bold px-4 py-2 rounded-xl text-xs bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30"
-                        >
-                          {toFarsiNumber(Number(avgScore).toFixed(1).replace(/\.0$/, ''))}٪
-                        </button>
+                        <ScoreBadge score={avgScore} />
+                      </td>
+                      <td className="p-2 md:p-4 px-4 md:px-6 text-center whitespace-nowrap">
+                        <ActionButtonGroup>
+                          <ActionButton 
+                            onClick={() => setSelectedUserForExams(user)}
+                            icon={List} 
+                            title="مشاهده لیست آزمون‌ها" 
+                            color="indigo" 
+                          />
+                        </ActionButtonGroup>
                       </td>
                     </tr>
                   )
@@ -142,8 +151,6 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
             </table>
           </div>
         )}
-      </DashboardCard>
-
       {selectedUserForExams && (
         <UserExamsListModal
           user={selectedUserForExams}

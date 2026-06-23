@@ -30,11 +30,11 @@ export function ActionButton({ icon: Icon, title, color = 'slate', ...props }: A
 
   return (
     <button
-      className={`p-1.5 md:p-2 rounded-lg md:rounded-xl transition-colors tooltip-trigger ${colorClasses[color]}`}
+      className={`p-1.5 rounded-lg transition-colors tooltip-trigger ${colorClasses[color]}`}
       title={title}
       {...props}
     >
-      <Icon className="w-3.5 h-3.5 md:w-5 md:h-5" />
+      <Icon className="w-4 h-4" />
     </button>
   );
 }

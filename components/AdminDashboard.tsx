@@ -97,8 +97,8 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
           <NavItem active={activeTab === 'overview'} onClick={() => handleTabClick('overview')} icon={<LayoutDashboard />} label="داشبورد" />
           <NavItem active={activeTab === 'exams'} onClick={() => handleTabClick('exams')} icon={<List />} label="همه آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleTabClick('create')} icon={<PlusCircle />} label="ساخت آزمون" />
-          <NavItem active={activeTab === 'reports'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
-          <NavItem active={activeTab === 'user-management'} onClick={() => handleTabClick('user-management')} icon={<Users />} label="مدیریت کاربران" />
+          <NavItem active={activeTab === 'reports' || activeTab === 'user-performance'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
+          <NavItem active={activeTab === 'users'} onClick={() => handleTabClick('users')} icon={<Users />} label="مدیریت کاربران" />
           <NavItem active={activeTab === 'question-bank'} onClick={() => handleTabClick('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
 
@@ -141,8 +141,9 @@ export default function AdminDashboard({ user, initialExams, userRole = 'admin',
                 onDataChanged={refreshExams} 
               />
             )}
-            {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
-          {activeTab === 'user-management' && <UserManagementTab onNavigate={handleNavigate} onDataChanged={refreshExams} />}
+            {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} initialSubTab="reports" onNavigate={handleNavigate} />}
+            {activeTab === 'user-performance' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} initialSubTab="users" onNavigate={handleNavigate} />}
+          {activeTab === 'users' && <UserManagementTab onNavigate={handleNavigate} onDataChanged={refreshExams} />}
           {activeTab === 'question-bank' && <QuestionBankTab userRole={userRole} />}
           </div>
         </div>

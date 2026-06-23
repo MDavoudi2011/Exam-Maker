@@ -96,7 +96,7 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
           <NavItem active={activeTab === 'overview'} onClick={() => handleTabClick('overview')} icon={<LayoutDashboard />} label="داشبورد" />
           <NavItem active={activeTab === 'exams' || activeTab === 'edit'} onClick={() => handleTabClick('exams')} icon={<List />} label="لیست آزمون‌ها" />
           <NavItem active={activeTab === 'create'} onClick={() => handleTabClick('create')} icon={<PlusCircle />} label="ساخت آزمون" />
-          <NavItem active={activeTab === 'reports'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
+          <NavItem active={activeTab === 'reports' || activeTab === 'user-performance'} onClick={() => handleTabClick('reports')} icon={<BarChart3 />} label="گزارش‌ها و نتایج" />
           <NavItem active={activeTab === 'question-bank'} onClick={() => handleTabClick('question-bank')} icon={<Database />} label="بانک سوالات" />
         </nav>
 
@@ -139,7 +139,8 @@ export default function ClientDashboard({ user, initialExams, userRole = 'user',
               onDataChanged={refreshExams} 
             />
           )}
-          {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} />}
+          {activeTab === 'reports' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} initialSubTab="reports" onNavigate={handleNavigate} />}
+          {activeTab === 'user-performance' && <ReportsTab initialExams={exams} initialSelectedExamId={navParam} initialSubTab="users" onNavigate={handleNavigate} />}
           {activeTab === 'question-bank' && <QuestionBankTab userRole={userRole} />}
           </div>
         </div>
