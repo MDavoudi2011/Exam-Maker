@@ -15,7 +15,7 @@ export const attemptService = {
   getAttemptsForPerformanceTab: async (examIds?: string[]) => {
     const supabase = createClient();
     let query = supabase.from('test_attempts')
-      .select('id, full_name, national_code, personnel_code, score, exam_id')
+      .select('id, full_name, national_code, personnel_code, org_title, class_name, school, district, score, exam_id, status, created_at, completed_at')
       .order('created_at', { ascending: false });
       
     if (examIds && examIds.length > 0) {

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/utils/styles.util';
 
-export function Modal({ isOpen, onClose, children }: { isOpen: boolean, onClose: () => void, children: React.ReactNode }) {
+export function Modal({ isOpen, onClose, children, maxWidth = 'max-w-2xl' }: { isOpen: boolean, onClose: () => void, children: React.ReactNode, maxWidth?: string }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -19,7 +19,7 @@ export function Modal({ isOpen, onClose, children }: { isOpen: boolean, onClose:
   return (
     <div className="fixed top-[72px] md:top-0 inset-x-0 bottom-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative w-full max-w-2xl bg-card rounded-3xl shadow-xl flex flex-col h-full md:h-auto md:max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden border border-border">
+      <div className={cn(`relative w-full ${maxWidth} bg-card rounded-3xl shadow-xl flex flex-col h-full md:h-auto md:max-h-[90vh] animate-in zoom-in-95 duration-200 overflow-hidden border border-border`)}>
         {children}
       </div>
     </div>

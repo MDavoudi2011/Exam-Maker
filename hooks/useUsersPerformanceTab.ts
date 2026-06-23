@@ -61,7 +61,14 @@ export function useUsersPerformanceTab(initialExams: any[]) {
   const usersMap = new Map<string, {
     fullName: string,
     uniqueId: string,
+    nationalCode: string,
+    personnelCode: string,
+    orgTitle: string,
+    className: string,
+    school: string,
+    district: string,
     attempts: Record<string, { score: number, attemptId: string }>,
+    allAttempts: any[],
     totalScore: number,
     examsCount: number,
   }>();
@@ -78,12 +85,22 @@ export function useUsersPerformanceTab(initialExams: any[]) {
       usersMap.set(identifier, {
         fullName: attempt.full_name || 'نامشخص',
         uniqueId: identifier,
+        nationalCode: attempt.national_code || '',
+        personnelCode: attempt.personnel_code || '',
+        orgTitle: attempt.org_title || '',
+        className: attempt.class_name || '',
+        school: attempt.school || '',
+        district: attempt.district || '',
         attempts: {},
+        allAttempts: [],
         totalScore: 0,
         examsCount: 0,
       });
     }
     const userStats = usersMap.get(identifier)!;
+    
+    // Add attempt to allAttempts
+    userStats.allAttempts.push(attempt);
     
     // Calculate percentage
     const rawScore = parseFloat(attempt.score) || 0;
@@ -123,11 +140,20 @@ export function useUsersPerformanceTab(initialExams: any[]) {
 
   const filteredExams = initialExams.filter(e => activeExamIds.has(e.id));
 
+  const [selectedUserForExams, setSelectedUserForExams] = useState<any | null>(null);
+
   const requestSort = (key: 'fullName' | 'uniqueId' | 'avgScore') => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
     setSortConfig({ key, direction });
   };
+
+  const showNationalCode = filteredUsers.some(u => u.nationalCode);
+  const showPersonnelCode = filteredUsers.some(u => u.personnelCode);
+  const showOrgTitle = filteredUsers.some(u => u.orgTitle);
+  const showClassName = filteredUsers.some(u => u.className);
+  const showSchool = filteredUsers.some(u => u.school);
+  const showDistrict = filteredUsers.some(u => u.district);
 
   return {
     searchTerm,
@@ -141,12 +167,20 @@ export function useUsersPerformanceTab(initialExams: any[]) {
     filteredExams,
     selectedAttemptId,
     setSelectedAttemptId,
+    selectedUserForExams,
+    setSelectedUserForExams,
     isSortDropdownOpen,
     setIsSortDropdownOpen,
     isIdentDropdownOpen,
     setIsIdentDropdownOpen,
     sortDropdownRef,
-    identDropdownRef
+    identDropdownRef,
+    showNationalCode,
+    showPersonnelCode,
+    showOrgTitle,
+    showClassName,
+    showSchool,
+    showDistrict,
   };
 }
 

@@ -10,6 +10,7 @@ import { FilterDropdown } from '@/components/ui/FilterDropdown';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DashboardCard } from '@/components/ui/DashboardCard';
+import { UserExamsListModal } from './UserExamsListModal';
 
 export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
   const {
@@ -24,12 +25,20 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
     filteredExams,
     selectedAttemptId,
     setSelectedAttemptId,
+    selectedUserForExams,
+    setSelectedUserForExams,
     isSortDropdownOpen,
     setIsSortDropdownOpen,
     isIdentDropdownOpen,
     setIsIdentDropdownOpen,
     sortDropdownRef,
-    identDropdownRef
+    identDropdownRef,
+    showNationalCode,
+    showPersonnelCode,
+    showOrgTitle,
+    showClassName,
+    showSchool,
+    showDistrict,
   } = useUsersPerformanceTab(initialExams);
 
   return (
@@ -83,12 +92,17 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
             <table className={`w-full text-right border-collapse z-10 relative ${filteredUsers.length > 0 ? 'min-w-max md:min-w-[800px]' : 'min-w-full'}`}>
               <thead>
                 <tr className="bg-muted/50 text-muted-foreground text-xs md:text-sm border-y border-border">
-                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold w-1/3">تکمیل کننده</th>
-                  <th className="p-3 md:p-4 font-semibold text-center w-32">{identifierBasis === 'national_code' ? 'کد ملی' : identifierBasis === 'personnel_code' ? 'کد پرسنلی' : 'کد ملی/پرسنلی'}</th>
-                  {filteredExams.map((exam: any) => (
-                    <th key={exam.id} className="p-3 md:p-4 font-semibold text-center">{exam.title}</th>
-                  ))}
-                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-24">میانگین</th>
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold min-w-[150px]">تکمیل کننده</th>
+                  {identifierBasis === 'auto' && showNationalCode && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">کد ملی</th>}
+                  {identifierBasis === 'auto' && showPersonnelCode && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">کد پرسنلی</th>}
+                  {identifierBasis === 'national_code' && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">کد ملی</th>}
+                  {identifierBasis === 'personnel_code' && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">کد پرسنلی</th>}
+                  {showOrgTitle && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">عنوان سازمانی</th>}
+                  {showClassName && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">کلاس/پایه</th>}
+                  {showSchool && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">مدرسه</th>}
+                  {showDistrict && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">ناحیه/منطقه</th>}
+                  <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap min-w-[120px]">مجموع آزمون‌ها</th>
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-32">میانگین نمرات</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-xs md:text-sm">
@@ -96,29 +110,30 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
                   const avgScore = user.examsCount > 0 ? (user.totalScore / user.examsCount).toFixed(1) : 0;
                   return (
                     <tr key={idx} className="hover:bg-muted/50 transition-colors group">
-                      <td className="p-3 md:p-4 px-4 md:px-6 font-bold text-foreground">{user.fullName}</td>
-                      <td className="p-3 md:p-4 font-medium text-muted-foreground text-center">{user.uniqueId}</td>
-                      {filteredExams.map((exam: any) => {
-                        const att = user.attempts[exam.id];
-                        return (
-                          <td key={exam.id} className="p-3 md:p-4 text-center">
-                            {att ? (
-                              <button 
-                                onClick={() => setSelectedAttemptId(att.attemptId)}
-                                className={`font-bold px-3 py-1.5 rounded-xl text-xs transition-transform hover:scale-105 active:scale-95 ${att.score >= 50 ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}
-                              >
-                                {toFarsiNumber(Number(att.score).toFixed(1).replace(/\.0$/, ''))}٪
-                              </button>
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
-                          </td>
-                        );
-                      })}
-                      <td className="p-3 md:p-4 px-4 md:px-6 text-center">
-                        <span className="inline-block font-bold px-3 py-1.5 rounded-xl text-xs bg-primary/10 text-primary">
-                          {toFarsiNumber(Number(avgScore).toFixed(1).replace(/\.0$/, ''))}٪
+                      <td className="p-3 md:p-4 px-4 md:px-6 font-bold text-foreground">{user.fullName || '-'}</td>
+                      
+                      {identifierBasis === 'auto' && showNationalCode && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.nationalCode || '-'}</td>}
+                      {identifierBasis === 'auto' && showPersonnelCode && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.personnelCode || '-'}</td>}
+                      {identifierBasis === 'national_code' && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.nationalCode || '-'}</td>}
+                      {identifierBasis === 'personnel_code' && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.personnelCode || '-'}</td>}
+
+                      {showOrgTitle && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.orgTitle || '-'}</td>}
+                      {showClassName && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.className || '-'}</td>}
+                      {showSchool && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.school || '-'}</td>}
+                      {showDistrict && <td className="p-3 md:p-4 font-medium text-muted-foreground text-center whitespace-nowrap">{user.district || '-'}</td>}
+
+                      <td className="p-3 md:p-4 text-center">
+                        <span className="inline-block font-bold px-3 py-1.5 rounded-lg text-xs bg-secondary text-secondary-foreground">
+                          {toFarsiNumber(user.examsCount)}
                         </span>
+                      </td>
+                      <td className="p-3 md:p-4 px-4 md:px-6 text-center">
+                        <button 
+                          onClick={() => setSelectedUserForExams(user)}
+                          className="inline-block font-bold px-4 py-2 rounded-xl text-xs bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30"
+                        >
+                          {toFarsiNumber(Number(avgScore).toFixed(1).replace(/\.0$/, ''))}٪
+                        </button>
                       </td>
                     </tr>
                   )
@@ -128,6 +143,15 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
           </div>
         )}
       </DashboardCard>
+
+      {selectedUserForExams && (
+        <UserExamsListModal
+          user={selectedUserForExams}
+          exams={initialExams}
+          onClose={() => setSelectedUserForExams(null)}
+          onViewAttempt={(attemptId) => setSelectedAttemptId(attemptId)}
+        />
+      )}
 
       {selectedAttemptId && (
         <UserPerformanceModal attemptId={selectedAttemptId} onClose={() => setSelectedAttemptId(null)} />
