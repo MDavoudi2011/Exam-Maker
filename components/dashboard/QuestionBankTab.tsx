@@ -116,15 +116,13 @@ export function QuestionBankTab({ userRole = 'user' }: { userRole?: string }) {
               }
             />
             
-            {userRole === 'admin' && (
-              <PrimaryButton 
-                onClick={() => setEditingQuestion({ content: '', options: ['', '', '', ''], correct_option_index: 0, topic: '', point_value: 10 })}
-                icon={<Plus className="w-4 h-4 md:w-5 md:h-5" />}
-              >
-                <span className="hidden sm:inline">افزودن سوال</span>
-                <span className="sm:hidden inline">افزودن</span>
-              </PrimaryButton>
-            )}
+            <PrimaryButton 
+              onClick={() => setEditingQuestion({ content: '', options: ['', '', '', ''], correct_option_index: 0, topic: '', point_value: 10 })}
+              icon={<Plus className="w-4 h-4 md:w-5 md:h-5" />}
+            >
+              <span className="hidden sm:inline">افزودن سوال</span>
+              <span className="sm:hidden inline">افزودن</span>
+            </PrimaryButton>
           </div>
         </div>
 
