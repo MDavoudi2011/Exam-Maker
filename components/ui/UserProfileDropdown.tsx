@@ -114,19 +114,6 @@ export function UserProfileDropdown({
           </button>
 
           <button
-            onClick={() => {
-              setIsOpen(false);
-              setIsLocked(false);
-              router.push('/settings');
-            }}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors border-b border-border"
-            dir="rtl"
-          >
-            <Settings className="w-4 h-4 shrink-0" />
-            <span>تنظیمات</span>
-          </button>
-
-          <button
             onClick={(e) => {
               e.stopPropagation();
               toggleDarkMode();

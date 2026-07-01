@@ -2,10 +2,26 @@ import { useState } from 'react';
 import { authService } from '@/services/auth.service';
 import { AuthMode } from '@/types/auth.type';
 
+const getPersianError = (error: any) => {
+  if (!error) return 'خطایی رخ داد.';
+  const msg = typeof error === 'string' ? error : (error.message || '');
+  
+  if (msg.includes('Invalid login credentials')) return 'ایمیل یا رمز عبور اشتباه است.';
+  if (msg.includes('Email not confirmed')) return 'ایمیل تایید نشده است.';
+  if (msg.includes('User already registered')) return 'این کاربر از قبل ثبت نام کرده است.';
+  if (msg.includes('Password should be at least')) return 'رمز عبور باید حداقل ۶ کاراکتر باشد.';
+  if (msg.includes('Token has expired or is invalid') || msg.includes('OTP expired') || msg.includes('Invalid Token')) return 'کد وارد شده نامعتبر است یا منقضی شده.';
+  if (msg.includes('rate_limit')) return 'درخواست‌های شما بیش از حد مجاز است. لطفا بعدا تلاش کنید.';
+  if (msg.includes('نام کاربری یافت نشد') || msg.includes('این نام کاربری از قبل ثبت شده است')) return msg;
+  
+  return msg;
+};
+
 export function useClientLogin() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,7 +47,7 @@ export function useClientLogin() {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'خطایی رخ داد.');
+      setError(getPersianError(err));
     } finally {
       setLoading(false);
     }
@@ -51,7 +67,65 @@ export function useClientLogin() {
       if (error) throw error;
       window.location.reload();
     } catch (err: any) {
-      setError(err.message || 'کد وارد شده نامعتبر است یا منقضی شده.');
+      setError(getPersianError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error } = await authService.resetPassword(email);
+      if (error) throw error;
+      setMode('reset_password_verify');
+    } catch (err: any) {
+      setError(getPersianError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyResetOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error } = await authService.verifyRecoveryOtp({
+        email,
+        token: otpCode,
+      });
+      
+      if (error) throw error;
+      setMode('reset_password_set');
+    } catch (err: any) {
+      setError(getPersianError(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('رمز عبور و تکرار آن مطابقت ندارند.');
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error } = await authService.updatePassword(password);
+      if (error) throw error;
+      // Password updated successfully. They are usually logged in at this point if they verified OTP on the same device.
+      window.location.reload();
+    } catch (err: any) {
+      setError(getPersianError(err));
     } finally {
       setLoading(false);
     }
@@ -64,7 +138,7 @@ export function useClientLogin() {
       const { error } = await authService.signInWithGoogle();
       if (error) throw error;
     } catch (err: any) {
-      setError(err.message || 'خطایی در ورود با گوگل رخ داد.');
+      setError(getPersianError(err) || 'خطایی در ورود با گوگل رخ داد.');
       setLoading(false);
     }
   };
@@ -76,6 +150,8 @@ export function useClientLogin() {
     setUsername,
     password,
     setPassword,
+    confirmPassword,
+    setConfirmPassword,
     otpCode,
     setOtpCode,
     loading,
@@ -85,6 +161,9 @@ export function useClientLogin() {
     setMode,
     handleAuth,
     handleVerify,
+    handleForgotPassword,
+    handleVerifyResetOtp,
+    handleResetPassword,
     handleGoogleLogin
   };
 }

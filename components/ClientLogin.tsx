@@ -13,6 +13,8 @@ export default function ClientLogin() {
     setUsername,
     password,
     setPassword,
+    confirmPassword,
+    setConfirmPassword,
     otpCode,
     setOtpCode,
     loading,
@@ -22,6 +24,9 @@ export default function ClientLogin() {
     setMode,
     handleAuth,
     handleVerify,
+    handleForgotPassword,
+    handleVerifyResetOtp,
+    handleResetPassword,
     handleGoogleLogin
   } = useClientLogin();
 
@@ -53,7 +58,7 @@ export default function ClientLogin() {
             )}
           </div>
 
-          {mode !== 'verify' ? (
+          {mode === 'login' || mode === 'signup' ? (
             <>
               <div className="flex p-1 bg-muted/80 rounded-2xl mb-8 border border-border/50">
                 <button 
@@ -106,7 +111,14 @@ export default function ClientLogin() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <label className="text-sm font-bold text-foreground px-1">رمز عبور</label>
+                  <div className="flex items-center justify-between px-1">
+                    <label className="text-sm font-bold text-foreground">رمز عبور</label>
+                    {mode === 'login' && (
+                      <button type="button" onClick={() => { setMode('forgot_password'); setError(''); }} className="text-xs font-bold text-primary hover:text-primary/80 transition-colors">
+                        رمز عبور خود را فراموش کردید؟
+                      </button>
+                    )}
+                  </div>
                   <input 
                     type="password" 
                     value={password}
@@ -149,10 +161,77 @@ export default function ClientLogin() {
                 </button>
               </form>
             </>
-          ) : (
-            <form onSubmit={handleVerify} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+          ) : mode === 'forgot_password' ? (
+            <form onSubmit={handleForgotPassword} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="text-center mb-6">
-                <h3 className="text-lg font-bold text-foreground mb-2">تایید ایمیل</h3>
+                <h3 className="text-xl font-bold text-foreground mb-2">بازیابی رمز عبور</h3>
+                <p className="text-sm text-muted-foreground font-medium">ایمیل خود را برای دریافت کد بازیابی وارد کنید.</p>
+              </div>
+              {error && <div className="p-4 text-sm rounded-2xl font-medium bg-destructive/10 text-destructive border border-destructive/20">{error}</div>}
+              
+              <div className="flex flex-col gap-3">
+                <label className="text-sm font-bold text-foreground px-1">آدرس ایمیل</label>
+                <input 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-muted/50 border border-border px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all dir-ltr text-left font-medium"
+                  placeholder="name@example.com"
+                  required
+                />
+              </div>
+
+              <div className="pt-2">
+                <button type="submit" disabled={loading} className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2">
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'ارسال کد بازیابی'}
+                </button>
+              </div>
+              <button type="button" onClick={() => setMode('login')} className="w-full flex justify-center items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-bold mt-4">
+                <ArrowRight className="w-4 h-4" /> بازگشت به صفحه ورود
+              </button>
+            </form>
+          ) : mode === 'reset_password_set' ? (
+            <form onSubmit={handleResetPassword} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-bold text-foreground mb-2">رمز عبور جدید</h3>
+                <p className="text-sm text-muted-foreground font-medium">رمز عبور جدید خود را وارد کنید.</p>
+              </div>
+              {error && <div className="p-4 text-sm rounded-2xl font-medium bg-destructive/10 text-destructive border border-destructive/20">{error}</div>}
+              
+              <div className="flex flex-col gap-3">
+                <label className="text-sm font-bold text-foreground px-1">رمز عبور جدید</label>
+                <input 
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-muted/50 border border-border px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all dir-ltr text-left font-medium tracking-widest"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <label className="text-sm font-bold text-foreground px-1">تکرار رمز عبور جدید</label>
+                <input 
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-muted/50 border border-border px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all dir-ltr text-left font-medium tracking-widest"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <div className="pt-2">
+                <button type="submit" disabled={loading} className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2">
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'ذخیره رمز عبور'}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={mode === 'verify' ? handleVerify : handleVerifyResetOtp} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-bold text-foreground mb-2">تایید ایمیل</h3>
                 <p className="text-sm text-muted-foreground font-medium">کد ۶ رقمی به {email} ارسال شد.</p>
               </div>
               {error && <div className="p-4 text-sm rounded-2xl font-medium bg-destructive/10 text-destructive border border-destructive/20">{error}</div>}
@@ -160,13 +239,17 @@ export default function ClientLogin() {
                 type="text" 
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
-                className="w-full bg-muted/50 border border-border px-4 py-3 rounded-2xl outline-none font-bold text-2xl tracking-[0.5em] h-14 text-center"
+                className="w-full bg-muted/50 border border-border px-4 py-3 rounded-2xl outline-none font-bold text-2xl tracking-[0.5em] h-14 text-center dir-ltr"
                 placeholder="------"
                 maxLength={6}
                 required
               />
-              <button type="submit" disabled={loading} className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl transition-all">تأیید</button>
-              <button type="button" onClick={() => setMode('login')} className="w-full flex justify-center items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-bold">
+              <div className="pt-2">
+                <button type="submit" disabled={loading} className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2">
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'تأیید کد'}
+                </button>
+              </div>
+              <button type="button" onClick={() => setMode(mode === 'verify' ? 'signup' : 'forgot_password')} className="w-full flex justify-center items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-bold mt-4">
                 <ArrowRight className="w-4 h-4" /> بازگشت
               </button>
             </form>

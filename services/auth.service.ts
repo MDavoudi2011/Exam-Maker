@@ -57,6 +57,18 @@ export const authService = {
       }
     });
   },
+  resetPassword: async (email: string) => {
+    const supabase = createClient();
+    return supabase.auth.resetPasswordForEmail(email);
+  },
+  verifyRecoveryOtp: async ({ email, token }: any) => {
+    const supabase = createClient();
+    return supabase.auth.verifyOtp({ email, token, type: 'recovery' });
+  },
+  updatePassword: async (password: string) => {
+    const supabase = createClient();
+    return supabase.auth.updateUser({ password });
+  },
   signOut: async () => {
     const supabase = createClient();
     return supabase.auth.signOut();

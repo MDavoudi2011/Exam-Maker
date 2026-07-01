@@ -104,9 +104,9 @@ export function UsersPerformanceTab({ initialExams }: { initialExams: any[] }) {
                   {showClassName && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">کلاس/پایه</th>}
                   {showSchool && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">مدرسه</th>}
                   {showDistrict && <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap">ناحیه/منطقه</th>}
-                  <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap min-w-[90px] w-24">تعداد آزمون‌ها</th>
-                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-28">میانگین نمرات</th>
-                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-36 md:w-48">آزمون‌ها</th>
+                  <th className="p-3 md:p-4 font-semibold text-center whitespace-nowrap w-24 md:w-48">تعداد آزمون‌ها</th>
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-32">میانگین نمرات</th>
+                  <th className="p-3 md:p-4 px-4 md:px-6 font-semibold text-center w-24 md:w-48">آزمون‌ها</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-xs md:text-sm">
