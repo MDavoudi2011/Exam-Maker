@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { LogOut, LayoutDashboard, Moon, Sun, Settings } from "lucide-react";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,7 @@ export function UserProfileDropdown({
 }: UserProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -33,17 +34,31 @@ export function UserProfileDropdown({
     setIsLocked(false);
   });
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const handleMouseEnter = () => {
     if (!isMobile && !isLocked) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setIsOpen(true);
     }
   };
 
   const handleMouseLeave = () => {
     if (!isMobile && !isLocked) {
-      setIsOpen(false);
+      timeoutRef.current = setTimeout(() => {
+        setIsOpen(false);
+      }, 500);
     }
   };
 
@@ -91,9 +106,9 @@ export function UserProfileDropdown({
         )}
       </div>
 
-      <div className="absolute top-full left-0 pt-2">
+      <div className={`absolute top-full left-0 pt-2 ${isOpen ? "" : "pointer-events-none"}`}>
         <div
-          className={`w-[160px] bg-card border border-border rounded-2xl shadow-xl overflow-hidden transition-all duration-200 origin-top-left flex flex-col ${isOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible pointer-events-none"}`}
+          className={`w-[160px] bg-card border border-border rounded-2xl shadow-xl overflow-hidden transition-all duration-300 origin-top-left flex flex-col ${isOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible pointer-events-none"}`}
         >
           <div className="px-4 py-3 bg-muted/20 border-b border-border flex flex-col items-start justify-center text-left" dir="ltr">
             <p className="text-sm font-bold text-foreground w-full truncate">{displayName}</p>
