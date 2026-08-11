@@ -1,15 +1,11 @@
-import { redirect } from 'next/navigation';
-import ClientDashboard from '@/components/ClientDashboard';
 import { dashboardServer } from '@/services/dashboard.server';
+import { Overview } from '@/components/overview/Overview'; // Temporarily using the old one, will move later
 
 export const dynamic = 'force-dynamic';
 
-export default async function DashboardPage() {
-  const { user, userRole, initialExams } = await dashboardServer.getInitialData(false);
+export default async function DashboardOverviewPage() {
+  const { initialExams } = await dashboardServer.getInitialData(false);
 
-  if (userRole === 'admin') {
-    redirect('/admin');
-  }
-
-  return <ClientDashboard user={user} initialExams={initialExams} userRole={userRole} />;
+  // We will need to update Overview to not use the handleNavigate callback from the old structure.
+  return <Overview initialExams={initialExams} />;
 }

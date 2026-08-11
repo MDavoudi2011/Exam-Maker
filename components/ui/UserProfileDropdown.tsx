@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { LogOut, LayoutDashboard, Moon, Sun, Settings } from "lucide-react";
+import Image from 'next/image';
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useRouter } from "next/navigation";
 
@@ -98,7 +99,9 @@ export function UserProfileDropdown({
         dir="ltr"
       >
         {avatarUrl ? (
-          <img src={avatarUrl} alt={displayName} className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border border-border/50" referrerPolicy="no-referrer" />
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border border-border/50 relative shrink-0">
+            <Image src={avatarUrl} alt={displayName} fill className="object-cover" referrerPolicy="no-referrer" sizes="(max-width: 768px) 40px, 48px" unoptimized />
+          </div>
         ) : (
           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold shadow-md shrink-0 text-lg md:text-xl">
             {initial}
